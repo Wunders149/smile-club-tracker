@@ -1,0 +1,138 @@
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+[1G[0K7:07:54 AM [express] serving on port 5000
+7:07:59 AM [express] GET /api/volunteers 200 in 4ms :: [{"id":4,"fullName":"Jane Doe","contact":"+261 34 00 000 00","address":"Majunga Be","email":"jane.doe@example.com","photo":"","studyField":"Medicine","major":"General","position":"President","createdAt":"2026-03-11T07:07:54.172Z"},{"id":5,"fullName":"John Smith","contact":"+261 32 11 111 11","address":"Tsaramandroso","email":"john.smith@example.com","photo":"","studyField":"Management","major":"Finance","position":"Vice President","createdAt":"2026-03-11T07:07:54.177Z"},{"id":6,"fullName":"Alice Johnson","contact":"+261 33 22 222 22","address":"Amborovy","email":"alice.j@example.com","photo":"","studyField":"Engineering","major":"Civil","position":"Active Volunteer","createdAt":"2026-03-11T07:07:54.179Z"}]
+7:07:59 AM [express] GET /api/volunteers/ranking 200 in 3ms :: [{"volunteer":{"id":5,"fullName":"John Smith","contact":"+261 32 11 111 11","address":"Tsaramandroso","email":"john.smith@example.com","photo":"","studyField":"Management","major":"Finance","position":"Vice President","createdAt":"2026-03-11T07:07:54.177Z"},"attendanceCount":1},{"volunteer":{"id":4,"fullName":"Jane Doe","contact":"+261 34 00 000 00","address":"Majunga Be","email":"jane.doe@example.com","photo":"","studyField":"Medicine","major":"General","position":"President","createdAt":"2026-03-11T07:07:54.172Z"},"attendanceCount":1},{"volunteer":{"id":6,"fullName":"Alice Johnson","contact":"+261 33 22 222 22","address":"Amborovy","email":"alice.j@example.com","photo":"","studyField":"Engineering","major":"Civil","position":"Active Volunteer","createdAt":"2026-03-11T07:07:54.179Z"},"attendanceCount":0}]
+7:07:59 AM [express] GET /api/events 200 in 13ms :: [{"id":3,"name":"Annual General Meeting","type":"Meeting","date":"2026-03-09T07:07:54.182Z","description":"Discussing the yearly goals.","createdAt":"2026-03-11T07:07:54.182Z"},{"id":4,"name":"Beach Cleanup","type":"Awareness","date":"2026-03-13T07:07:54.191Z","description":"Cleaning the tourist beach.","createdAt":"2026-03-11T07:07:54.192Z"}]
+7:08:04 AM [express] GET /api/volunteers 200 in 3ms :: [{"id":4,"fullName":"Jane Doe","contact":"+261 34 00 000 00","address":"Majunga Be","email":"jane.doe@example.com","photo":"","studyField":"Medicine","major":"General","position":"President","createdAt":"2026-03-11T07:07:54.172Z"},{"id":5,"fullName":"John Smith","contact":"+261 32 11 111 11","address":"Tsaramandroso","email":"john.smith@example.com","photo":"","studyField":"Management","major":"Finance","position":"Vice President","createdAt":"2026-03-11T07:07:54.177Z"},{"id":6,"fullName":"Alice Johnson","contact":"+261 33 22 222 22","address":"Amborovy","email":"alice.j@example.com","photo":"","studyField":"Engineering","major":"Civil","position":"Active Volunteer","createdAt":"2026-03-11T07:07:54.179Z"}]
+7:08:04 AM [express] GET /api/events 200 in 4ms :: [{"id":3,"name":"Annual General Meeting","type":"Meeting","date":"2026-03-09T07:07:54.182Z","description":"Discussing the yearly goals.","createdAt":"2026-03-11T07:07:54.182Z"},{"id":4,"name":"Beach Cleanup","type":"Awareness","date":"2026-03-13T07:07:54.191Z","description":"Cleaning the tourist beach.","createdAt":"2026-03-11T07:07:54.192Z"}]
+7:08:04 AM [express] GET /api/volunteers/ranking 200 in 3ms :: [{"volunteer":{"id":5,"fullName":"John Smith","contact":"+261 32 11 111 11","address":"Tsaramandroso","email":"john.smith@example.com","photo":"","studyField":"Management","major":"Finance","position":"Vice President","createdAt":"2026-03-11T07:07:54.177Z"},"attendanceCount":1},{"volunteer":{"id":4,"fullName":"Jane Doe","contact":"+261 34 00 000 00","address":"Majunga Be","email":"jane.doe@example.com","photo":"","studyField":"Medicine","major":"General","position":"President","createdAt":"2026-03-11T07:07:54.172Z"},"attendanceCount":1},{"volunteer":{"id":6,"fullName":"Alice Johnson","contact":"+261 33 22 222 22","address":"Amborovy","email":"alice.j@example.com","photo":"","studyField":"Engineering","major":"Civil","position":"Active Volunteer","createdAt":"2026-03-11T07:07:54.179Z"},"attendanceCount":0}]
+7:08:34 AM [express] DELETE /api/volunteers/4 204 in 31ms
+7:08:35 AM [express] GET /api/volunteers 200 in 2ms :: [{"id":5,"fullName":"John Smith","contact":"+261 32 11 111 11","address":"Tsaramandroso","email":"john.smith@example.com","photo":"","studyField":"Management","major":"Finance","position":"Vice President","createdAt":"2026-03-11T07:07:54.177Z"},{"id":6,"fullName":"Alice Johnson","contact":"+261 33 22 222 22","address":"Amborovy","email":"alice.j@example.com","photo":"","studyField":"Engineering","major":"Civil","position":"Active Volunteer","createdAt":"2026-03-11T07:07:54.179Z"}]
+7:08:37 AM [express] DELETE /api/volunteers/5 204 in 5ms
+7:08:38 AM [express] GET /api/volunteers 200 in 2ms :: [{"id":6,"fullName":"Alice Johnson","contact":"+261 33 22 222 22","address":"Amborovy","email":"alice.j@example.com","photo":"","studyField":"Engineering","major":"Civil","position":"Active Volunteer","createdAt":"2026-03-11T07:07:54.179Z"}]
+7:08:42 AM [express] DELETE /api/volunteers/6 204 in 4ms
+7:08:42 AM [express] GET /api/volunteers 200 in 1ms :: []
+7:08:46 AM [express] DELETE /api/events/3 204 in 4ms
+7:08:47 AM [express] GET /api/events 200 in 2ms :: [{"id":4,"name":"Beach Cleanup","type":"Awareness","date":"2026-03-13T07:07:54.191Z","description":"Cleaning the tourist beach.","createdAt":"2026-03-11T07:07:54.192Z"}]
+7:08:49 AM [express] DELETE /api/events/4 204 in 3ms
+7:08:50 AM [express] GET /api/events 200 in 2ms :: []
+7:08:53 AM [express] GET /api/volunteers/ranking 200 in 3ms :: []
+7:09:43 AM [express] POST /api/volunteers 201 in 37ms :: {"id":7,"fullName":"","contact":"","address":"","email":"","photo":"","studyField":"","major":"","position":"Active Volunteer","createdAt":"2026-03-11T07:09:43.392Z"}
+7:09:43 AM [express] GET /api/volunteers 200 in 1ms :: [{"id":7,"fullName":"","contact":"","address":"","email":"","photo":"","studyField":"","major":"","position":"Active Volunteer","createdAt":"2026-03-11T07:09:43.392Z"}]
+7:09:51 AM [express] DELETE /api/volunteers/7 204 in 4ms
+7:09:52 AM [express] GET /api/volunteers 200 in 1ms :: []
+7:10:13 AM [express] GET /api/volunteers/ranking 304 in 13ms :: []
+7:12:03 AM [express] POST /api/volunteers 201 in 45ms :: {"id":8,"fullName":"Philibert RAZAFIMAHEFA","contact":"+261 34 35 053 34","address":"La Corniche, Mahajanga","email":"razafimahefaphilibert7@gmail.com","photo":"","studyField":"IT Student","major":"Software Engineering","position":"Vice President","createdAt":"2026-03-11T07:12:03.296Z"}
+7:12:04 AM [express] GET /api/volunteers 200 in 1ms :: [{"id":8,"fullName":"Philibert RAZAFIMAHEFA","contact":"+261 34 35 053 34","address":"La Corniche, Mahajanga","email":"razafimahefaphilibert7@gmail.com","photo":"","studyField":"IT Student","major":"Software Engineering","position":"Vice President","createdAt":"2026-03-11T07:12:03.296Z"}]
+7:14:27 AM [express] POST /api/events 201 in 36ms :: {"id":5,"name":"General Assembly","type":"Meeting","date":"2026-03-15T11:00:00.000Z","description":"Electing Smile Club Mahajanga 2025 Best Volunteer Of the Year.\nStrengthening Club internal organization.","createdAt":"2026-03-11T07:14:27.748Z"}
+7:14:28 AM [express] GET /api/events 200 in 1ms :: [{"id":5,"name":"General Assembly","type":"Meeting","date":"2026-03-15T11:00:00.000Z","description":"Electing Smile Club Mahajanga 2025 Best Volunteer Of the Year.\nStrengthening Club internal organization.","createdAt":"2026-03-11T07:14:27.748Z"}]
+7:14:34 AM [express] GET /api/events/5/attendances 200 in 1ms :: []
+7:16:28 AM [express] POST /api/events 201 in 51ms :: {"id":6,"name":"Learning Medical Vocabulary and Medical Expertise In Madagascar","type":"Training","date":"2026-03-08T11:00:00.000Z","description":"English Education in the medical field.","createdAt":"2026-03-11T07:16:28.424Z"}
+7:16:28 AM [express] GET /api/events 200 in 2ms :: [{"id":5,"name":"General Assembly","type":"Meeting","date":"2026-03-15T11:00:00.000Z","description":"Electing Smile Club Mahajanga 2025 Best Volunteer Of the Year.\nStrengthening Club internal organization.","createdAt":"2026-03-11T07:14:27.748Z"},{"id":6,"name":"Learning Medical Vocabulary and Medical Expertise In Madagascar","type":"Training","date":"2026-03-08T11:00:00.000Z","description":"English Education in the medical field.","createdAt":"2026-03-11T07:16:28.424Z"}]
+7:16:34 AM [express] GET /api/events/6/attendances 200 in 1ms :: []
+7:17:12 AM [express] GET /api/volunteers/ranking 200 in 11ms :: [{"volunteer":{"id":8,"fullName":"Philibert RAZAFIMAHEFA","contact":"+261 34 35 053 34","address":"La Corniche, Mahajanga","email":"razafimahefaphilibert7@gmail.com","photo":"","studyField":"IT Student","major":"Software Engineering","position":"Vice President","createdAt":"2026-03-11T07:12:03.296Z"},"attendanceCount":0}]
+7:24:29 AM [express] POST /api/volunteers 201 in 41ms :: {"id":9,"fullName":"Théophile MAGNI","contact":"+261343977501","address":"Mahajanga","email":"theomagni1@gmail.com","photo":"","studyField":"Medicine","major":"General Medicine","position":"Active Volunteer","createdAt":"2026-03-11T07:24:29.931Z"}
+7:24:30 AM [express] GET /api/volunteers 200 in 1ms :: [{"id":8,"fullName":"Philibert RAZAFIMAHEFA","contact":"+261 34 35 053 34","address":"La Corniche, Mahajanga","email":"razafimahefaphilibert7@gmail.com","photo":"","studyField":"IT Student","major":"Software Engineering","position":"Vice President","createdAt":"2026-03-11T07:12:03.296Z"},{"id":9,"fullName":"Théophile MAGNI","contact":"+261343977501","address":"Mahajanga","email":"theomagni1@gmail.com","photo":"","studyField":"Medicine","major":"General Medicine","position":"Active Volunteer","createdAt":"2026-03-11T07:24:29.931Z"}]
+7:25:40 AM [express] PUT /api/volunteers/9 200 in 40ms :: {"id":9,"fullName":"Théophile MAGNI","contact":"+261343977501","address":"Mahajanga","email":"theomagni1@gmail.com","photo":"https://drive.google.com/file/d/1tHTT400ai9v67XhX47SzNvrF5_Zi8I5h/view?usp=sharing","studyField":"Medicine","major":"General Medicine","position":"Active Volunteer","createdAt":"2026-03-11T07:24:29.931Z"}
+7:25:40 AM [express] GET /api/volunteers 200 in 1ms :: [{"id":8,"fullName":"Philibert RAZAFIMAHEFA","contact":"+261 34 35 053 34","address":"La Corniche, Mahajanga","email":"razafimahefaphilibert7@gmail.com","photo":"","studyField":"IT Student","major":"Software Engineering","position":"Vice President","createdAt":"2026-03-11T07:12:03.296Z"},{"id":9,"fullName":"Théophile MAGNI","contact":"+261343977501","address":"Mahajanga","email":"theomagni1@gmail.com","photo":"https://drive.google.com/file/d/1tHTT400ai9v67XhX47SzNvrF5_Zi8I5h/view?usp=sharing","studyField":"Medicine","major":"General Medicine","position":"Active Volunteer","createdAt":"2026-03-11T07:24:29.931Z"}]
+7:26:18 AM [express] PUT /api/volunteers/9 200 in 12ms :: {"id":9,"fullName":"Théophile MAGNI","contact":"+261343977501","address":"Mahajanga","email":"theomagni1@gmail.com","photo":"","studyField":"Medicine","major":"General Medicine","position":"Active Volunteer","createdAt":"2026-03-11T07:24:29.931Z"}
+7:26:22 AM [express] GET /api/volunteers 200 in 2ms :: [{"id":8,"fullName":"Philibert RAZAFIMAHEFA","contact":"+261 34 35 053 34","address":"La Corniche, Mahajanga","email":"razafimahefaphilibert7@gmail.com","photo":"","studyField":"IT Student","major":"Software Engineering","position":"Vice President","createdAt":"2026-03-11T07:12:03.296Z"},{"id":9,"fullName":"Théophile MAGNI","contact":"+261343977501","address":"Mahajanga","email":"theomagni1@gmail.com","photo":"","studyField":"Medicine","major":"General Medicine","position":"Active Volunteer","createdAt":"2026-03-11T07:24:29.931Z"}]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m7:27:48 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mindex.html[22m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m7:27:54 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Layout.tsx, /src/index.css[22m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m7:27:55 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Layout.tsx, /src/index.css[22m [33m(x2)[39m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m7:27:57 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Layout.tsx, /src/index.css[22m [33m(x3)[39m

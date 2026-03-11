@@ -1,0 +1,132 @@
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+[1G[0K7:28:04 AM [express] serving on port 5000
+7:28:25 AM [express] GET /api/events 304 in 16ms :: [{"id":5,"name":"General Assembly","type":"Meeting","date":"2026-03-15T11:00:00.000Z","description":"Electing Smile Club Mahajanga 2025 Best Volunteer Of the Year.\nStrengthening Club internal organization.","createdAt":"2026-03-11T07:14:27.748Z"},{"id":6,"name":"Learning Medical Vocabulary and Medical Expertise In Madagascar","type":"Training","date":"2026-03-08T11:00:00.000Z","description":"English Education in the medical field.","createdAt":"2026-03-11T07:16:28.424Z"}]
+7:28:25 AM [express] GET /api/volunteers 304 in 16ms :: [{"id":8,"fullName":"Philibert RAZAFIMAHEFA","contact":"+261 34 35 053 34","address":"La Corniche, Mahajanga","email":"razafimahefaphilibert7@gmail.com","photo":"","studyField":"IT Student","major":"Software Engineering","position":"Vice President","createdAt":"2026-03-11T07:12:03.296Z"},{"id":9,"fullName":"Théophile MAGNI","contact":"+261343977501","address":"Mahajanga","email":"theomagni1@gmail.com","photo":"","studyField":"Medicine","major":"General Medicine","position":"Active Volunteer","createdAt":"2026-03-11T07:24:29.931Z"}]
+7:28:25 AM [express] GET /api/volunteers/ranking 200 in 16ms :: [{"volunteer":{"id":8,"fullName":"Philibert RAZAFIMAHEFA","contact":"+261 34 35 053 34","address":"La Corniche, Mahajanga","email":"razafimahefaphilibert7@gmail.com","photo":"","studyField":"IT Student","major":"Software Engineering","position":"Vice President","createdAt":"2026-03-11T07:12:03.296Z"},"attendanceCount":0},{"volunteer":{"id":9,"fullName":"Théophile MAGNI","contact":"+261343977501","address":"Mahajanga","email":"theomagni1@gmail.com","photo":"","studyField":"Medicine","major":"General Medicine","position":"Active Volunteer","createdAt":"2026-03-11T07:24:29.931Z"},"attendanceCount":0}]
+7:30:37 AM [express] GET /api/events/6/attendances 304 in 18ms :: []
+7:30:48 AM [express] POST /api/attendances 201 in 51ms :: {"success":true}
+7:30:55 AM [express] GET /api/events/6/attendances 200 in 3ms :: [{"id":7,"volunteerId":8,"eventId":6,"attended":true,"createdAt":"2026-03-11T07:30:48.880Z"},{"id":8,"volunteerId":9,"eventId":6,"attended":true,"createdAt":"2026-03-11T07:30:48.880Z"}]
+7:30:58 AM [express] GET /api/volunteers/ranking 200 in 3ms :: [{"volunteer":{"id":8,"fullName":"Philibert RAZAFIMAHEFA","contact":"+261 34 35 053 34","address":"La Corniche, Mahajanga","email":"razafimahefaphilibert7@gmail.com","photo":"","studyField":"IT Student","major":"Software Engineering","position":"Vice President","createdAt":"2026-03-11T07:12:03.296Z"},"attendanceCount":1},{"volunteer":{"id":9,"fullName":"Théophile MAGNI","contact":"+261343977501","address":"Mahajanga","email":"theomagni1@gmail.com","photo":"","studyField":"Medicine","major":"General Medicine","position":"Active Volunteer","createdAt":"2026-03-11T07:24:29.931Z"},"attendanceCount":1}]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m7:35:23 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Events.tsx, /src/pages/Volunteers.tsx, /src/pages/Dashboard.tsx, /src/pages/Attendance.tsx, /src/pages/Rankings.tsx[22m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m7:35:25 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Events.tsx, /src/pages/Volunteers.tsx, /src/pages/Dashboard.tsx, /src/pages/Attendance.tsx, /src/pages/Rankings.tsx[22m [33m(x2)[39m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m7:35:26 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Events.tsx, /src/pages/Volunteers.tsx, /src/pages/Dashboard.tsx, /src/pages/Attendance.tsx, /src/pages/Rankings.tsx[22m [33m(x3)[39m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m7:35:27 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Events.tsx, /src/pages/Volunteers.tsx, /src/pages/Dashboard.tsx, /src/pages/Attendance.tsx, /src/pages/Rankings.tsx[22m [33m(x4)[39m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m7:35:46 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Dashboard.tsx, /src/pages/Attendance.tsx, /src/pages/Rankings.tsx, /src/pages/Volunteers.tsx, /src/pages/Events.tsx[22m

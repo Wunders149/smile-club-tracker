@@ -1,0 +1,354 @@
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+[1G[0K7:37:06 AM [express] serving on port 5000
+Internal Server Error: error: column "status" does not exist
+    at [90m/home/runner/workspace/[39mnode_modules/[4mpg-pool[24m/index.js:45:11
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+    at async <anonymous> [90m(/home/runner/workspace/[39mnode_modules/[4msrc[24m/node-postgres/session.ts:104:19[90m)[39m
+    at async DatabaseStorage.getVolunteerRankings [90m(/home/runner/workspace/[39mserver/storage.ts:120:30[90m)[39m
+    at async <anonymous> [90m(/home/runner/workspace/[39mserver/routes.ts:80:18[90m)[39m {
+  length: [33m106[39m,
+  severity: [32m'ERROR'[39m,
+  code: [32m'42703'[39m,
+  detail: [90mundefined[39m,
+  hint: [90mundefined[39m,
+  position: [32m'42'[39m,
+  internalPosition: [90mundefined[39m,
+  internalQuery: [90mundefined[39m,
+  where: [90mundefined[39m,
+  schema: [90mundefined[39m,
+  table: [90mundefined[39m,
+  column: [90mundefined[39m,
+  dataType: [90mundefined[39m,
+  constraint: [90mundefined[39m,
+  file: [32m'parse_relation.c'[39m,
+  line: [32m'3727'[39m,
+  routine: [32m'errorMissingColumn'[39m
+}
+7:37:41 AM [express] GET /api/volunteers/ranking 500 in 27ms :: {"message":"column \"status\" does not exist"}
+7:37:41 AM [express] GET /api/events 304 in 21ms :: [{"id":5,"name":"General Assembly","type":"Meeting","date":"2026-03-15T11:00:00.000Z","description":"Electing Smile Club Mahajanga 2025 Best Volunteer Of the Year.\nStrengthening Club internal organization.","createdAt":"2026-03-11T07:14:27.748Z"},{"id":6,"name":"Learning Medical Vocabulary and Medical Expertise In Madagascar","type":"Training","date":"2026-03-08T11:00:00.000Z","description":"English Education in the medical field.","createdAt":"2026-03-11T07:16:28.424Z"}]
+7:37:41 AM [express] GET /api/volunteers 304 in 23ms :: [{"id":8,"fullName":"Philibert RAZAFIMAHEFA","contact":"+261 34 35 053 34","address":"La Corniche, Mahajanga","email":"razafimahefaphilibert7@gmail.com","photo":"","studyField":"IT Student","major":"Software Engineering","position":"Vice President","createdAt":"2026-03-11T07:12:03.296Z"},{"id":9,"fullName":"Théophile MAGNI","contact":"+261343977501","address":"Mahajanga","email":"theomagni1@gmail.com","photo":"","studyField":"Medicine","major":"General Medicine","position":"Active Volunteer","createdAt":"2026-03-11T07:24:29.931Z"}]
+7:39:28 AM [express] GET /api/events 304 in 11ms :: [{"id":5,"name":"General Assembly","type":"Meeting","date":"2026-03-15T11:00:00.000Z","description":"Electing Smile Club Mahajanga 2025 Best Volunteer Of the Year.\nStrengthening Club internal organization.","createdAt":"2026-03-11T07:14:27.748Z"},{"id":6,"name":"Learning Medical Vocabulary and Medical Expertise In Madagascar","type":"Training","date":"2026-03-08T11:00:00.000Z","description":"English Education in the medical field.","createdAt":"2026-03-11T07:16:28.424Z"}]
+Internal Server Error: error: column "status" does not exist
+    at [90m/home/runner/workspace/[39mnode_modules/[4mpg-pool[24m/index.js:45:11
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+    at async <anonymous> [90m(/home/runner/workspace/[39mnode_modules/[4msrc[24m/node-postgres/session.ts:104:19[90m)[39m
+    at async DatabaseStorage.getVolunteerRankings [90m(/home/runner/workspace/[39mserver/storage.ts:120:30[90m)[39m
+    at async <anonymous> [90m(/home/runner/workspace/[39mserver/routes.ts:80:18[90m)[39m {
+  length: [33m106[39m,
+  severity: [32m'ERROR'[39m,
+  code: [32m'42703'[39m,
+  detail: [90mundefined[39m,
+  hint: [90mundefined[39m,
+  position: [32m'42'[39m,
+  internalPosition: [90mundefined[39m,
+  internalQuery: [90mundefined[39m,
+  where: [90mundefined[39m,
+  schema: [90mundefined[39m,
+  table: [90mundefined[39m,
+  column: [90mundefined[39m,
+  dataType: [90mundefined[39m,
+  constraint: [90mundefined[39m,
+  file: [32m'parse_relation.c'[39m,
+  line: [32m'3727'[39m,
+  routine: [32m'errorMissingColumn'[39m
+}
+7:39:28 AM [express] GET /api/volunteers/ranking 500 in 13ms :: {"message":"column \"status\" does not exist"}
+7:39:28 AM [express] GET /api/volunteers 304 in 16ms :: [{"id":8,"fullName":"Philibert RAZAFIMAHEFA","contact":"+261 34 35 053 34","address":"La Corniche, Mahajanga","email":"razafimahefaphilibert7@gmail.com","photo":"","studyField":"IT Student","major":"Software Engineering","position":"Vice President","createdAt":"2026-03-11T07:12:03.296Z"},{"id":9,"fullName":"Théophile MAGNI","contact":"+261343977501","address":"Mahajanga","email":"theomagni1@gmail.com","photo":"","studyField":"Medicine","major":"General Medicine","position":"Active Volunteer","createdAt":"2026-03-11T07:24:29.931Z"}]
+7:42:43 AM [express] GET /api/volunteers 304 in 11ms :: [{"id":8,"fullName":"Philibert RAZAFIMAHEFA","contact":"+261 34 35 053 34","address":"La Corniche, Mahajanga","email":"razafimahefaphilibert7@gmail.com","photo":"","studyField":"IT Student","major":"Software Engineering","position":"Vice President","createdAt":"2026-03-11T07:12:03.296Z"},{"id":9,"fullName":"Théophile MAGNI","contact":"+261343977501","address":"Mahajanga","email":"theomagni1@gmail.com","photo":"","studyField":"Medicine","major":"General Medicine","position":"Active Volunteer","createdAt":"2026-03-11T07:24:29.931Z"}]
+7:42:50 AM [express] GET /api/events 304 in 2ms :: [{"id":5,"name":"General Assembly","type":"Meeting","date":"2026-03-15T11:00:00.000Z","description":"Electing Smile Club Mahajanga 2025 Best Volunteer Of the Year.\nStrengthening Club internal organization.","createdAt":"2026-03-11T07:14:27.748Z"},{"id":6,"name":"Learning Medical Vocabulary and Medical Expertise In Madagascar","type":"Training","date":"2026-03-08T11:00:00.000Z","description":"English Education in the medical field.","createdAt":"2026-03-11T07:16:28.424Z"}]
+7:42:53 AM [express] GET /api/volunteers/ranking 200 in 4ms :: [{"volunteer":{"id":8,"fullName":"Philibert RAZAFIMAHEFA","contact":"+261 34 35 053 34","address":"La Corniche, Mahajanga","email":"razafimahefaphilibert7@gmail.com","photo":"","studyField":"IT Student","major":"Software Engineering","position":"Vice President","createdAt":"2026-03-11T07:12:03.296Z"},"totalPoints":0},{"volunteer":{"id":9,"fullName":"Théophile MAGNI","contact":"+261343977501","address":"Mahajanga","email":"theomagni1@gmail.com","photo":"","studyField":"Medicine","major":"General Medicine","position":"Active Volunteer","createdAt":"2026-03-11T07:24:29.931Z"},"totalPoints":0}]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m7:44:02 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Rankings.tsx, /src/index.css[22m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m7:44:02 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Rankings.tsx, /src/index.css[22m [33m(x2)[39m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m7:44:06 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Attendance.tsx, /src/index.css[22m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m7:44:08 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Attendance.tsx, /src/index.css[22m [33m(x2)[39m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m7:44:09 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Attendance.tsx, /src/index.css[22m [33m(x3)[39m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m7:44:13 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Attendance.tsx, /src/index.css[22m [33m(x4)[39m
+[replit-cartographer] Error processing /home/runner/workspace/client/src/pages/Attendance.tsx: SyntaxError: Adjacent JSX elements must be wrapped in an enclosing tag. Did you want a JSX fragment <>...</>? (161:22)
+    at toParseError [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parse-error.ts:95:45[90m)[39m
+    at raise [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/tokenizer/index.ts:1503:19[90m)[39m
+    at jsxParseElementAt [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/plugins/jsx/index.ts:543:20[90m)[39m
+    at jsxParseElement [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/plugins/jsx/index.ts:559:19[90m)[39m
+    at parseExprAtom [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/plugins/jsx/index.ts:573:21[90m)[39m
+    at parseExprSubscripts [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:734:23[90m)[39m
+    at parseUpdate [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:713:21[90m)[39m
+    at parseMaybeUnary [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:675:23[90m)[39m
+    at parseMaybeUnary [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/plugins/typescript/index.ts:3855:20[90m)[39m
+    at parseMaybeUnaryOrPrivate [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:409:14[90m)[39m
+    at parseExprOps [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:421:23[90m)[39m
+    at parseMaybeConditional [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:376:23[90m)[39m
+    at parseMaybeAssign [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:301:21[90m)[39m
+    at fn [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/plugins/typescript/index.ts:3708:23[90m)[39m
+    at tryParse [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/util.ts:174:20[90m)[39m
+    at parseMaybeAssign [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/plugins/typescript/index.ts:3707:20[90m)[39m
+    at callback [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:257:12[90m)[39m
+    at allowInAnd [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:3192:12[90m)[39m
+    at parseMaybeAssignAllowIn [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:256:17[90m)[39m
+    at parseMaybeAssignAllowInOrVoidPattern [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:3306:17[90m)[39m
+    at parseParenAndDistinguishExpression [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:1813:16[90m)[39m
+    at parseExprAtom [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:1162:21[90m)[39m
+    at parseExprAtom [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/plugins/jsx/index.ts:583:22[90m)[39m
+    at parseExprSubscripts [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:734:23[90m)[39m
+    at parseUpdate [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:713:21[90m)[39m
+    at parseMaybeUnary [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:675:23[90m)[39m
+    at parseMaybeUnary [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/plugins/typescript/index.ts:3855:20[90m)[39m
+    at parseMaybeUnaryOrPrivate [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:409:14[90m)[39m
+    at parseExprOps [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:421:23[90m)[39m
+    at parseMaybeConditional [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:376:23[90m)[39m
+    at parseMaybeAssign [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:301:21[90m)[39m
+    at parseMaybeAssign [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/plugins/typescript/index.ts:3727:22[90m)[39m
+    at parseExpressionBase [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:226:23[90m)[39m
+    at callback [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:217:39[90m)[39m
+    at allowInAnd [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:3187:16[90m)[39m
+    at parseExpression [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:217:17[90m)[39m
+    at parseReturnStatement [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/statement.ts:1110:28[90m)[39m
+    at parseStatementContent [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/statement.ts:538:21[90m)[39m
+    at parseStatementContent [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/plugins/typescript/index.ts:3185:20[90m)[39m
+    at parseStatementLike [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/statement.ts:477:17[90m)[39m
+    at parseStatementListItem [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/statement.ts:426:17[90m)[39m
+    at parseBlockOrModuleBlockBody [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/statement.ts:1439:16[90m)[39m
+    at parseBlockBody [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/statement.ts:1412:10[90m)[39m
+    at parseBlock [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/statement.ts:1380:10[90m)[39m
+    at parseFunctionBody [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:2616:24[90m)[39m
+    at parseArrowExpression [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:2553:10[90m)[39m
+    at parseParenAndDistinguishExpression [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:1837:12[90m)[39m
+    at parseExprAtom [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:1162:21[90m)[39m
+    at parseExprAtom [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/plugins/jsx/index.ts:583:22[90m)[39m
+    at parseExprSubscripts [90m(/home/runner/workspace/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:734:23[90m)[39m {
+  code: [32m'BABEL_PARSER_SYNTAX_ERROR'[39m,
+  reasonCode: [32m'UnwrappedAdjacentJSXElements'[39m,
+  loc: Position { line: [33m161[39m, column: [33m22[39m, index: [33m8304[39m },
+  pos: [33m8304[39m,
+  syntaxPlugin: [32m'jsx'[39m
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m7:44:13 AM[22m [31m[1m[vite][22m[39m [31mInternal server error: /home/runner/workspace/client/src/pages/Attendance.tsx: Adjacent JSX elements must be wrapped in an enclosing tag. Did you want a JSX fragment <>...</>? (161:22)
+
+[0m [90m 159 |[31m                       [33m<[31m[33m/[31m[33mdiv[31m[33m>[31m
+ [90m 160 |[31m                       
+[31m[1m>[22m[31m[90m 161 |[31m                       [33m<[31m[33mdiv[31m className[33m=[31m[32m"text-right"[31m[33m>[31m
+ [90m     |[31m                       [31m[1m^[22m[31m
+ [90m 162 |[31m                          {attendanceState[vol[33m.[31mid] [33m?[31m (
+ [90m 163 |[31m                            [33m<[31m[33mspan[31m className[33m=[31m[32m"text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-md"[31m[33m>[31m[33mPresent[31m[33m<[31m[33m/[31m[33mspan[31m[33m>[31m
+ [90m 164 |[31m                          ) [33m:[31m ([0m[39m
+  Plugin: [35mvite:react-babel[39m
+  File: [36m/home/runner/workspace/client/src/pages/Attendance.tsx[39m:161:22
+[33m  159 |                        </div>
+  160 |                        
+  161 |                        <div className="text-right">
+      |                        ^
+  162 |                           {attendanceState[vol.id] ? (
+  163 |                             <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-md">Presen...[39m
+      at toParseError (/home/runner/workspace/node_modules/@babel/parser/src/parse-error.ts:95:45)
+      at raise (/home/runner/workspace/node_modules/@babel/parser/src/tokenizer/index.ts:1503:19)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:543:20)
+      at jsxParseElement (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:559:19)
+      at parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:573:21)
+      at parseExprSubscripts (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:734:23)
+      at parseUpdate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:713:21)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:675:23)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3855:20)
+      at parseMaybeUnaryOrPrivate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:409:14)
+      at parseExprOps (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:421:23)
+      at parseMaybeConditional (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:376:23)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:301:21)
+      at fn (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3708:23)
+      at tryParse (/home/runner/workspace/node_modules/@babel/parser/src/parser/util.ts:174:20)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3707:20)
+      at callback (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:257:12)
+      at allowInAnd (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:3192:12)
+      at parseMaybeAssignAllowIn (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:256:17)
+      at parseMaybeAssignAllowInOrVoidPattern (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:3306:17)
+      at parseParenAndDistinguishExpression (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:1813:16)
+      at parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:1162:21)
+      at parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:583:22)
+      at parseExprSubscripts (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:734:23)
+      at parseUpdate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:713:21)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:675:23)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3855:20)
+      at parseMaybeUnaryOrPrivate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:409:14)
+      at parseExprOps (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:421:23)
+      at parseMaybeConditional (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:376:23)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:301:21)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3727:22)
+      at parseExpressionBase (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:226:23)
+      at callback (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:217:39)
+      at allowInAnd (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:3187:16)
+      at parseExpression (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:217:17)
+      at parseReturnStatement (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1110:28)
+      at parseStatementContent (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:538:21)
+      at parseStatementContent (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3185:20)
+      at parseStatementLike (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:477:17)
+      at parseStatementListItem (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:426:17)
+      at parseBlockOrModuleBlockBody (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1439:16)
+      at parseBlockBody (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1412:10)
+      at parseBlock (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1380:10)
+      at parseFunctionBody (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:2616:24)
+      at parseArrowExpression (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:2553:10)
+      at parseParenAndDistinguishExpression (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:1837:12)
+      at parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:1162:21)
+      at parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:583:22)
+      at parseExprSubscripts (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:734:23)
+[1G[0K⠙[1G[0K

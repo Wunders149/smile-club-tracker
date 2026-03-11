@@ -1,0 +1,32 @@
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+[1G[0K7:04:53 AM [express] serving on port 5000
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m7:05:31 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Dashboard.tsx, /src/index.css[22m
+7:05:35 AM [express] GET /api/events 200 in 18ms :: [{"id":1,"name":"Annual General Meeting","type":"Meeting","date":"2026-03-09T07:02:55.773Z","description":"Discussing the yearly goals.","createdAt":"2026-03-11T07:02:55.773Z"},{"id":2,"name":"Beach Cleanup","type":"Awareness","date":"2026-03-13T07:02:55.776Z","description":"Cleaning the tourist beach.","createdAt":"2026-03-11T07:02:55.777Z"}]
+7:05:35 AM [express] GET /api/volunteers 200 in 15ms :: [{"id":1,"fullName":"Jane Doe","contact":"+261 34 00 000 00","address":"Majunga Be","email":"jane.doe@example.com","photo":"","studyField":"Medicine","major":"General","position":"President","createdAt":"2026-03-11T07:02:55.763Z"},{"id":2,"fullName":"John Smith","contact":"+261 32 11 111 11","address":"Tsaramandroso","email":"john.smith@example.com","photo":"","studyField":"Management","major":"Finance","position":"Vice President","createdAt":"2026-03-11T07:02:55.767Z"},{"id":3,"fullName":"Alice Johnson","contact":"+261 33 22 222 22","address":"Amborovy","email":"alice.j@example.com","photo":"","studyField":"Engineering","major":"Civil","position":"Active Volunteer","createdAt":"2026-03-11T07:02:55.770Z"}]
+7:05:35 AM [express] GET /api/volunteers/ranking 200 in 17ms :: [{"volunteer":{"id":2,"fullName":"John Smith","contact":"+261 32 11 111 11","address":"Tsaramandroso","email":"john.smith@example.com","photo":"","studyField":"Management","major":"Finance","position":"Vice President","createdAt":"2026-03-11T07:02:55.767Z"},"attendanceCount":1},{"volunteer":{"id":1,"fullName":"Jane Doe","contact":"+261 34 00 000 00","address":"Majunga Be","email":"jane.doe@example.com","photo":"","studyField":"Medicine","major":"General","position":"President","createdAt":"2026-03-11T07:02:55.763Z"},"attendanceCount":1},{"volunteer":{"id":3,"fullName":"Alice Johnson","contact":"+261 33 22 222 22","address":"Amborovy","email":"alice.j@example.com","photo":"","studyField":"Engineering","major":"Civil","position":"Active Volunteer","createdAt":"2026-03-11T07:02:55.770Z"},"attendanceCount":0}]

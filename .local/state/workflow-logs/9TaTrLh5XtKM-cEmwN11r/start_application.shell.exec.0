@@ -1,0 +1,17 @@
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+[1G[0KBackup restoration failed: TypeError: value.toISOString is not a function
+    at PgTimestamp.mapToDriverValue [90m(/home/runner/workspace/[39mnode_modules/[4msrc[24m/pg-core/columns/timestamp.ts:66:16[90m)[39m
+    at <anonymous> [90m(/home/runner/workspace/[39mnode_modules/[4msrc[24m/sql/sql.ts:223:69[90m)[39m
+    at Array.map (<anonymous>)
+    at SQL.buildQueryFromSourceParams [90m(/home/runner/workspace/[39mnode_modules/[4msrc[24m/sql/sql.ts:148:30[90m)[39m
+    at <anonymous> [90m(/home/runner/workspace/[39mnode_modules/[4msrc[24m/sql/sql.ts:170:17[90m)[39m
+    at Array.map (<anonymous>)
+    at SQL.buildQueryFromSourceParams [90m(/home/runner/workspace/[39mnode_modules/[4msrc[24m/sql/sql.ts:148:30[90m)[39m
+    at <anonymous> [90m(/home/runner/workspace/[39mnode_modules/[4msrc[24m/sql/sql.ts:174:17[90m)[39m
+    at Array.map (<anonymous>)
+    at SQL.buildQueryFromSourceParams [90m(/home/runner/workspace/[39mnode_modules/[4msrc[24m/sql/sql.ts:148:30[90m)[39m
+8:38:06 AM [backup] Database backup created: backups/backup-2026-03-11T08-38-06-801Z.json
+8:38:07 AM [express] serving on port 5000

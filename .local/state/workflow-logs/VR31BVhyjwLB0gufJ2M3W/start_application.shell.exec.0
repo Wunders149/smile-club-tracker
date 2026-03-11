@@ -1,0 +1,34 @@
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+[1G[0K7:45:13 AM [express] serving on port 5000
+[2m7:45:17 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32m✨ new dependencies optimized: [33mrecharts[32m[39m
+[2m7:45:17 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32m✨ optimized dependencies changed. reloading[39m
+7:45:27 AM [express] GET /api/volunteers 200 in 17ms :: [{"id":8,"fullName":"Philibert RAZAFIMAHEFA","contact":"+261 34 35 053 34","address":"La Corniche, Mahajanga","email":"razafimahefaphilibert7@gmail.com","photo":"","studyField":"IT Student","major":"Software Engineering","position":"Vice President","createdAt":"2026-03-11T07:12:03.296Z"},{"id":9,"fullName":"Théophile MAGNI","contact":"+261343977501","address":"Mahajanga","email":"theomagni1@gmail.com","photo":"","studyField":"Medicine","major":"General Medicine","position":"Active Volunteer","createdAt":"2026-03-11T07:24:29.931Z"}]
+7:45:27 AM [express] GET /api/events 200 in 19ms :: [{"id":5,"name":"General Assembly","type":"Meeting","date":"2026-03-15T11:00:00.000Z","description":"Electing Smile Club Mahajanga 2025 Best Volunteer Of the Year.\nStrengthening Club internal organization.","createdAt":"2026-03-11T07:14:27.748Z"},{"id":6,"name":"Learning Medical Vocabulary and Medical Expertise In Madagascar","type":"Training","date":"2026-03-08T11:00:00.000Z","description":"English Education in the medical field.","createdAt":"2026-03-11T07:16:28.424Z"}]
+7:45:27 AM [express] GET /api/volunteers/ranking 200 in 19ms :: [{"volunteer":{"id":8,"fullName":"Philibert RAZAFIMAHEFA","contact":"+261 34 35 053 34","address":"La Corniche, Mahajanga","email":"razafimahefaphilibert7@gmail.com","photo":"","studyField":"IT Student","major":"Software Engineering","position":"Vice President","createdAt":"2026-03-11T07:12:03.296Z"},"totalPoints":0},{"volunteer":{"id":9,"fullName":"Théophile MAGNI","contact":"+261343977501","address":"Mahajanga","email":"theomagni1@gmail.com","photo":"","studyField":"Medicine","major":"General Medicine","position":"Active Volunteer","createdAt":"2026-03-11T07:24:29.931Z"},"totalPoints":0}]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m7:46:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Statistics.tsx, /src/index.css[22m

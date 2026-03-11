@@ -1,0 +1,48 @@
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+[1G[0K7:05:38 AM [express] serving on port 5000
+7:05:46 AM [express] GET /api/volunteers 304 in 4ms :: [{"id":1,"fullName":"Jane Doe","contact":"+261 34 00 000 00","address":"Majunga Be","email":"jane.doe@example.com","photo":"","studyField":"Medicine","major":"General","position":"President","createdAt":"2026-03-11T07:02:55.763Z"},{"id":2,"fullName":"John Smith","contact":"+261 32 11 111 11","address":"Tsaramandroso","email":"john.smith@example.com","photo":"","studyField":"Management","major":"Finance","position":"Vice President","createdAt":"2026-03-11T07:02:55.767Z"},{"id":3,"fullName":"Alice Johnson","contact":"+261 33 22 222 22","address":"Amborovy","email":"alice.j@example.com","photo":"","studyField":"Engineering","major":"Civil","position":"Active Volunteer","createdAt":"2026-03-11T07:02:55.770Z"}]
+7:05:46 AM [express] GET /api/volunteers/ranking 304 in 3ms :: [{"volunteer":{"id":2,"fullName":"John Smith","contact":"+261 32 11 111 11","address":"Tsaramandroso","email":"john.smith@example.com","photo":"","studyField":"Management","major":"Finance","position":"Vice President","createdAt":"2026-03-11T07:02:55.767Z"},"attendanceCount":1},{"volunteer":{"id":1,"fullName":"Jane Doe","contact":"+261 34 00 000 00","address":"Majunga Be","email":"jane.doe@example.com","photo":"","studyField":"Medicine","major":"General","position":"President","createdAt":"2026-03-11T07:02:55.763Z"},"attendanceCount":1},{"volunteer":{"id":3,"fullName":"Alice Johnson","contact":"+261 33 22 222 22","address":"Amborovy","email":"alice.j@example.com","photo":"","studyField":"Engineering","major":"Civil","position":"Active Volunteer","createdAt":"2026-03-11T07:02:55.770Z"},"attendanceCount":0}]
+7:05:46 AM [express] GET /api/events 304 in 12ms :: [{"id":1,"name":"Annual General Meeting","type":"Meeting","date":"2026-03-09T07:02:55.773Z","description":"Discussing the yearly goals.","createdAt":"2026-03-11T07:02:55.773Z"},{"id":2,"name":"Beach Cleanup","type":"Awareness","date":"2026-03-13T07:02:55.776Z","description":"Cleaning the tourist beach.","createdAt":"2026-03-11T07:02:55.777Z"}]
+7:06:43 AM [express] GET /api/volunteers 304 in 10ms :: [{"id":1,"fullName":"Jane Doe","contact":"+261 34 00 000 00","address":"Majunga Be","email":"jane.doe@example.com","photo":"","studyField":"Medicine","major":"General","position":"President","createdAt":"2026-03-11T07:02:55.763Z"},{"id":2,"fullName":"John Smith","contact":"+261 32 11 111 11","address":"Tsaramandroso","email":"john.smith@example.com","photo":"","studyField":"Management","major":"Finance","position":"Vice President","createdAt":"2026-03-11T07:02:55.767Z"},{"id":3,"fullName":"Alice Johnson","contact":"+261 33 22 222 22","address":"Amborovy","email":"alice.j@example.com","photo":"","studyField":"Engineering","major":"Civil","position":"Active Volunteer","createdAt":"2026-03-11T07:02:55.770Z"}]
+7:06:43 AM [express] GET /api/volunteers/ranking 304 in 13ms :: [{"volunteer":{"id":2,"fullName":"John Smith","contact":"+261 32 11 111 11","address":"Tsaramandroso","email":"john.smith@example.com","photo":"","studyField":"Management","major":"Finance","position":"Vice President","createdAt":"2026-03-11T07:02:55.767Z"},"attendanceCount":1},{"volunteer":{"id":1,"fullName":"Jane Doe","contact":"+261 34 00 000 00","address":"Majunga Be","email":"jane.doe@example.com","photo":"","studyField":"Medicine","major":"General","position":"President","createdAt":"2026-03-11T07:02:55.763Z"},"attendanceCount":1},{"volunteer":{"id":3,"fullName":"Alice Johnson","contact":"+261 33 22 222 22","address":"Amborovy","email":"alice.j@example.com","photo":"","studyField":"Engineering","major":"Civil","position":"Active Volunteer","createdAt":"2026-03-11T07:02:55.770Z"},"attendanceCount":0}]
+7:06:43 AM [express] GET /api/events 304 in 1ms :: [{"id":1,"name":"Annual General Meeting","type":"Meeting","date":"2026-03-09T07:02:55.773Z","description":"Discussing the yearly goals.","createdAt":"2026-03-11T07:02:55.773Z"},{"id":2,"name":"Beach Cleanup","type":"Awareness","date":"2026-03-13T07:02:55.776Z","description":"Cleaning the tourist beach.","createdAt":"2026-03-11T07:02:55.777Z"}]
+7:06:53 AM [express] DELETE /api/volunteers/1 204 in 42ms
+7:06:54 AM [express] GET /api/volunteers 200 in 5ms :: [{"id":2,"fullName":"John Smith","contact":"+261 32 11 111 11","address":"Tsaramandroso","email":"john.smith@example.com","photo":"","studyField":"Management","major":"Finance","position":"Vice President","createdAt":"2026-03-11T07:02:55.767Z"},{"id":3,"fullName":"Alice Johnson","contact":"+261 33 22 222 22","address":"Amborovy","email":"alice.j@example.com","photo":"","studyField":"Engineering","major":"Civil","position":"Active Volunteer","createdAt":"2026-03-11T07:02:55.770Z"}]
+7:06:57 AM [express] DELETE /api/volunteers/2 204 in 4ms
+7:06:58 AM [express] GET /api/volunteers 200 in 1ms :: [{"id":3,"fullName":"Alice Johnson","contact":"+261 33 22 222 22","address":"Amborovy","email":"alice.j@example.com","photo":"","studyField":"Engineering","major":"Civil","position":"Active Volunteer","createdAt":"2026-03-11T07:02:55.770Z"}]
+7:07:01 AM [express] DELETE /api/volunteers/3 204 in 4ms
+7:07:01 AM [express] GET /api/volunteers 200 in 2ms :: []
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m7:07:26 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Volunteers.tsx, /src/index.css[22m
+7:07:29 AM [express] GET /api/volunteers 304 in 14ms :: []
+7:07:35 AM [express] GET /api/events 304 in 2ms :: [{"id":1,"name":"Annual General Meeting","type":"Meeting","date":"2026-03-09T07:02:55.773Z","description":"Discussing the yearly goals.","createdAt":"2026-03-11T07:02:55.773Z"},{"id":2,"name":"Beach Cleanup","type":"Awareness","date":"2026-03-13T07:02:55.776Z","description":"Cleaning the tourist beach.","createdAt":"2026-03-11T07:02:55.777Z"}]
+7:07:43 AM [express] DELETE /api/events/2 204 in 4ms
+7:07:43 AM [express] GET /api/events 200 in 2ms :: [{"id":1,"name":"Annual General Meeting","type":"Meeting","date":"2026-03-09T07:02:55.773Z","description":"Discussing the yearly goals.","createdAt":"2026-03-11T07:02:55.773Z"}]
+7:07:47 AM [express] DELETE /api/events/1 204 in 3ms
+7:07:47 AM [express] GET /api/events 200 in 1ms :: []
+7:07:50 AM [express] GET /api/volunteers/ranking 200 in 2ms :: []
