@@ -166,7 +166,7 @@ export default function Dashboard() {
                         <p className="text-sm text-muted-foreground">{record.volunteer.position}</p>
                       </div>
                       <div className="bg-secondary/10 text-secondary-foreground font-bold px-3 py-1 rounded-full text-sm">
-                        {record.attendanceCount} pts
+                        {record.totalPoints} pts
                       </div>
                     </div>
                   ))}

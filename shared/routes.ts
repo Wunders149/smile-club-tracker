@@ -29,7 +29,7 @@ export const api = {
       responses: {
         200: z.array(z.object({
           volunteer: z.custom<typeof volunteers.$inferSelect>(),
-          attendanceCount: z.number()
+          totalPoints: z.number()
         })),
       },
     },
