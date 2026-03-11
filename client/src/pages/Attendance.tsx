@@ -53,10 +53,10 @@ export default function Attendance() {
 
   const sortedEvents = events ? [...events].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) : [];
   const statusColors: Record<string, string> = {
-    on_time: 'bg-green-100 text-green-800',
-    late: 'bg-yellow-100 text-yellow-800',
-    excused: 'bg-blue-100 text-blue-800',
-    absent: 'bg-gray-100 text-gray-800'
+    on_time: 'bg-green-100 text-green-800 border-green-200',
+    late: 'bg-blue-100 text-blue-800 border-blue-200',
+    excused: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    absent: 'bg-red-100 text-red-800 border-red-200'
   };
 
   return (
