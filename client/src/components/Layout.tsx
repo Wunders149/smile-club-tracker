@@ -50,14 +50,8 @@ export function Layout({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-background flex">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-72 bg-card border-r border-border/50 shadow-sm z-10 p-6 sticky top-0 h-screen">
-        <div className="flex items-center gap-3 mb-8 px-2">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20 text-white font-bold text-xl">
-            S
-          </div>
-          <div>
-            <h1 className="font-display font-bold text-xl leading-tight">Smile Club</h1>
-            <p className="text-xs text-muted-foreground">Mahajanga</p>
-          </div>
+        <div className="mb-8">
+          <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="h-16 w-auto object-contain" />
         </div>
         
         <nav className="flex-1">
@@ -74,12 +68,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-card/80 backdrop-blur-md border-b border-border/50 z-50 flex items-center justify-between px-4">
-        <div className="flex items-center gap-2">
-           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-md text-white font-bold">
-            S
-          </div>
-          <span className="font-display font-bold text-lg">Smile Club</span>
-        </div>
+        <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="h-10 w-auto object-contain" />
         
         <Sheet>
           <SheetTrigger asChild>
@@ -88,11 +77,8 @@ export function Layout({ children }: { children: ReactNode }) {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-72 bg-card">
-            <div className="flex items-center gap-3 mb-8 pt-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl">
-                S
-              </div>
-              <h2 className="font-display font-bold text-xl">Menu</h2>
+            <div className="mb-8 pt-4">
+              <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="h-12 w-auto object-contain" />
             </div>
             <NavLinks />
           </SheetContent>
