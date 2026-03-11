@@ -1,0 +1,124 @@
+{
+  "timestamp": "2026-03-11T08:33:07.109Z",
+  "version": "1.0",
+  "data": {
+    "volunteers": [
+      {
+        "id": 9,
+        "fullName": "Théophile MAGNI",
+        "contact": "+261343977501",
+        "address": "Mahajanga",
+        "email": "theomagni1@gmail.com",
+        "photo": "",
+        "studyField": "Medicine",
+        "major": "General Medicine",
+        "position": "Active Volunteer",
+        "gender": "Male",
+        "createdAt": "2026-03-11T07:24:29.931Z"
+      },
+      {
+        "id": 8,
+        "fullName": "Philibert RAZAFIMAHEFA",
+        "contact": "+261 34 35 053 34",
+        "address": "La Corniche, Mahajanga",
+        "email": "razafimahefaphilibert7@gmail.com",
+        "photo": "",
+        "studyField": "IT Student",
+        "major": "Software Engineering",
+        "position": "Vice President",
+        "gender": "Male",
+        "createdAt": "2026-03-11T07:12:03.296Z"
+      }
+    ],
+    "events": [
+      {
+        "id": 5,
+        "name": "General Assembly",
+        "type": "Meeting",
+        "date": "2026-03-15T11:00:00.000Z",
+        "description": "Electing Smile Club Mahajanga 2025 Best Volunteer Of the Year.\nStrengthening Club internal organization.",
+        "createdAt": "2026-03-11T07:14:27.748Z"
+      },
+      {
+        "id": 6,
+        "name": "Learning Medical Vocabulary and Medical Expertise In Madagascar",
+        "type": "Training",
+        "date": "2026-03-08T11:00:00.000Z",
+        "description": "English Education in the medical field.",
+        "createdAt": "2026-03-11T07:16:28.424Z"
+      }
+    ],
+    "attendance": [
+      {
+        "id": 1,
+        "volunteerId": 1,
+        "eventId": 1,
+        "status": "absent",
+        "createdAt": "2026-03-11T07:02:55.782Z"
+      },
+      {
+        "id": 2,
+        "volunteerId": 2,
+        "eventId": 1,
+        "status": "absent",
+        "createdAt": "2026-03-11T07:02:55.782Z"
+      },
+      {
+        "id": 3,
+        "volunteerId": 3,
+        "eventId": 1,
+        "status": "absent",
+        "createdAt": "2026-03-11T07:02:55.782Z"
+      },
+      {
+        "id": 4,
+        "volunteerId": 4,
+        "eventId": 3,
+        "status": "absent",
+        "createdAt": "2026-03-11T07:07:54.196Z"
+      },
+      {
+        "id": 5,
+        "volunteerId": 5,
+        "eventId": 3,
+        "status": "absent",
+        "createdAt": "2026-03-11T07:07:54.196Z"
+      },
+      {
+        "id": 6,
+        "volunteerId": 6,
+        "eventId": 3,
+        "status": "absent",
+        "createdAt": "2026-03-11T07:07:54.196Z"
+      },
+      {
+        "id": 7,
+        "volunteerId": 8,
+        "eventId": 6,
+        "status": "absent",
+        "createdAt": "2026-03-11T07:30:48.880Z"
+      },
+      {
+        "id": 8,
+        "volunteerId": 9,
+        "eventId": 6,
+        "status": "absent",
+        "createdAt": "2026-03-11T07:30:48.880Z"
+      },
+      {
+        "id": 9,
+        "volunteerId": 8,
+        "eventId": 5,
+        "status": "on_time",
+        "createdAt": "2026-03-11T07:48:19.575Z"
+      },
+      {
+        "id": 10,
+        "volunteerId": 9,
+        "eventId": 5,
+        "status": "on_time",
+        "createdAt": "2026-03-11T07:48:19.575Z"
+      }
+    ]
+  }
+}
