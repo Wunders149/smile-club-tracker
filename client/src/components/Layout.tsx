@@ -6,7 +6,8 @@ import {
   CalendarDays, 
   CheckSquare, 
   Trophy,
-  Menu
+  Menu,
+  BarChart3
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -17,6 +18,7 @@ const NAV_ITEMS = [
   { href: "/events", label: "Events", icon: CalendarDays },
   { href: "/attendance", label: "Attendance", icon: CheckSquare },
   { href: "/rankings", label: "Rankings", icon: Trophy },
+  { href: "/statistics", label: "Statistics", icon: BarChart3 },
 ];
 
 export function Layout({ children }: { children: ReactNode }) {

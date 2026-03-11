@@ -28,7 +28,7 @@ export default function Rankings() {
         ) : (
           <div className="space-y-4">
             {rankings.map((record, index) => {
-              const { volunteer, attendanceCount } = record;
+              const { volunteer, totalPoints } = record;
               
               // Top 3 styling logic
               const isFirst = index === 0;
@@ -84,10 +84,10 @@ export default function Rankings() {
                       {/* Score */}
                       <div className="text-right shrink-0">
                         <div className="font-display font-bold text-3xl text-primary leading-none">
-                          {attendanceCount}
+                          {totalPoints}
                         </div>
                         <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1">
-                          Events
+                          Points
                         </div>
                       </div>
                     </CardContent>
