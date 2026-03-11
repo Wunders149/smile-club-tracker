@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { 
   LayoutDashboard, 
@@ -7,10 +7,13 @@ import {
   CheckSquare, 
   Trophy,
   Menu,
-  BarChart3
+  BarChart3,
+  CloudUpload
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useMutation } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -23,6 +26,34 @@ const NAV_ITEMS = [
 
 export function Layout({ children }: { children: ReactNode }) {
   const [location] = useLocation();
+  const { toast } = useToast();
+
+  const syncMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/backup", { method: "POST" });
+      if (!res.ok) throw new Error("Sync failed");
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Success", description: "Database synced to GitHub." });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to sync to GitHub.", variant: "destructive" });
+    }
+  });
+
+  const SyncButton = () => (
+    <Button 
+      variant="outline" 
+      size="sm" 
+      onClick={() => syncMutation.mutate()} 
+      disabled={syncMutation.isPending}
+      className="w-full flex items-center gap-2 rounded-xl mt-4 border-primary/20 hover:border-primary/50 text-primary"
+    >
+      <CloudUpload className={`w-4 h-4 ${syncMutation.isPending ? 'animate-pulse' : ''}`} />
+      {syncMutation.isPending ? "Syncing..." : "Sync to GitHub"}
+    </Button>
+  );
 
   const NavLinks = () => (
     <div className="space-y-2 py-4">
@@ -58,6 +89,7 @@ export function Layout({ children }: { children: ReactNode }) {
         
         <nav className="flex-1">
           <NavLinks />
+          <SyncButton />
         </nav>
 
         <div className="mt-auto pt-6 border-t border-border/50">
@@ -83,6 +115,7 @@ export function Layout({ children }: { children: ReactNode }) {
               <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="h-[58px] w-auto object-contain" />
             </div>
             <NavLinks />
+            <SyncButton />
           </SheetContent>
         </Sheet>
       </div>

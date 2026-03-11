@@ -4,10 +4,22 @@ import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
 
+import { createBackup } from "./backup";
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+
+  // --- Backup ---
+  app.post("/api/backup", async (req, res) => {
+    try {
+      await createBackup();
+      res.json({ success: true, message: "Backup synced to GitHub successfully" });
+    } catch (err: any) {
+      res.status(500).json({ message: err.message });
+    }
+  });
 
   // --- Volunteers ---
   app.get(api.volunteers.list.path, async (req, res) => {

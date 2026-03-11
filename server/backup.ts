@@ -87,6 +87,7 @@ export async function restoreBackup() {
   try {
     if (!GITHUB_TOKEN || !GITHUB_REPO) return;
 
+    const latestBackupFile = GITHUB_PATH;
     const fileData = await getGithubFile();
     if (!fileData || !fileData.content) {
       log("No backup found on GitHub to restore.", "backup");
@@ -96,6 +97,8 @@ export async function restoreBackup() {
     // Decode base64 content
     const content = Buffer.from(fileData.content, "base64").toString("utf-8");
     const backupData = JSON.parse(content);
+    
+    log(`Restore data preview: ${JSON.stringify(backupData.data.volunteers?.map((v: any) => v.fullName))}`, "backup");
 
     // Clear existing data
     await db.delete(attendances);
