@@ -45,6 +45,7 @@ export function useCreateVolunteer() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [api.volunteers.list.path] });
       queryClient.invalidateQueries({ queryKey: [api.volunteers.ranking.path] });
+      queryClient.invalidateQueries({ queryKey: [api.statistics.get.path] });
       toast({ title: "Success", description: "Volunteer created successfully." });
     },
     onError: (error) => {
@@ -72,6 +73,7 @@ export function useUpdateVolunteer() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [api.volunteers.list.path] });
       queryClient.invalidateQueries({ queryKey: [api.volunteers.ranking.path] });
+      queryClient.invalidateQueries({ queryKey: [api.statistics.get.path] });
       toast({ title: "Success", description: "Volunteer updated successfully." });
     },
     onError: (error) => {
@@ -96,6 +98,7 @@ export function useDeleteVolunteer() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [api.volunteers.list.path] });
       queryClient.invalidateQueries({ queryKey: [api.volunteers.ranking.path] });
+      queryClient.invalidateQueries({ queryKey: [api.statistics.get.path] });
       toast({ title: "Success", description: "Volunteer deleted successfully." });
     },
     onError: (error) => {

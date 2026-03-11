@@ -35,6 +35,7 @@ export function useRecordAttendance() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: [api.attendances.listByEvent.path, variables.eventId] });
       queryClient.invalidateQueries({ queryKey: [api.volunteers.ranking.path] });
+      queryClient.invalidateQueries({ queryKey: [api.statistics.get.path] });
       toast({ title: "Success", description: "Attendance recorded successfully." });
     },
     onError: (error) => {

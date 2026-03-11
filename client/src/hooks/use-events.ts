@@ -33,6 +33,7 @@ export function useCreateEvent() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [api.events.list.path] });
+      queryClient.invalidateQueries({ queryKey: [api.statistics.get.path] });
       toast({ title: "Success", description: "Event created successfully." });
     },
     onError: (error) => {
@@ -59,6 +60,7 @@ export function useUpdateEvent() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [api.events.list.path] });
+      queryClient.invalidateQueries({ queryKey: [api.statistics.get.path] });
       toast({ title: "Success", description: "Event updated successfully." });
     },
     onError: (error) => {
@@ -82,6 +84,7 @@ export function useDeleteEvent() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [api.events.list.path] });
+      queryClient.invalidateQueries({ queryKey: [api.statistics.get.path] });
       toast({ title: "Success", description: "Event deleted successfully." });
     },
     onError: (error) => {

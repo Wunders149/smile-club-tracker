@@ -10,7 +10,8 @@ export default function Statistics() {
       const res = await fetch('/api/statistics');
       if (!res.ok) throw new Error('Failed to fetch statistics');
       return res.json();
-    }
+    },
+    refetchInterval: 30000, // Auto-refresh every 30 seconds
   });
 
   if (isLoading) return <Layout><div className="text-center py-12">Loading statistics...</div></Layout>;
