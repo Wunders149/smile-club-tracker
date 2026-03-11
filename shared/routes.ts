@@ -128,12 +128,33 @@ export const api = {
         eventId: z.number(),
         records: z.array(z.object({
           volunteerId: z.number(),
-          attended: z.boolean(),
+          status: z.string(),
         })),
       }),
       responses: {
         201: z.object({ success: z.boolean() }),
         400: errorSchemas.validation,
+      },
+    },
+  },
+  statistics: {
+    get: {
+      method: 'GET' as const,
+      path: '/api/statistics' as const,
+      responses: {
+        200: z.object({
+          genderBreakdown: z.array(z.object({
+            gender: z.string().nullable(),
+            count: z.number()
+          })),
+          fieldStudyBreakdown: z.array(z.object({
+            field: z.string().nullable(),
+            count: z.number()
+          })),
+          totalVolunteers: z.number(),
+          maleCount: z.number(),
+          femaleCount: z.number()
+        }),
       },
     },
   },

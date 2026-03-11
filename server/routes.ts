@@ -55,9 +55,9 @@ async function seedDatabase() {
     });
 
     await storage.recordAttendances(e1.id, [
-      { volunteerId: v1.id, attended: true },
-      { volunteerId: v2.id, attended: true },
-      { volunteerId: v3.id, attended: false }
+      { volunteerId: v1.id, status: "on_time" },
+      { volunteerId: v2.id, status: "late" },
+      { volunteerId: v3.id, status: "absent" }
     ]);
   }
 }
@@ -206,6 +206,12 @@ export async function registerRoutes(
       }
       throw err;
     }
+  });
+
+  // --- Statistics ---
+  app.get(api.statistics.get.path, async (req, res) => {
+    const stats = await storage.getStatistics();
+    res.json(stats);
   });
 
   return httpServer;

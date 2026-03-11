@@ -15,6 +15,29 @@ export const EVENT_TYPES = [
   "Awareness", "Fundraising", "Outing"
 ] as const;
 
+export const ATTENDANCE_STATUS = [
+  "on_time",
+  "late",
+  "excused",
+  "absent"
+] as const;
+
+export const GENDERS = [
+  "Male",
+  "Female"
+] as const;
+
+const ATTENDANCE_POINTS: Record<typeof ATTENDANCE_STATUS[number], number> = {
+  on_time: 5,
+  late: 3,
+  excused: 1,
+  absent: 0
+};
+
+export function getAttendancePoints(status: typeof ATTENDANCE_STATUS[number]): number {
+  return ATTENDANCE_POINTS[status] || 0;
+}
+
 export const volunteers = pgTable("volunteers", {
   id: serial("id").primaryKey(),
   fullName: text("full_name").notNull(),
@@ -39,9 +62,9 @@ export const events = pgTable("events", {
 
 export const attendances = pgTable("attendances", {
   id: serial("id").primaryKey(),
-  volunteerId: integer("volunteer_id").notNull(), // Manually handling ref for simplicity, though Drizzle supports it
+  volunteerId: integer("volunteer_id").notNull(),
   eventId: integer("event_id").notNull(),
-  attended: boolean("attended").default(false),
+  status: text("status").default("absent"), // on_time, late, excused, absent
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -82,5 +105,13 @@ export type UpdateAttendanceRequest = Partial<InsertAttendance>;
 
 export type RankingRecord = {
   volunteer: Volunteer;
-  attendanceCount: number;
+  totalPoints: number;
+};
+
+export type StatisticsData = {
+  genderBreakdown: { gender: string | null; count: number }[];
+  fieldStudyBreakdown: { field: string | null; count: number }[];
+  totalVolunteers: number;
+  maleCount: number;
+  femaleCount: number;
 };

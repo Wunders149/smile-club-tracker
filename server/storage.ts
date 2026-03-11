@@ -3,7 +3,8 @@ import {
   volunteers, events, attendances,
   type InsertVolunteer, type UpdateVolunteerRequest, type Volunteer,
   type InsertEvent, type UpdateEventRequest, type Event,
-  type InsertAttendance, type Attendance, type RankingRecord
+  type InsertAttendance, type Attendance, type RankingRecord, type StatisticsData,
+  getAttendancePoints
 } from "@shared/schema";
 import { eq, sql, desc } from "drizzle-orm";
 
@@ -24,10 +25,13 @@ export interface IStorage {
 
   // Attendances
   getAttendancesByEvent(eventId: number): Promise<Attendance[]>;
-  recordAttendances(eventId: number, records: { volunteerId: number; attended: boolean }[]): Promise<boolean>;
+  recordAttendances(eventId: number, records: { volunteerId: number; status: string }[]): Promise<boolean>;
 
   // Rankings
   getVolunteerRankings(): Promise<RankingRecord[]>;
+
+  // Statistics
+  getStatistics(): Promise<StatisticsData>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -90,7 +94,7 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(attendances).where(eq(attendances.eventId, eventId));
   }
 
-  async recordAttendances(eventId: number, records: { volunteerId: number; attended: boolean }[]): Promise<boolean> {
+  async recordAttendances(eventId: number, records: { volunteerId: number; status: string }[]): Promise<boolean> {
     // Delete existing records for this event
     await db.delete(attendances).where(eq(attendances.eventId, eventId));
     
@@ -99,7 +103,7 @@ export class DatabaseStorage implements IStorage {
       const inserts = records.map(r => ({
         eventId,
         volunteerId: r.volunteerId,
-        attended: r.attended
+        status: r.status
       }));
       await db.insert(attendances).values(inserts);
     }
@@ -109,16 +113,46 @@ export class DatabaseStorage implements IStorage {
 
   // --- Rankings ---
   async getVolunteerRankings(): Promise<RankingRecord[]> {
-    const records = await db.select({
-      volunteer: volunteers,
-      attendanceCount: sql<number>`cast(count(${attendances.id}) as integer)`
-    })
-    .from(volunteers)
-    .leftJoin(attendances, sql`${volunteers.id} = ${attendances.volunteerId} and ${attendances.attended} = true`)
-    .groupBy(volunteers.id)
-    .orderBy(desc(sql`count(${attendances.id})`));
+    const allVolunteers = await db.select().from(volunteers);
     
-    return records;
+    const rankings: RankingRecord[] = [];
+    for (const vol of allVolunteers) {
+      const volAttendances = await db.select().from(attendances).where(eq(attendances.volunteerId, vol.id));
+      const totalPoints = volAttendances.reduce((sum, att) => sum + getAttendancePoints(att.status as any), 0);
+      rankings.push({ volunteer: vol, totalPoints });
+    }
+    
+    return rankings.sort((a, b) => b.totalPoints - a.totalPoints);
+  }
+
+  // --- Statistics ---
+  async getStatistics(): Promise<StatisticsData> {
+    const allVolunteers = await db.select().from(volunteers);
+    
+    const genderBreakdown = allVolunteers.reduce((acc, v) => {
+      const existing = acc.find(g => g.gender === (v.gender || null));
+      if (existing) existing.count++;
+      else acc.push({ gender: v.gender || null, count: 1 });
+      return acc;
+    }, [] as { gender: string | null; count: number }[]);
+    
+    const fieldStudyBreakdown = allVolunteers.reduce((acc, v) => {
+      const existing = acc.find(f => f.field === (v.studyField || null));
+      if (existing) existing.count++;
+      else acc.push({ field: v.studyField || null, count: 1 });
+      return acc;
+    }, [] as { field: string | null; count: number }[]).map(({ field, count }) => ({ field, count }));
+    
+    const maleCount = allVolunteers.filter(v => v.gender === 'Male').length;
+    const femaleCount = allVolunteers.filter(v => v.gender === 'Female').length;
+    
+    return {
+      genderBreakdown,
+      fieldStudyBreakdown,
+      totalVolunteers: allVolunteers.length,
+      maleCount,
+      femaleCount
+    };
   }
 }
 
