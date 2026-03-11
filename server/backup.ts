@@ -66,3 +66,76 @@ export async function createBackup() {
     console.error("Backup creation failed:", err);
   }
 }
+
+export async function restoreBackup() {
+  try {
+    // Check if backups directory exists
+    try {
+      await fs.access(BACKUPS_DIR);
+    } catch {
+      // No backups directory - nothing to restore
+      return;
+    }
+
+    // Find the most recent backup file
+    const files = await fs.readdir(BACKUPS_DIR);
+    const backupFiles = files
+      .filter((f) => f.startsWith("backup-") && f.endsWith(".json"))
+      .sort()
+      .reverse();
+
+    if (backupFiles.length === 0) {
+      // No backup files found
+      return;
+    }
+
+    const latestBackupFile = backupFiles[0];
+    const backupPath = join(BACKUPS_DIR, latestBackupFile);
+    const backupContent = await fs.readFile(backupPath, "utf-8");
+    const backupData = JSON.parse(backupContent);
+
+    // Clear existing data
+    await db.delete(attendances);
+    await db.delete(events);
+    await db.delete(volunteers);
+
+    // Restore volunteers (convert createdAt strings back to Date)
+    if (backupData.data.volunteers && backupData.data.volunteers.length > 0) {
+      const volunteersToInsert = backupData.data.volunteers.map((v: any) => ({
+        ...v,
+        createdAt: v.createdAt ? new Date(v.createdAt) : new Date()
+      }));
+      await db.insert(volunteers).values(volunteersToInsert);
+    }
+
+    // Restore events (convert createdAt strings back to Date)
+    if (backupData.data.events && backupData.data.events.length > 0) {
+      const eventsToInsert = backupData.data.events.map((e: any) => ({
+        ...e,
+        createdAt: e.createdAt ? new Date(e.createdAt) : new Date(),
+        date: e.date ? new Date(e.date) : new Date()
+      }));
+      await db.insert(events).values(eventsToInsert);
+    }
+
+    // Restore attendances (convert date strings back to Date)
+    if (backupData.data.attendance && backupData.data.attendance.length > 0) {
+      const attendancesToInsert = backupData.data.attendance.map((a: any) => ({
+        ...a,
+        createdAt: a.createdAt ? new Date(a.createdAt) : new Date()
+      }));
+      await db.insert(attendances).values(attendancesToInsert);
+    }
+
+    const volunteerCount = backupData.data.volunteers?.length || 0;
+    const eventCount = backupData.data.events?.length || 0;
+    const attendanceCount = backupData.data.attendance?.length || 0;
+
+    log(
+      `Database restored from ${latestBackupFile}: ${volunteerCount} volunteers, ${eventCount} events, ${attendanceCount} attendance records`,
+      "backup"
+    );
+  } catch (err) {
+    console.error("Backup restoration failed:", err);
+  }
+}
