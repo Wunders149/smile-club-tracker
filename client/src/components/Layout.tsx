@@ -53,7 +53,7 @@ export function Layout({ children }: { children: ReactNode }) {
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-72 bg-card border-r border-border/50 shadow-sm z-10 p-6 sticky top-0 h-screen">
         <div className="mb-8">
-          <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="h-16 w-auto object-contain" />
+          <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="h-[77px] w-auto object-contain" />
         </div>
         
         <nav className="flex-1">
@@ -70,7 +70,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-card/80 backdrop-blur-md border-b border-border/50 z-50 flex items-center justify-between px-4">
-        <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="h-10 w-auto object-contain" />
+        <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="h-12 w-auto object-contain" />
         
         <Sheet>
           <SheetTrigger asChild>
@@ -80,7 +80,7 @@ export function Layout({ children }: { children: ReactNode }) {
           </SheetTrigger>
           <SheetContent side="left" className="w-72 bg-card">
             <div className="mb-8 pt-4">
-              <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="h-12 w-auto object-contain" />
+              <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="h-[58px] w-auto object-contain" />
             </div>
             <NavLinks />
           </SheetContent>
