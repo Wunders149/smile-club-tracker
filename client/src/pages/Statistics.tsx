@@ -84,27 +84,27 @@ export default function Statistics() {
             </CardContent>
           </Card>
 
-          {/* Field of Study */}
+          {/* Position Distribution */}
           <Card className="rounded-2xl border-border/50 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5" /> Field of Study
+                <BarChart3 className="w-5 h-5" /> Position Distribution
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {stats.fieldStudyBreakdown?.length > 0 ? (
-                <div className="space-y-4">
-                  {stats.fieldStudyBreakdown.slice(0, 8).map((field: any, i: number) => (
+              {stats.positionBreakdown?.length > 0 ? (
+                <div className="space-y-3">
+                  {stats.positionBreakdown.slice(0, 8).map((pos: any, i: number) => (
                     <div key={i} className="flex items-center justify-between">
-                      <span className="text-sm text-foreground font-medium">{field.field || 'Unspecified'}</span>
+                      <span className="text-sm text-foreground font-medium">{pos.position}</span>
                       <div className="flex items-center gap-3">
-                        <div className="w-32 bg-muted rounded-full h-2">
+                        <div className="w-24 bg-muted rounded-full h-2">
                           <div 
-                            className="bg-primary h-full rounded-full" 
-                            style={{ width: `${(field.count / stats.totalVolunteers * 100)}%` }}
+                            className="bg-accent h-full rounded-full" 
+                            style={{ width: `${(pos.count / stats.totalVolunteers * 100)}%` }}
                           ></div>
                         </div>
-                        <span className="font-bold text-muted-foreground w-8 text-right">{field.count}</span>
+                        <span className="font-bold text-muted-foreground w-6 text-right">{pos.count}</span>
                       </div>
                     </div>
                   ))}
@@ -113,6 +113,35 @@ export default function Statistics() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Field of Study */}
+        <Card className="rounded-2xl border-border/50 shadow-lg">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="w-5 h-5" /> Field of Study Distribution
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {stats.fieldStudyBreakdown?.length > 0 ? (
+              <div className="space-y-3">
+                {stats.fieldStudyBreakdown.slice(0, 8).map((field: any, i: number) => (
+                  <div key={i} className="flex items-center justify-between">
+                    <span className="text-sm text-foreground font-medium">{field.field || 'Unspecified'}</span>
+                    <div className="flex items-center gap-3">
+                      <div className="w-32 bg-muted rounded-full h-2">
+                        <div 
+                          className="bg-primary h-full rounded-full" 
+                          style={{ width: `${(field.count / stats.totalVolunteers * 100)}%` }}
+                        ></div>
+                      </div>
+                      <span className="font-bold text-muted-foreground w-8 text-right">{field.count}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : <p className="text-muted-foreground">No data</p>}
+          </CardContent>
+        </Card>
       </div>
     </Layout>
   );

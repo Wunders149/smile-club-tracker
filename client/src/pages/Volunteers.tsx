@@ -12,7 +12,7 @@ import { Plus, MoreVertical, Edit2, Trash2, Mail, Phone, GraduationCap, Users } 
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertVolunteerSchema, type Volunteer } from "@shared/schema";
+import { insertVolunteerSchema, type Volunteer, GENDERS } from "@shared/schema";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
@@ -31,7 +31,7 @@ export default function Volunteers() {
   const form = useForm<FormValues>({
     resolver: zodResolver(insertVolunteerSchema),
     defaultValues: {
-      fullName: "", contact: "", address: "", email: "", photo: "", studyField: "", major: "", position: POSITIONS[8]
+      fullName: "", contact: "", address: "", email: "", photo: "", studyField: "", major: "", position: POSITIONS[8], gender: undefined
     }
   });
 
@@ -161,6 +161,18 @@ export default function Volunteers() {
                     )} />
                     <FormField control={form.control} name="major" render={({ field }) => (
                       <FormItem><FormLabel>Major</FormLabel><FormControl><Input className="rounded-xl" {...field} value={field.value || ''}/></FormControl><FormMessage/></FormItem>
+                    )} />
+                    <FormField control={form.control} name="gender" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Gender</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value || ''}>
+                          <FormControl><SelectTrigger className="rounded-xl"><SelectValue placeholder="Select gender" /></SelectTrigger></FormControl>
+                          <SelectContent>
+                            {GENDERS.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage/>
+                      </FormItem>
                     )} />
                   </div>
                   <DialogFooter className="pt-4">

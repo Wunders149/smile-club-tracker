@@ -143,12 +143,20 @@ export class DatabaseStorage implements IStorage {
       return acc;
     }, [] as { field: string | null; count: number }[]).map(({ field, count }) => ({ field, count }));
     
+    const positionBreakdown = allVolunteers.reduce((acc, v) => {
+      const existing = acc.find(p => p.position === v.position);
+      if (existing) existing.count++;
+      else acc.push({ position: v.position, count: 1 });
+      return acc;
+    }, [] as { position: string; count: number }[]).sort((a, b) => b.count - a.count);
+    
     const maleCount = allVolunteers.filter(v => v.gender === 'Male').length;
     const femaleCount = allVolunteers.filter(v => v.gender === 'Female').length;
     
     return {
       genderBreakdown,
       fieldStudyBreakdown,
+      positionBreakdown,
       totalVolunteers: allVolunteers.length,
       maleCount,
       femaleCount

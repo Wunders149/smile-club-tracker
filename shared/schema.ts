@@ -48,6 +48,7 @@ export const volunteers = pgTable("volunteers", {
   studyField: text("study_field"),
   major: text("major"),
   position: text("position").notNull(),
+  gender: text("gender"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -111,6 +112,7 @@ export type RankingRecord = {
 export type StatisticsData = {
   genderBreakdown: { gender: string | null; count: number }[];
   fieldStudyBreakdown: { field: string | null; count: number }[];
+  positionBreakdown: { position: string; count: number }[];
   totalVolunteers: number;
   maleCount: number;
   femaleCount: number;
