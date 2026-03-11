@@ -4,71 +4,10 @@ import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
 
-async function seedDatabase() {
-  const existingVolunteers = await storage.getVolunteers();
-  if (existingVolunteers.length === 0) {
-    const v1 = await storage.createVolunteer({
-      fullName: "Jane Doe",
-      contact: "+261 34 00 000 00",
-      address: "Majunga Be",
-      email: "jane.doe@example.com",
-      position: "President",
-      studyField: "Medicine",
-      major: "General",
-      photo: ""
-    });
-    
-    const v2 = await storage.createVolunteer({
-      fullName: "John Smith",
-      contact: "+261 32 11 111 11",
-      address: "Tsaramandroso",
-      email: "john.smith@example.com",
-      position: "Vice President",
-      studyField: "Management",
-      major: "Finance",
-      photo: ""
-    });
-
-    const v3 = await storage.createVolunteer({
-      fullName: "Alice Johnson",
-      contact: "+261 33 22 222 22",
-      address: "Amborovy",
-      email: "alice.j@example.com",
-      position: "Active Volunteer",
-      studyField: "Engineering",
-      major: "Civil",
-      photo: ""
-    });
-
-    const e1 = await storage.createEvent({
-      name: "Annual General Meeting",
-      type: "Meeting",
-      date: new Date(new Date().setHours(new Date().getHours() - 48)),
-      description: "Discussing the yearly goals."
-    });
-
-    const e2 = await storage.createEvent({
-      name: "Beach Cleanup",
-      type: "Awareness",
-      date: new Date(new Date().setHours(new Date().getHours() + 48)),
-      description: "Cleaning the tourist beach."
-    });
-
-    await storage.recordAttendances(e1.id, [
-      { volunteerId: v1.id, status: "on_time" },
-      { volunteerId: v2.id, status: "late" },
-      { volunteerId: v3.id, status: "absent" }
-    ]);
-  }
-}
-
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-
-  // Seed DB on startup
-  seedDatabase().catch(console.error);
 
   // --- Volunteers ---
   app.get(api.volunteers.list.path, async (req, res) => {
