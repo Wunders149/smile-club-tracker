@@ -21,6 +21,7 @@ import { format } from "date-fns";
 // Re-create schema to handle datetime-local string properly before sending
 const formSchema = insertEventSchema.extend({
   date: z.coerce.date(),
+  endTime: z.coerce.date().nullable().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -38,13 +39,14 @@ export default function Events() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "", type: EVENT_TYPES[0], date: new Date(), description: ""
+      name: "", type: EVENT_TYPES[0], date: new Date(), description: "", venue: "", speaker: "", endTime: null
     }
   });
 
   const onEdit = (ev: Event) => {
     form.reset({
-      name: ev.name, type: ev.type, date: new Date(ev.date), description: ev.description || ""
+      name: ev.name, type: ev.type, date: new Date(ev.date), description: ev.description || "",
+      venue: ev.venue || "", speaker: ev.speaker || "", endTime: ev.endTime ? new Date(ev.endTime) : null
     });
     setEditingEvent(ev);
   };
@@ -100,7 +102,7 @@ export default function Events() {
                     )} />
                     <FormField control={form.control} name="date" render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Date & Time</FormLabel>
+                        <FormLabel>Start Date & Time</FormLabel>
                         <FormControl>
                           <Input 
                             type="datetime-local" 
@@ -113,6 +115,28 @@ export default function Events() {
                       </FormItem>
                     )} />
                   </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField control={form.control} name="venue" render={({ field }) => (
+                      <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="Meeting Room A" className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
+                    )} />
+                    <FormField control={form.control} name="speaker" render={({ field }) => (
+                      <FormItem><FormLabel>Speaker (optional)</FormLabel><FormControl><Input placeholder="Dr. Smith" className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
+                    )} />
+                  </div>
+                  <FormField control={form.control} name="endTime" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ending Time (optional)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="datetime-local" 
+                          className="rounded-xl" 
+                          value={field.value ? new Date(new Date(field.value).getTime() - new Date(field.value).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
+                          onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                        />
+                      </FormControl>
+                      <FormMessage/>
+                    </FormItem>
+                  )} />
                   <FormField control={form.control} name="description" render={({ field }) => (
                     <FormItem><FormLabel>Description (optional)</FormLabel><FormControl><Textarea className="rounded-xl resize-none h-24" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
                   )} />
@@ -150,7 +174,7 @@ export default function Events() {
                     )} />
                     <FormField control={form.control} name="date" render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Date & Time</FormLabel>
+                        <FormLabel>Start Date & Time</FormLabel>
                         <FormControl>
                           <Input 
                             type="datetime-local" 
@@ -163,6 +187,28 @@ export default function Events() {
                       </FormItem>
                     )} />
                   </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField control={form.control} name="venue" render={({ field }) => (
+                      <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="Meeting Room A" className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
+                    )} />
+                    <FormField control={form.control} name="speaker" render={({ field }) => (
+                      <FormItem><FormLabel>Speaker (optional)</FormLabel><FormControl><Input placeholder="Dr. Smith" className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
+                    )} />
+                  </div>
+                  <FormField control={form.control} name="endTime" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ending Time (optional)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="datetime-local" 
+                          className="rounded-xl" 
+                          value={field.value ? new Date(new Date(field.value).getTime() - new Date(field.value).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
+                          onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                        />
+                      </FormControl>
+                      <FormMessage/>
+                    </FormItem>
+                  )} />
                   <FormField control={form.control} name="description" render={({ field }) => (
                     <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea className="rounded-xl resize-none h-24" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
                   )} />

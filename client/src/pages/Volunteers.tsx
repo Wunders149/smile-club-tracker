@@ -39,7 +39,7 @@ export default function Volunteers() {
     form.reset({
       fullName: vol.fullName, contact: vol.contact, address: vol.address,
       email: vol.email, photo: vol.photo || "", studyField: vol.studyField || "",
-      major: vol.major || "", position: vol.position
+      major: vol.major || "", position: vol.position, gender: vol.gender || undefined
     });
     setEditingVol(vol);
   };
@@ -110,6 +110,18 @@ export default function Volunteers() {
                     )} />
                     <FormField control={form.control} name="major" render={({ field }) => (
                       <FormItem><FormLabel>Major (optional)</FormLabel><FormControl><Input placeholder="Surgery, Software..." className="rounded-xl" {...field} value={field.value || ''}/></FormControl><FormMessage/></FormItem>
+                    )} />
+                    <FormField control={form.control} name="gender" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Gender</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value || ''}>
+                          <FormControl><SelectTrigger className="rounded-xl"><SelectValue placeholder="Select gender" /></SelectTrigger></FormControl>
+                          <SelectContent>
+                            {GENDERS.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage/>
+                      </FormItem>
                     )} />
                   </div>
                   <DialogFooter className="pt-4">

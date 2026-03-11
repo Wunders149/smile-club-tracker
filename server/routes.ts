@@ -145,7 +145,8 @@ export async function registerRoutes(
     try {
       // Coerce dates from strings
       const bodySchema = api.events.create.input.extend({
-        date: z.coerce.date()
+        date: z.coerce.date(),
+        endTime: z.coerce.date().nullable().optional()
       });
       const input = bodySchema.parse(req.body);
       const item = await storage.createEvent(input);
@@ -164,7 +165,8 @@ export async function registerRoutes(
   app.put(api.events.update.path, async (req, res) => {
     try {
       const bodySchema = api.events.update.input.extend({
-        date: z.coerce.date().optional()
+        date: z.coerce.date().optional(),
+        endTime: z.coerce.date().nullable().optional()
       });
       const input = bodySchema.parse(req.body);
       const item = await storage.updateEvent(Number(req.params.id), input);

@@ -109,7 +109,10 @@ export default function Attendance() {
                 <div className="p-4 sm:p-6 border-b border-border/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <h3 className="font-bold text-foreground flex items-center gap-2">
-                      <Users className="w-5 h-5 text-primary" /> Roster
+                      <Users className="w-5 h-5 text-primary" /> Roster 
+                      <span className="ml-2 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs">
+                        {Object.values(attendanceState).filter(s => s !== 'absent').length} Attending
+                      </span>
                     </h3>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
