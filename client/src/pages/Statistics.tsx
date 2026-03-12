@@ -170,22 +170,24 @@ export default function Statistics() {
             <CardContent>
               <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                 {stats.fieldStudyBreakdown?.length > 0 ? (
-                  stats.fieldStudyBreakdown.map((study: any, i: number) => (
-                    <div key={i} className="flex items-center justify-between group">
-                      <span className="text-sm text-muted-foreground font-medium truncate max-w-[150px] group-hover:text-foreground transition-colors" title={study.field || 'Unspecified'}>
-                        {study.field || 'Unspecified'}
-                      </span>
-                      <div className="flex items-center gap-3">
-                        <div className="w-24 sm:w-32 bg-muted rounded-full h-2 overflow-hidden">
-                          <div 
-                            className="bg-green-500/60 h-full rounded-full transition-all duration-500 group-hover:bg-green-500" 
-                            style={{ width: `${(study.count / stats.totalVolunteers * 100)}%` }}
-                          ></div>
+                  [...stats.fieldStudyBreakdown]
+                    .sort((a: any, b: any) => b.count - a.count)
+                    .map((study: any, i: number) => (
+                      <div key={i} className="flex items-center justify-between group">
+                        <span className="text-sm text-muted-foreground font-medium truncate max-w-[150px] group-hover:text-foreground transition-colors" title={study.field || 'Unspecified'}>
+                          {study.field || 'Unspecified'}
+                        </span>
+                        <div className="flex items-center gap-3">
+                          <div className="w-24 sm:w-32 bg-muted rounded-full h-2 overflow-hidden">
+                            <div 
+                              className="bg-green-500/60 h-full rounded-full transition-all duration-500 group-hover:bg-green-500" 
+                              style={{ width: `${(study.count / stats.totalVolunteers * 100)}%` }}
+                            ></div>
+                          </div>
+                          <span className="font-bold text-foreground w-6 text-right text-sm">{study.count}</span>
                         </div>
-                        <span className="font-bold text-foreground w-6 text-right text-sm">{study.count}</span>
                       </div>
-                    </div>
-                  ))
+                    ))
                 ) : (
                   <p className="text-center py-12 text-muted-foreground italic">No data available</p>
                 )}
