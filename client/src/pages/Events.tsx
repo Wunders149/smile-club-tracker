@@ -40,6 +40,8 @@ export default function Events() {
   const deleteMut = useDeleteEvent();
 
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [showAddPrompt, setShowAddPrompt] = useState(false);
+  const [promptDate, setPromptDate] = useState<Date | null>(null);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [view, setView] = useState<"grid" | "calendar">("grid");
@@ -68,6 +70,15 @@ export default function Events() {
     if (!editingEvent && (!currentEnd || currentEnd.getTime() <= newDate.getTime())) {
       form.setValue("endTime", addHours(newDate, 1));
     }
+  };
+
+  const handleOpenAdd = () => {
+    const defaultDate = new Date();
+    defaultDate.setMinutes(0, 0, 0);
+    form.reset({
+      name: "", type: EVENT_TYPES[0], date: defaultDate, description: "", venue: "", speaker: "", endTime: addHours(defaultDate, 1)
+    });
+    setIsAddOpen(true);
   };
 
   const onSubmit = async (data: FormValues) => {
@@ -116,19 +127,14 @@ export default function Events() {
               </Button>
             </div>
 
-            <Dialog open={isAddOpen} onOpenChange={(open) => {
-              setIsAddOpen(open);
-              if (!open) {
-                form.reset({ date: new Date(), endTime: addHours(new Date(), 1) });
-              } else {
-                form.setValue("endTime", addHours(new Date(), 1));
-              }
-            }}>
-              <DialogTrigger asChild>
-                <Button className="bg-primary hover:bg-primary/90 text-white font-medium rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 px-6">
-                  <Plus className="w-4 h-4 mr-2" /> Add Event
-                </Button>
-              </DialogTrigger>
+            <Button 
+              onClick={handleOpenAdd}
+              className="bg-primary hover:bg-primary/90 text-white font-medium rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 px-6"
+            >
+              <Plus className="w-4 h-4 mr-2" /> Add Event
+            </Button>
+
+            <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
               <DialogContent className="sm:max-w-[550px] bg-card rounded-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="font-display text-2xl">Add New Event</DialogTitle>
@@ -445,7 +451,16 @@ export default function Events() {
                 <Calendar 
                   mode="single"
                   selected={selectedDate}
-                  onSelect={setSelectedDate}
+                  onSelect={(date) => {
+                    setSelectedDate(date);
+                    if (date) {
+                      const hasEvent = events?.some(ev => isSameDay(new Date(ev.date), date));
+                      if (!hasEvent) {
+                        setPromptDate(date);
+                        setShowAddPrompt(true);
+                      }
+                    }
+                  }}
                   className="rounded-md border border-border/50"
                   modifiers={{ event: eventDays }}
                   modifiersClassNames={{ event: "bg-primary/20 font-bold text-primary" }}
@@ -468,6 +483,28 @@ export default function Events() {
               {filteredEvents.length === 0 ? (
                 <div className="py-12 text-center bg-muted/20 rounded-2xl border border-dashed border-border/50">
                   <p className="text-muted-foreground">No events scheduled for this day</p>
+                  <Button 
+                    variant="outline" 
+                    className="mt-4 rounded-xl"
+                    onClick={() => {
+                      if (selectedDate) {
+                        const dateWithTime = new Date(selectedDate);
+                        dateWithTime.setHours(9, 0, 0, 0);
+                        form.reset({
+                          name: "",
+                          type: EVENT_TYPES[0],
+                          date: dateWithTime,
+                          description: "",
+                          venue: "",
+                          speaker: "",
+                          endTime: addHours(dateWithTime, 1)
+                        });
+                        setIsAddOpen(true);
+                      }
+                    }}
+                  >
+                    <Plus className="w-4 h-4 mr-2" /> Create Event
+                  </Button>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -479,6 +516,41 @@ export default function Events() {
             </div>
           </div>
         )}
+
+        <AlertDialog open={showAddPrompt} onOpenChange={setShowAddPrompt}>
+          <AlertDialogContent className="rounded-2xl">
+            <AlertDialogHeader>
+              <AlertDialogTitle>No event on this date</AlertDialogTitle>
+              <AlertDialogDescription>
+                Would you like to add a new event for {promptDate ? format(promptDate, 'MMMM d, yyyy') : ''}?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="rounded-xl">No, thanks</AlertDialogCancel>
+              <AlertDialogAction 
+                className="bg-primary text-white hover:bg-primary/90 rounded-xl"
+                onClick={() => {
+                  if (promptDate) {
+                    const dateWithTime = new Date(promptDate);
+                    dateWithTime.setHours(9, 0, 0, 0);
+                    form.reset({
+                      name: "",
+                      type: EVENT_TYPES[0],
+                      date: dateWithTime,
+                      description: "",
+                      venue: "",
+                      speaker: "",
+                      endTime: addHours(dateWithTime, 1)
+                    });
+                    setIsAddOpen(true);
+                  }
+                }}
+              >
+                Yes, Add Event
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </Layout>
   );
