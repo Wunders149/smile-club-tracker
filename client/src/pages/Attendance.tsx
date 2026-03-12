@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Layout } from "@/components/Layout";
 import { useEvents } from "@/hooks/use-events";
 import { useVolunteers } from "@/hooks/use-volunteers";
@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { format } from "date-fns";
-import { CheckSquare, Save, Users, AlertCircle } from "lucide-react";
+import { CheckSquare, Save, Users, AlertCircle, Printer } from "lucide-react";
 import { motion } from "framer-motion";
+import { useReactToPrint } from "react-to-print";
 
 export default function Attendance() {
   const { data: events, isLoading: loadingEvents } = useEvents();
@@ -19,6 +20,12 @@ export default function Attendance() {
   const recordMut = useRecordAttendance();
 
   const [attendanceState, setAttendanceState] = useState<Record<number, string>>({});
+  const printRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: `Attendance_Roster_${format(new Date(), 'yyyy-MM-dd')}`,
+  });
   
   useEffect(() => {
     if (volunteers && existingAttendances) {
@@ -52,6 +59,9 @@ export default function Attendance() {
   };
 
   const sortedEvents = events ? [...events].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) : [];
+  const sortedVolunteers = volunteers ? [...volunteers].sort((a, b) => a.fullName.localeCompare(b.fullName)) : [];
+  const selectedEvent = events?.find(e => e.id === selectedEventId);
+
   const statusColors: Record<string, string> = {
     on_time: 'bg-green-100 text-green-800 border-green-200',
     late: 'bg-blue-100 text-blue-800 border-blue-200',
@@ -62,13 +72,15 @@ export default function Attendance() {
   return (
     <Layout>
       <div className="space-y-6 max-w-4xl mx-auto">
-        <div>
-          <h1 className="text-3xl font-display font-bold text-foreground">Record Attendance</h1>
-          <p className="text-muted-foreground mt-1">Select an event and mark attendance status for each volunteer.</p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-display font-bold text-foreground">Record Attendance</h1>
+            <p className="text-muted-foreground mt-1">Select an event and mark attendance status for each volunteer.</p>
+          </div>
         </div>
 
-        <Card className="border-border/50 shadow-lg shadow-black/5 rounded-2xl">
-          <CardHeader className="bg-muted/20 border-b border-border/50 pb-6 rounded-t-2xl">
+        <Card className="border-border/50 shadow-lg shadow-black/5 rounded-2xl overflow-hidden">
+          <CardHeader className="bg-muted/20 border-b border-border/50 pb-6">
             <CardTitle className="text-lg">1. Select Event</CardTitle>
             <CardDescription>Choose the event you want to record attendance for.</CardDescription>
             <div className="mt-4 max-w-md">
@@ -116,6 +128,10 @@ export default function Attendance() {
                     </h3>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
+                    <Button variant="outline" size="sm" onClick={() => handlePrint()} className="rounded-lg h-9 text-xs border-primary/30 text-primary">
+                      <Printer className="w-3.5 h-3.5 mr-1.5" /> Print Roster
+                    </Button>
+                    <div className="w-px h-6 bg-border/50 mx-1 hidden sm:block" />
                     <Button variant="outline" size="sm" onClick={() => updateAll('on_time')} className="rounded-lg h-9 text-xs">✓ On Time</Button>
                     <Button variant="outline" size="sm" onClick={() => updateAll('late')} className="rounded-lg h-9 text-xs">⏱ Late</Button>
                     <Button variant="outline" size="sm" onClick={() => updateAll('excused')} className="rounded-lg h-9 text-xs">ℹ Excused</Button>
@@ -123,8 +139,8 @@ export default function Attendance() {
                   </div>
                 </div>
 
-                <div className="divide-y divide-border/20">
-                  {volunteers.map((vol) => {
+                <div className="divide-y divide-border/20 max-h-[500px] overflow-y-auto">
+                  {sortedVolunteers.map((vol) => {
                     const status = attendanceState[vol.id] || 'absent';
                     return (
                       <div key={vol.id} className="p-4 sm:px-6 flex items-center justify-between hover:bg-muted/10 transition-colors">
@@ -167,6 +183,51 @@ export default function Attendance() {
             )}
           </CardContent>
         </Card>
+
+        {/* Printable Roster */}
+        <div className="hidden">
+          <div ref={printRef} className="p-10 bg-white text-black font-sans w-full">
+            <div className="flex justify-between items-start mb-8 border-b-2 border-primary pb-6">
+              <div>
+                <img src="/smile-club-logo.png" alt="Logo" className="h-16 mb-2" />
+                <h1 className="text-2xl font-bold uppercase tracking-tight">Attendance Roster</h1>
+              </div>
+              <div className="text-right">
+                <p className="font-bold text-lg">{selectedEvent?.name || "Event Roster"}</p>
+                <p className="text-gray-600">{selectedEvent?.date ? format(new Date(selectedEvent.date), 'MMMM d, yyyy') : format(new Date(), 'MMMM d, yyyy')}</p>
+                <p className="text-gray-500 text-sm mt-1">{selectedEvent?.type || "General"}</p>
+              </div>
+            </div>
+
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="border border-gray-200 p-3 text-left font-bold uppercase text-xs tracking-wider">Volunteer Name</th>
+                  <th className="border border-gray-200 p-3 text-left font-bold uppercase text-xs tracking-wider">Position</th>
+                  <th className="border border-gray-200 p-3 text-center font-bold uppercase text-xs tracking-wider w-32">Status</th>
+                  <th className="border border-gray-200 p-3 text-left font-bold uppercase text-xs tracking-wider w-40">Signature</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedVolunteers.map((vol) => (
+                  <tr key={vol.id}>
+                    <td className="border border-gray-200 p-3 font-medium">{vol.fullName}</td>
+                    <td className="border border-gray-200 p-3 text-gray-600 text-sm">{vol.position}</td>
+                    <td className="border border-gray-200 p-3 text-center font-bold text-xs uppercase italic">
+                      {attendanceState[vol.id]?.replace('_', ' ') || 'absent'}
+                    </td>
+                    <td className="border border-gray-200 p-3"></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div className="mt-12 pt-8 border-t border-gray-100 flex justify-between items-end text-xs text-gray-400">
+              <p>Generated by Smile Club Mahajanga Tracker</p>
+              <p className="italic">"For the patients"</p>
+            </div>
+          </div>
+        </div>
       </div>
     </Layout>
   );
