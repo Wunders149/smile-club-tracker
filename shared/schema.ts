@@ -11,8 +11,8 @@ export const POSITIONS = [
 ] as const;
 
 export const EVENT_TYPES = [
-  "Meeting", "Workshop", "Training", "Surgical Programs",
-  "Awareness", "Fundraising", "Outing"
+  "Meeting", "English Training", "Conference", "Surgical Programs",
+  "Awareness", "Fundraising", "Outing", "Social Work", "Learning Time"
 ] as const;
 
 export const ATTENDANCE_STATUS = [
@@ -116,6 +116,7 @@ export type StatisticsData = {
   genderBreakdown: { gender: string | null; count: number }[];
   fieldStudyBreakdown: { field: string | null; count: number }[];
   positionBreakdown: { position: string; count: number }[];
+  commitmentTrend: { date: string; points: number }[];
   totalVolunteers: number;
   maleCount: number;
   femaleCount: number;

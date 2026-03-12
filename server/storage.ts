@@ -153,10 +153,27 @@ export class DatabaseStorage implements IStorage {
     const maleCount = allVolunteers.filter(v => v.gender === 'Male').length;
     const femaleCount = allVolunteers.filter(v => v.gender === 'Female').length;
     
+    // Commitment Trend
+    const allEvents = await db.select().from(events);
+    const allAttendances = await db.select().from(attendances);
+    
+    const commitmentMap = new Map<string, number>();
+    allEvents.forEach(ev => {
+      const dateStr = ev.date.toISOString().split('T')[0];
+      const eventAttendances = allAttendances.filter(a => a.eventId === ev.id);
+      const dayPoints = eventAttendances.reduce((sum, a) => sum + getAttendancePoints(a.status as any), 0);
+      commitmentMap.set(dateStr, (commitmentMap.get(dateStr) || 0) + dayPoints);
+    });
+
+    const commitmentTrend = Array.from(commitmentMap.entries())
+      .map(([date, points]) => ({ date, points }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+
     return {
       genderBreakdown,
       fieldStudyBreakdown,
       positionBreakdown,
+      commitmentTrend,
       totalVolunteers: allVolunteers.length,
       maleCount,
       femaleCount
