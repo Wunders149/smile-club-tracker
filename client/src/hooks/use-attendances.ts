@@ -22,7 +22,7 @@ export function useRecordAttendance() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (data: { eventId: number, records: { volunteerId: number, attended: boolean }[] }) => {
+    mutationFn: async (data: { eventId: number, records: { volunteerId: number, status: string }[] }) => {
       const res = await fetch(api.attendances.record.path, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

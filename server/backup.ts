@@ -2,11 +2,11 @@ import { db } from "./db";
 import { volunteers, events, attendances } from "@shared/schema";
 import { log } from "./index";
 
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-const GITHUB_REPO = process.env.GITHUB_REPO; // e.g. "username/repo"
-const GITHUB_PATH = process.env.GITHUB_PATH || "data.json";
-
 async function getGithubFile() {
+  const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+  const GITHUB_REPO = process.env.GITHUB_REPO;
+  const GITHUB_PATH = process.env.GITHUB_PATH || "data.json";
+
   if (!GITHUB_TOKEN || !GITHUB_REPO) {
     console.warn("GitHub backup/restore skipped: GITHUB_TOKEN or GITHUB_REPO not set");
     return null;
@@ -30,6 +30,10 @@ async function getGithubFile() {
 }
 
 export async function createBackup() {
+  const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+  const GITHUB_REPO = process.env.GITHUB_REPO;
+  const GITHUB_PATH = process.env.GITHUB_PATH || "data.json";
+
   try {
     if (!GITHUB_TOKEN || !GITHUB_REPO) return;
 
@@ -84,6 +88,10 @@ export async function createBackup() {
 }
 
 export async function restoreBackup() {
+  const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+  const GITHUB_REPO = process.env.GITHUB_REPO;
+  const GITHUB_PATH = process.env.GITHUB_PATH || "data.json";
+
   try {
     if (!GITHUB_TOKEN || !GITHUB_REPO) return;
 

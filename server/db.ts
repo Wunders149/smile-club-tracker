@@ -13,7 +13,6 @@ if (!process.env.DATABASE_URL) {
 export const pool = new Pool({ 
   connectionString: process.env.DATABASE_URL,
   max: 1,
-  family: 4, // Force IPv4 to avoid ENETUNREACH errors on Render
   ssl: {
     rejectUnauthorized: false
   }
