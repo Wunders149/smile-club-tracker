@@ -16,7 +16,7 @@ import { insertVolunteerSchema, type Volunteer, GENDERS } from "@shared/schema";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import imageCompression from 'browser-image-compression';
-import { uploadVolunteerPhoto } from "@/lib/supabase";
+import { uploadVolunteerPhoto, deleteVolunteerPhoto } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 
 type FormValues = z.infer<typeof insertVolunteerSchema>;
@@ -56,6 +56,12 @@ export default function Volunteers() {
 
     setIsUploading(true);
     try {
+      // Deleting the current photo if it exists on Supabase
+      const currentPhoto = form.getValues("photo");
+      if (currentPhoto && currentPhoto.includes('supabase.co')) {
+        await deleteVolunteerPhoto(currentPhoto);
+      }
+
       // Compression options
       const options = {
         maxSizeMB: 0.1, // Max 100KB
@@ -326,7 +332,13 @@ export default function Volunteers() {
                 <AlertDialogAction 
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl"
                   onClick={async () => {
-                    if (deletingId) await deleteMut.mutateAsync(deletingId);
+                    if (deletingId) {
+                      const volunteerToDelete = volunteers?.find(v => v.id === deletingId);
+                      if (volunteerToDelete?.photo && volunteerToDelete.photo.includes('supabase.co')) {
+                        await deleteVolunteerPhoto(volunteerToDelete.photo);
+                      }
+                      await deleteMut.mutateAsync(deletingId);
+                    }
                     setDeletingId(null);
                   }}
                 >

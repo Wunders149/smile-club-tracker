@@ -44,6 +44,8 @@ export async function registerRoutes(
     try {
       const input = api.volunteers.create.input.parse(req.body);
       const item = await storage.createVolunteer(input);
+      // Sync backup to GitHub
+      createBackup().catch(err => console.error("Auto-backup failed:", err));
       res.status(201).json(item);
     } catch (err) {
       if (err instanceof z.ZodError) {
@@ -60,6 +62,7 @@ export async function registerRoutes(
     try {
       const input = api.volunteers.update.input.parse(req.body);
       const item = await storage.updateVolunteer(Number(req.params.id), input);
+      createBackup().catch(err => console.error("Auto-backup failed:", err));
       res.json(item);
     } catch (err) {
       if (err instanceof z.ZodError) {
@@ -74,6 +77,7 @@ export async function registerRoutes(
 
   app.delete(api.volunteers.delete.path, async (req, res) => {
     await storage.deleteVolunteer(Number(req.params.id));
+    createBackup().catch(err => console.error("Auto-backup failed:", err));
     res.status(204).send();
   });
 
@@ -101,6 +105,7 @@ export async function registerRoutes(
       });
       const input = bodySchema.parse(req.body);
       const item = await storage.createEvent(input);
+      createBackup().catch(err => console.error("Auto-backup failed:", err));
       res.status(201).json(item);
     } catch (err) {
       if (err instanceof z.ZodError) {
@@ -121,6 +126,7 @@ export async function registerRoutes(
       });
       const input = bodySchema.parse(req.body);
       const item = await storage.updateEvent(Number(req.params.id), input);
+      createBackup().catch(err => console.error("Auto-backup failed:", err));
       res.json(item);
     } catch (err) {
       if (err instanceof z.ZodError) {
@@ -135,6 +141,7 @@ export async function registerRoutes(
 
   app.delete(api.events.delete.path, async (req, res) => {
     await storage.deleteEvent(Number(req.params.id));
+    createBackup().catch(err => console.error("Auto-backup failed:", err));
     res.status(204).send();
   });
 
@@ -149,6 +156,7 @@ export async function registerRoutes(
     try {
       const input = api.attendances.record.input.parse(req.body);
       await storage.recordAttendances(input.eventId, input.records);
+      createBackup().catch(err => console.error("Auto-backup failed:", err));
       res.status(201).json({ success: true });
     } catch (err) {
       if (err instanceof z.ZodError) {

@@ -28,3 +28,25 @@ export const uploadVolunteerPhoto = async (file: File) => {
 
   return publicUrl;
 };
+
+export const deleteVolunteerPhoto = async (photoUrl: string) => {
+  if (!photoUrl) return;
+
+  try {
+    // Extract the file path from the public URL
+    // Format is usually: .../storage/v1/object/public/volunteers/volunteer-photos/filename.ext
+    const urlParts = photoUrl.split('/volunteers/');
+    if (urlParts.length < 2) return;
+
+    const filePath = urlParts[1];
+    const { error } = await supabase.storage
+      .from('volunteers')
+      .remove([filePath]);
+
+    if (error) {
+      console.error('Error deleting photo from storage:', error);
+    }
+  } catch (err) {
+    console.error('Unexpected error during photo deletion:', err);
+  }
+};
