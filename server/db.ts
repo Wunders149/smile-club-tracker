@@ -12,6 +12,19 @@ if (!process.env.DATABASE_URL) {
 
 export const pool = new Pool({ 
   connectionString: process.env.DATABASE_URL,
-  max: 1 // Supabase Free tier has limited connections
+  max: 1,
+  ssl: {
+    rejectUnauthorized: false // Required for Supabase/Render connectivity
+  }
 });
+
+// Test connection
+pool.connect((err, client, release) => {
+  if (err) {
+    return console.error('Error acquiring client', err.stack);
+  }
+  console.log('Successfully connected to PostgreSQL database');
+  release();
+});
+
 export const db = drizzle(pool, { schema });

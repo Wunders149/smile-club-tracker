@@ -112,6 +112,7 @@ export async function restoreBackup() {
         createdAt: v.createdAt ? new Date(v.createdAt) : new Date()
       }));
       await db.insert(volunteers).values(volunteersToInsert);
+      log(`Inserted ${volunteersToInsert.length} volunteers into DB`, "backup");
     }
 
     // Restore events
@@ -123,6 +124,7 @@ export async function restoreBackup() {
         endTime: e.endTime ? new Date(e.endTime) : null
       }));
       await db.insert(events).values(eventsToInsert);
+      log(`Inserted ${eventsToInsert.length} events into DB`, "backup");
     }
 
     // Restore attendances
@@ -132,6 +134,7 @@ export async function restoreBackup() {
         createdAt: a.createdAt ? new Date(a.createdAt) : new Date()
       }));
       await db.insert(attendances).values(attendancesToInsert);
+      log(`Inserted ${attendancesToInsert.length} attendance records into DB`, "backup");
     }
 
     const volunteerCount = backupData.data.volunteers?.length || 0;
