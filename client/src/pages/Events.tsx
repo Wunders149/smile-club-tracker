@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Layout } from "@/components/Layout";
 import { useEvents, useCreateEvent, useUpdateEvent, useDeleteEvent } from "@/hooks/use-events";
+import { useVolunteers } from "@/hooks/use-volunteers";
 import { EVENT_TYPES, type InsertEvent, type Event } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,15 +10,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Plus, MoreVertical, Edit2, Trash2, CalendarDays, MapPin, LayoutGrid, Calendar as CalendarIcon, User } from "lucide-react";
+import { Plus, MoreVertical, Edit2, Trash2, CalendarDays, MapPin, LayoutGrid, Calendar as CalendarIcon, User, Search } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertEventSchema } from "@shared/schema";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { format, isSameDay } from "date-fns";
+import { format, isSameDay, addHours } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { Check } from "lucide-react";
 
 // Re-create schema to handle datetime-local string properly before sending
 const formSchema = insertEventSchema.extend({
@@ -29,6 +34,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function Events() {
   const { data: events, isLoading } = useEvents();
+  const { data: volunteers } = useVolunteers();
   const createMut = useCreateEvent();
   const updateMut = useUpdateEvent();
   const deleteMut = useDeleteEvent();
@@ -38,6 +44,7 @@ export default function Events() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [view, setView] = useState<"grid" | "calendar">("grid");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [speakerSearchOpen, setSpeakerSearchOpen] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -52,6 +59,15 @@ export default function Events() {
       venue: ev.venue || "", speaker: ev.speaker || "", endTime: ev.endTime ? new Date(ev.endTime) : null
     });
     setEditingEvent(ev);
+  };
+
+  const onDateChange = (newDate: Date) => {
+    form.setValue("date", newDate);
+    // Automatically set end time to 1 hour later for NEW events or if end time not touched
+    const currentEnd = form.getValues("endTime");
+    if (!editingEvent && (!currentEnd || currentEnd.getTime() <= newDate.getTime())) {
+      form.setValue("endTime", addHours(newDate, 1));
+    }
   };
 
   const onSubmit = async (data: FormValues) => {
@@ -102,14 +118,18 @@ export default function Events() {
 
             <Dialog open={isAddOpen} onOpenChange={(open) => {
               setIsAddOpen(open);
-              if (!open) form.reset({ date: new Date() });
+              if (!open) {
+                form.reset({ date: new Date(), endTime: addHours(new Date(), 1) });
+              } else {
+                form.setValue("endTime", addHours(new Date(), 1));
+              }
             }}>
               <DialogTrigger asChild>
                 <Button className="bg-primary hover:bg-primary/90 text-white font-medium rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 px-6">
                   <Plus className="w-4 h-4 mr-2" /> Add Event
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px] bg-card rounded-2xl">
+              <DialogContent className="sm:max-w-[550px] bg-card rounded-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="font-display text-2xl">Add New Event</DialogTitle>
                 </DialogHeader>
@@ -137,7 +157,7 @@ export default function Events() {
                               type="datetime-local" 
                               className="rounded-xl" 
                               value={field.value ? new Date(field.value.getTime() - field.value.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
-                              onChange={(e) => field.onChange(new Date(e.target.value))}
+                              onChange={(e) => onDateChange(new Date(e.target.value))}
                             />
                           </FormControl>
                           <FormMessage/>
@@ -148,26 +168,89 @@ export default function Events() {
                       <FormField control={form.control} name="venue" render={({ field }) => (
                         <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="Meeting Room A" className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
                       )} />
-                      <FormField control={form.control} name="speaker" render={({ field }) => (
-                        <FormItem><FormLabel>Speaker (optional)</FormLabel><FormControl><Input placeholder="Dr. Smith" className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
+                      <FormField control={form.control} name="endTime" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Ending Time</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="datetime-local" 
+                              className="rounded-xl" 
+                              value={field.value ? new Date(new Date(field.value).getTime() - new Date(field.value).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
+                              onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                            />
+                          </FormControl>
+                          <FormMessage/>
+                        </FormItem>
                       )} />
                     </div>
-                    <FormField control={form.control} name="endTime" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Ending Time (optional)</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="datetime-local" 
-                            className="rounded-xl" 
-                            value={field.value ? new Date(new Date(field.value).getTime() - new Date(field.value).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
-                            onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
-                          />
-                        </FormControl>
-                        <FormMessage/>
+                    
+                    <FormField control={form.control} name="speaker" render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Speaker</FormLabel>
+                        <Popover open={speakerSearchOpen} onOpenChange={setSpeakerSearchOpen}>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                className={cn(
+                                  "w-full justify-between rounded-xl font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value || "Select volunteer or enter name..."}
+                                <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 rounded-xl" align="start">
+                            <Command>
+                              <CommandInput placeholder="Search volunteers..." />
+                              <CommandList>
+                                <CommandEmpty>
+                                  <div className="p-2">
+                                    <p className="text-xs text-muted-foreground mb-2">No volunteer found. Type a name above then click below to add as guest:</p>
+                                    <Button 
+                                      size="sm" 
+                                      className="w-full text-xs h-8"
+                                      onClick={() => {
+                                        const searchInput = document.querySelector('[cmdk-input]') as HTMLInputElement;
+                                        if (searchInput?.value) {
+                                          field.onChange(searchInput.value);
+                                          setSpeakerSearchOpen(false);
+                                        }
+                                      }}
+                                    >
+                                      Use as Guest Speaker
+                                    </Button>
+                                  </div>
+                                </CommandEmpty>
+                                <CommandGroup heading="Volunteers">
+                                  {volunteers?.map((vol) => (
+                                    <CommandItem
+                                      key={vol.id}
+                                      value={vol.fullName}
+                                      onSelect={() => {
+                                        field.onChange(vol.fullName);
+                                        setSpeakerSearchOpen(false);
+                                      }}
+                                    >
+                                      <Check className={cn("mr-2 h-4 w-4", vol.fullName === field.value ? "opacity-100" : "opacity-0")} />
+                                      {vol.fullName}
+                                      <span className="ml-2 text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">{vol.position}</span>
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
                       </FormItem>
                     )} />
+
                     <FormField control={form.control} name="description" render={({ field }) => (
-                      <FormItem><FormLabel>Description (optional)</FormLabel><FormControl><Textarea className="rounded-xl resize-none h-24" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
+                      <FormItem><FormLabel>Description (optional)</FormLabel><FormControl><Textarea className="rounded-xl resize-none h-20" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
                     )} />
                     <DialogFooter className="pt-4">
                       <Button type="submit" disabled={createMut.isPending} className="rounded-xl px-8 w-full sm:w-auto">
@@ -180,7 +263,7 @@ export default function Events() {
             </Dialog>
 
             <Dialog open={!!editingEvent} onOpenChange={(open) => { if (!open) setEditingEvent(null); }}>
-               <DialogContent className="sm:max-w-[500px] bg-card rounded-2xl">
+               <DialogContent className="sm:max-w-[550px] bg-card rounded-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="font-display text-2xl">Edit Event</DialogTitle>
                 </DialogHeader>
@@ -208,7 +291,7 @@ export default function Events() {
                               type="datetime-local" 
                               className="rounded-xl" 
                               value={field.value ? new Date(field.value.getTime() - field.value.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
-                              onChange={(e) => field.onChange(new Date(e.target.value))}
+                              onChange={(e) => onDateChange(new Date(e.target.value))}
                             />
                           </FormControl>
                           <FormMessage/>
@@ -219,26 +302,89 @@ export default function Events() {
                       <FormField control={form.control} name="venue" render={({ field }) => (
                         <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="Meeting Room A" className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
                       )} />
-                      <FormField control={form.control} name="speaker" render={({ field }) => (
-                        <FormItem><FormLabel>Speaker (optional)</FormLabel><FormControl><Input placeholder="Dr. Smith" className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
+                      <FormField control={form.control} name="endTime" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Ending Time</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="datetime-local" 
+                              className="rounded-xl" 
+                              value={field.value ? new Date(new Date(field.value).getTime() - new Date(field.value).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
+                              onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                            />
+                          </FormControl>
+                          <FormMessage/>
+                        </FormItem>
                       )} />
                     </div>
-                    <FormField control={form.control} name="endTime" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Ending Time (optional)</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="datetime-local" 
-                            className="rounded-xl" 
-                            value={field.value ? new Date(new Date(field.value).getTime() - new Date(field.value).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
-                            onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
-                          />
-                        </FormControl>
-                        <FormMessage/>
+
+                    <FormField control={form.control} name="speaker" render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Speaker</FormLabel>
+                        <Popover open={speakerSearchOpen} onOpenChange={setSpeakerSearchOpen}>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                className={cn(
+                                  "w-full justify-between rounded-xl font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value || "Select volunteer or enter name..."}
+                                <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 rounded-xl" align="start">
+                            <Command>
+                              <CommandInput placeholder="Search volunteers..." />
+                              <CommandList>
+                                <CommandEmpty>
+                                  <div className="p-2">
+                                    <p className="text-xs text-muted-foreground mb-2">No volunteer found. Type name then click below:</p>
+                                    <Button 
+                                      size="sm" 
+                                      className="w-full text-xs h-8"
+                                      onClick={() => {
+                                        const searchInput = document.querySelector('[cmdk-input]') as HTMLInputElement;
+                                        if (searchInput?.value) {
+                                          field.onChange(searchInput.value);
+                                          setSpeakerSearchOpen(false);
+                                        }
+                                      }}
+                                    >
+                                      Use as Guest Speaker
+                                    </Button>
+                                  </div>
+                                </CommandEmpty>
+                                <CommandGroup heading="Volunteers">
+                                  {volunteers?.map((vol) => (
+                                    <CommandItem
+                                      key={vol.id}
+                                      value={vol.fullName}
+                                      onSelect={() => {
+                                        field.onChange(vol.fullName);
+                                        setSpeakerSearchOpen(false);
+                                      }}
+                                    >
+                                      <Check className={cn("mr-2 h-4 w-4", vol.fullName === field.value ? "opacity-100" : "opacity-0")} />
+                                      {vol.fullName}
+                                      <span className="ml-2 text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">{vol.position}</span>
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
                       </FormItem>
                     )} />
+
                     <FormField control={form.control} name="description" render={({ field }) => (
-                      <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea className="rounded-xl resize-none h-24" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
+                      <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea className="rounded-xl resize-none h-20" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
                     )} />
                     <DialogFooter className="pt-4">
                       <Button type="submit" disabled={updateMut.isPending} className="rounded-xl px-8 w-full sm:w-auto">
@@ -286,7 +432,7 @@ export default function Events() {
         ) : view === "grid" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((ev) => (
-              <EventCard key={ev.id} ev={ev} onEdit={onEdit} setDeletingId={setDeletingId} />
+              <EventCard key={ev.id} ev={ev} onEdit={onEdit} setDeletingId={setDeletingId} volunteers={volunteers} />
             ))}
           </div>
         ) : (
@@ -326,7 +472,7 @@ export default function Events() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {filteredEvents.map((ev) => (
-                    <EventCard key={ev.id} ev={ev} onEdit={onEdit} setDeletingId={setDeletingId} />
+                    <EventCard key={ev.id} ev={ev} onEdit={onEdit} setDeletingId={setDeletingId} volunteers={volunteers} />
                   ))}
                 </div>
               )}
@@ -338,8 +484,9 @@ export default function Events() {
   );
 }
 
-function EventCard({ ev, onEdit, setDeletingId }: { ev: Event, onEdit: (ev: Event) => void, setDeletingId: (id: number) => void }) {
+function EventCard({ ev, onEdit, setDeletingId, volunteers }: { ev: Event, onEdit: (ev: Event) => void, setDeletingId: (id: number) => void, volunteers?: any[] }) {
   const isPast = new Date(ev.date) < new Date();
+  const isVolunteerSpeaker = volunteers?.some(v => v.fullName === ev.speaker);
   
   return (
     <div className={`
@@ -396,8 +543,11 @@ function EventCard({ ev, onEdit, setDeletingId }: { ev: Event, onEdit: (ev: Even
 
         {ev.speaker && (
           <div className="flex items-center gap-2">
-            <User className="w-4 h-4 text-primary/70" />
-            <span className="truncate">{ev.speaker}</span>
+            <User className={cn("w-4 h-4", isVolunteerSpeaker ? "text-primary" : "text-primary/70")} />
+            <span className={cn("truncate", isVolunteerSpeaker && "font-bold text-foreground/90")}>
+              {ev.speaker}
+              {isVolunteerSpeaker && <span className="ml-1 text-[9px] bg-primary/10 text-primary px-1 rounded">Volunteer</span>}
+            </span>
           </div>
         )}
 
