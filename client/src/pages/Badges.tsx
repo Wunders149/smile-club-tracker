@@ -154,6 +154,11 @@ const BadgeID = React.forwardRef<HTMLDivElement, { volunteer: any }>(({ voluntee
       {/* Background Accent */}
       <div className="absolute top-0 left-0 w-full h-24 bg-primary/5 -skew-y-6 -translate-y-8" />
       
+      {/* Watermark Logo */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none grayscale">
+        <img src="/smile-club-logo.png" alt="" className="w-64 object-contain" />
+      </div>
+
       {/* Logo */}
       <div className="z-10 mt-2 mb-6">
         <img src="/smile-club-logo.png" alt="Logo" className="h-16 object-contain" />

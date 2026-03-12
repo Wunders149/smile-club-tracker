@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { 
   LayoutDashboard, 
@@ -29,6 +29,15 @@ const NAV_ITEMS = [
 export function Layout({ children }: { children: ReactNode }) {
   const [location] = useLocation();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const currentItem = NAV_ITEMS.find(item => 
+      location === item.href || (item.href !== "/" && location.startsWith(item.href))
+    );
+    document.title = currentItem 
+      ? `${currentItem.label} | Smile Club Mahajanga` 
+      : "Smile Club Mahajanga Tracker";
+  }, [location]);
 
   const syncMutation = useMutation({
     mutationFn: async () => {
