@@ -11,6 +11,7 @@ import Events from "./pages/Events";
 import Attendance from "./pages/Attendance";
 import Rankings from "./pages/Rankings";
 import Statistics from "./pages/Statistics";
+import Badges from "./pages/Badges";
 
 function Router() {
   return (
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/attendance" component={Attendance} />
       <Route path="/rankings" component={Rankings} />
       <Route path="/statistics" component={Statistics} />
+      <Route path="/badges" component={Badges} />
       <Route component={NotFound} />
     </Switch>
   );

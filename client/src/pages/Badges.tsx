@@ -1,0 +1,133 @@
+import { useRef } from "react";
+import { Layout } from "@/components/Layout";
+import { useVolunteers } from "@/hooks/use-volunteers";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Printer, User, Download } from "lucide-react";
+import { useReactToPrint } from "react-to-print";
+
+export default function Badges() {
+  const { data: volunteers, isLoading } = useVolunteers();
+  const printRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: "Volunteer_Badges",
+  });
+
+  return (
+    <Layout>
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-display font-bold text-foreground">Volunteer Badges</h1>
+            <p className="text-muted-foreground mt-1">Generate and print ID badges for the team.</p>
+          </div>
+          <Button 
+            onClick={() => handlePrint()} 
+            disabled={!volunteers?.length}
+            className="rounded-xl shadow-lg shadow-primary/20"
+          >
+            <Printer className="w-4 h-4 mr-2" /> Print All Badges
+          </Button>
+        </div>
+
+        {isLoading ? (
+          <div className="text-center py-12 text-muted-foreground">Loading volunteers...</div>
+        ) : !volunteers?.length ? (
+          <div className="text-center py-12 border-2 border-dashed rounded-2xl">
+            <User className="w-12 h-12 text-muted mx-auto mb-3" />
+            <p className="text-muted-foreground">No volunteers found to generate badges.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {volunteers.map((volunteer) => (
+              <BadgeCard key={volunteer.id} volunteer={volunteer} />
+            ))}
+          </div>
+        )}
+
+        {/* Hidden Print Container */}
+        <div className="hidden">
+          <div ref={printRef} className="p-8 space-y-8 bg-white print:block">
+            <div className="grid grid-cols-2 gap-x-12 gap-y-16 justify-items-center">
+              {volunteers?.map((volunteer) => (
+                <div key={volunteer.id} className="print-break-inside-avoid">
+                  <BadgeID volunteer={volunteer} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </Layout>
+  );
+}
+
+function BadgeCard({ volunteer }: { volunteer: any }) {
+  const componentRef = useRef<HTMLDivElement>(null);
+  const handlePrint = useReactToPrint({
+    contentRef: componentRef,
+  });
+
+  return (
+    <Card className="p-4 flex flex-col items-center gap-4 bg-card border-border/50 shadow-md group hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden">
+      <div className="scale-75 origin-top -mb-16">
+        <BadgeID volunteer={volunteer} ref={componentRef} />
+      </div>
+      <div className="w-full flex gap-2 mt-2">
+        <Button variant="outline" size="sm" className="flex-1 rounded-xl" onClick={() => handlePrint()}>
+          <Printer className="w-3.5 h-3.5 mr-2" /> Print
+        </Button>
+      </div>
+    </Card>
+  );
+}
+
+import React from "react";
+
+const BadgeID = React.forwardRef<HTMLDivElement, { volunteer: any }>(({ volunteer }, ref) => {
+  return (
+    <div 
+      ref={ref}
+      className="w-[300px] h-[450px] bg-white border-[1px] border-gray-200 shadow-lg relative flex flex-col items-center p-6 text-black font-sans overflow-hidden"
+      style={{ printColorAdjust: 'exact', WebkitPrintColorAdjust: 'exact' }}
+    >
+      {/* Background Accent */}
+      <div className="absolute top-0 left-0 w-full h-24 bg-primary/5 -skew-y-6 -translate-y-8" />
+      
+      {/* Logo */}
+      <div className="z-10 mt-2 mb-6">
+        <img src="/smile-club-logo.png" alt="Logo" className="h-16 object-contain" />
+      </div>
+
+      {/* Photo */}
+      <div className="w-36 h-36 rounded-2xl overflow-hidden border-4 border-white shadow-xl z-10 bg-gray-50 mb-4 ring-1 ring-gray-100">
+        {volunteer.photo ? (
+          <img src={volunteer.photo} alt={volunteer.fullName} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
+            <User className="w-16 h-16" />
+          </div>
+        )}
+      </div>
+
+      {/* Details */}
+      <div className="text-center z-10 flex-1 flex flex-col justify-center">
+        <h2 className="text-xl font-bold uppercase tracking-tight leading-tight px-2">{volunteer.fullName}</h2>
+        <div className="h-0.5 w-12 bg-primary mx-auto my-2 rounded-full" />
+        <p className="text-sm font-semibold text-primary uppercase tracking-widest">{volunteer.position}</p>
+      </div>
+
+      {/* Footer */}
+      <div className="mt-auto w-full text-center z-10">
+        <div className="py-2 border-t border-gray-100">
+          <p className="italic font-display text-gray-400 text-sm">"For the patients"</p>
+        </div>
+        <div className="h-2 w-full bg-primary absolute bottom-0 left-0" />
+      </div>
+    </div>
+  );
+});
+
+BadgeID.displayName = "BadgeID";
