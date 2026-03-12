@@ -128,6 +128,16 @@ export default function Attendance() {
                     </h3>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
+                    <Button 
+                      variant="default" 
+                      size="sm" 
+                      onClick={handleSave} 
+                      disabled={recordMut.isPending}
+                      className="rounded-xl bg-primary hover:bg-primary/90 shadow-md shadow-primary/10 h-9 px-4"
+                    >
+                      <Save className="w-3.5 h-3.5 mr-1.5" /> {recordMut.isPending ? "Saving..." : "Save"}
+                    </Button>
+                    <div className="w-px h-6 bg-border/50 mx-1 hidden sm:block" />
                     <Button variant="outline" size="sm" onClick={() => handlePrint()} className="rounded-lg h-9 text-xs border-primary/30 text-primary">
                       <Printer className="w-3.5 h-3.5 mr-1.5" /> Print Roster
                     </Button>
@@ -188,15 +198,28 @@ export default function Attendance() {
         <div className="hidden">
           <div ref={printRef} className="p-10 bg-white text-black font-sans w-full">
             <style>{`
+              @page {
+                size: auto;
+                margin: 20mm;
+              }
               @media print {
+                body {
+                  margin: 0;
+                  padding: 0;
+                }
                 tr {
                   page-break-inside: avoid;
                 }
                 thead {
                   display: table-header-group;
                 }
+                tfoot {
+                  display: table-footer-group;
+                }
                 table {
-                  margin-top: 20px;
+                  width: 100%;
+                  border-collapse: collapse;
+                  margin-top: 10px;
                 }
               }
             `}</style>
