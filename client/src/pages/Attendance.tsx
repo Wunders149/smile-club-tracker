@@ -214,7 +214,7 @@ export default function Attendance() {
                     <td className="border border-gray-200 p-3 font-medium">{vol.fullName}</td>
                     <td className="border border-gray-200 p-3 text-gray-600 text-sm">{vol.position}</td>
                     <td className="border border-gray-200 p-3 text-center font-bold text-xs uppercase italic">
-                      {attendanceState[vol.id]?.replace('_', ' ') || 'absent'}
+                      {attendanceState[vol.id] !== 'absent' ? (attendanceState[vol.id]?.replace('_', ' ')) : ''}
                     </td>
                     <td className="border border-gray-200 p-3"></td>
                   </tr>
