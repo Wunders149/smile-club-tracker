@@ -187,6 +187,19 @@ export default function Attendance() {
         {/* Printable Roster */}
         <div className="hidden">
           <div ref={printRef} className="p-10 bg-white text-black font-sans w-full">
+            <style>{`
+              @media print {
+                tr {
+                  page-break-inside: avoid;
+                }
+                thead {
+                  display: table-header-group;
+                }
+                table {
+                  margin-top: 20px;
+                }
+              }
+            `}</style>
             <div className="flex justify-between items-start mb-8 border-b-2 border-primary pb-6">
               <div>
                 <img src="/smile-club-logo.png" alt="Logo" className="h-16 mb-2" />
