@@ -101,182 +101,180 @@ export default function Events() {
             </div>
 
             <Dialog open={isAddOpen} onOpenChange={(open) => {
-            setIsAddOpen(open);
-            if (!open) form.reset({ date: new Date() });
-          }}>
-            <DialogTrigger asChild>
-              <Button className="bg-primary hover:bg-primary/90 text-white font-medium rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 px-6">
-                <Plus className="w-4 h-4 mr-2" /> Add Event
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px] bg-card rounded-2xl">
-              <DialogHeader>
-                <DialogTitle className="font-display text-2xl">Add New Event</DialogTitle>
-              </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
-                  <FormField control={form.control} name="name" render={({ field }) => (
-                    <FormItem><FormLabel>Event Name</FormLabel><FormControl><Input placeholder="Annual Meeting..." className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
-                  )} />
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField control={form.control} name="type" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Event Type</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl><SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger></FormControl>
-                          <SelectContent>{EVENT_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                        </Select>
-                        <FormMessage/>
-                      </FormItem>
+              setIsAddOpen(open);
+              if (!open) form.reset({ date: new Date() });
+            }}>
+              <DialogTrigger asChild>
+                <Button className="bg-primary hover:bg-primary/90 text-white font-medium rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 px-6">
+                  <Plus className="w-4 h-4 mr-2" /> Add Event
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[500px] bg-card rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle className="font-display text-2xl">Add New Event</DialogTitle>
+                </DialogHeader>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
+                    <FormField control={form.control} name="name" render={({ field }) => (
+                      <FormItem><FormLabel>Event Name</FormLabel><FormControl><Input placeholder="Annual Meeting..." className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
                     )} />
-                    <FormField control={form.control} name="date" render={({ field }) => (
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField control={form.control} name="type" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Event Type</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl><SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger></FormControl>
+                            <SelectContent>{EVENT_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                          </Select>
+                          <FormMessage/>
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="date" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Start Date & Time</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="datetime-local" 
+                              className="rounded-xl" 
+                              value={field.value ? new Date(field.value.getTime() - field.value.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
+                              onChange={(e) => field.onChange(new Date(e.target.value))}
+                            />
+                          </FormControl>
+                          <FormMessage/>
+                        </FormItem>
+                      )} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField control={form.control} name="venue" render={({ field }) => (
+                        <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="Meeting Room A" className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
+                      )} />
+                      <FormField control={form.control} name="speaker" render={({ field }) => (
+                        <FormItem><FormLabel>Speaker (optional)</FormLabel><FormControl><Input placeholder="Dr. Smith" className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
+                      )} />
+                    </div>
+                    <FormField control={form.control} name="endTime" render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Start Date & Time</FormLabel>
+                        <FormLabel>Ending Time (optional)</FormLabel>
                         <FormControl>
                           <Input 
                             type="datetime-local" 
                             className="rounded-xl" 
-                            value={field.value ? new Date(field.value.getTime() - field.value.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
-                            onChange={(e) => field.onChange(new Date(e.target.value))}
+                            value={field.value ? new Date(new Date(field.value).getTime() - new Date(field.value).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
+                            onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
                           />
                         </FormControl>
                         <FormMessage/>
                       </FormItem>
                     )} />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField control={form.control} name="venue" render={({ field }) => (
-                      <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="Meeting Room A" className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
+                    <FormField control={form.control} name="description" render={({ field }) => (
+                      <FormItem><FormLabel>Description (optional)</FormLabel><FormControl><Textarea className="rounded-xl resize-none h-24" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
                     )} />
-                    <FormField control={form.control} name="speaker" render={({ field }) => (
-                      <FormItem><FormLabel>Speaker (optional)</FormLabel><FormControl><Input placeholder="Dr. Smith" className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
-                    )} />
-                  </div>
-                  <FormField control={form.control} name="endTime" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Ending Time (optional)</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="datetime-local" 
-                          className="rounded-xl" 
-                          value={field.value ? new Date(new Date(field.value).getTime() - new Date(field.value).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
-                          onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
-                        />
-                      </FormControl>
-                      <FormMessage/>
-                    </FormItem>
-                  )} />
-                  <FormField control={form.control} name="description" render={({ field }) => (
-                    <FormItem><FormLabel>Description (optional)</FormLabel><FormControl><Textarea className="rounded-xl resize-none h-24" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
-                  )} />
-                  <DialogFooter className="pt-4">
-                    <Button type="submit" disabled={createMut.isPending} className="rounded-xl px-8 w-full sm:w-auto">
-                      {createMut.isPending ? "Creating..." : "Save Event"}
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
+                    <DialogFooter className="pt-4">
+                      <Button type="submit" disabled={createMut.isPending} className="rounded-xl px-8 w-full sm:w-auto">
+                        {createMut.isPending ? "Creating..." : "Save Event"}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
 
-          {/* Edit Dialog */}
-          <Dialog open={!!editingEvent} onOpenChange={(open) => { if (!open) setEditingEvent(null); }}>
-             <DialogContent className="sm:max-w-[500px] bg-card rounded-2xl">
-              <DialogHeader>
-                <DialogTitle className="font-display text-2xl">Edit Event</DialogTitle>
-              </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
-                  <FormField control={form.control} name="name" render={({ field }) => (
-                    <FormItem><FormLabel>Event Name</FormLabel><FormControl><Input className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
-                  )} />
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField control={form.control} name="type" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Event Type</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl><SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger></FormControl>
-                          <SelectContent>{EVENT_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                        </Select>
-                        <FormMessage/>
-                      </FormItem>
+            <Dialog open={!!editingEvent} onOpenChange={(open) => { if (!open) setEditingEvent(null); }}>
+               <DialogContent className="sm:max-w-[500px] bg-card rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle className="font-display text-2xl">Edit Event</DialogTitle>
+                </DialogHeader>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
+                    <FormField control={form.control} name="name" render={({ field }) => (
+                      <FormItem><FormLabel>Event Name</FormLabel><FormControl><Input className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
                     )} />
-                    <FormField control={form.control} name="date" render={({ field }) => (
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField control={form.control} name="type" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Event Type</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl><SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger></FormControl>
+                            <SelectContent>{EVENT_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                          </Select>
+                          <FormMessage/>
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="date" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Start Date & Time</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="datetime-local" 
+                              className="rounded-xl" 
+                              value={field.value ? new Date(field.value.getTime() - field.value.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
+                              onChange={(e) => field.onChange(new Date(e.target.value))}
+                            />
+                          </FormControl>
+                          <FormMessage/>
+                        </FormItem>
+                      )} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField control={form.control} name="venue" render={({ field }) => (
+                        <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="Meeting Room A" className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
+                      )} />
+                      <FormField control={form.control} name="speaker" render={({ field }) => (
+                        <FormItem><FormLabel>Speaker (optional)</FormLabel><FormControl><Input placeholder="Dr. Smith" className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
+                      )} />
+                    </div>
+                    <FormField control={form.control} name="endTime" render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Start Date & Time</FormLabel>
+                        <FormLabel>Ending Time (optional)</FormLabel>
                         <FormControl>
                           <Input 
                             type="datetime-local" 
                             className="rounded-xl" 
-                            value={field.value ? new Date(field.value.getTime() - field.value.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
-                            onChange={(e) => field.onChange(new Date(e.target.value))}
+                            value={field.value ? new Date(new Date(field.value).getTime() - new Date(field.value).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
+                            onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
                           />
                         </FormControl>
                         <FormMessage/>
                       </FormItem>
                     )} />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField control={form.control} name="venue" render={({ field }) => (
-                      <FormItem><FormLabel>Venue</FormLabel><FormControl><Input placeholder="Meeting Room A" className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
+                    <FormField control={form.control} name="description" render={({ field }) => (
+                      <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea className="rounded-xl resize-none h-24" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
                     )} />
-                    <FormField control={form.control} name="speaker" render={({ field }) => (
-                      <FormItem><FormLabel>Speaker (optional)</FormLabel><FormControl><Input placeholder="Dr. Smith" className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
-                    )} />
-                  </div>
-                  <FormField control={form.control} name="endTime" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Ending Time (optional)</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="datetime-local" 
-                          className="rounded-xl" 
-                          value={field.value ? new Date(new Date(field.value).getTime() - new Date(field.value).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
-                          onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
-                        />
-                      </FormControl>
-                      <FormMessage/>
-                    </FormItem>
-                  )} />
-                  <FormField control={form.control} name="description" render={({ field }) => (
-                    <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea className="rounded-xl resize-none h-24" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
-                  )} />
-                  <DialogFooter className="pt-4">
-                    <Button type="submit" disabled={updateMut.isPending} className="rounded-xl px-8 w-full sm:w-auto">
-                      {updateMut.isPending ? "Saving..." : "Update Event"}
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
+                    <DialogFooter className="pt-4">
+                      <Button type="submit" disabled={updateMut.isPending} className="rounded-xl px-8 w-full sm:w-auto">
+                        {updateMut.isPending ? "Saving..." : "Update Event"}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
 
-          {/* Delete Alert */}
-          <AlertDialog open={!!deletingId} onOpenChange={(open) => { if (!open) setDeletingId(null); }}>
-            <AlertDialogContent className="rounded-2xl">
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete Event?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete the event and all associated attendance records.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
-                <AlertDialogAction 
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl"
-                  onClick={async () => {
-                    if (deletingId) await deleteMut.mutateAsync(deletingId);
-                    setDeletingId(null);
-                  }}
-                >
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+            <AlertDialog open={!!deletingId} onOpenChange={(open) => { if (!open) setDeletingId(null); }}>
+              <AlertDialogContent className="rounded-2xl">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Event?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the event and all associated attendance records.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+                  <AlertDialogAction 
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl"
+                    onClick={async () => {
+                      if (deletingId) await deleteMut.mutateAsync(deletingId);
+                      setDeletingId(null);
+                    }}
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         </div>
 
-        {/* Toggleable View */}
         {isLoading ? (
           <div className="py-12 text-center text-muted-foreground">Loading events...</div>
         ) : !events?.length ? (
