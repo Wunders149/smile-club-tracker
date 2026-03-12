@@ -97,25 +97,33 @@ export default function Badges() {
           <div ref={printRef} className="p-0 bg-white print:block">
             <style>{`
               @page {
-                size: auto;
-                margin: 15mm;
+                size: A4;
+                margin: 10mm;
               }
               @media print {
                 body {
                   print-color-adjust: exact;
                   -webkit-print-color-adjust: exact;
                 }
+                .page-break {
+                  page-break-after: always;
+                  break-after: page;
+                }
               }
             `}</style>
-            <div className="grid grid-cols-2 gap-x-8 gap-y-12 justify-items-center w-full">
-              {selectedVolunteers.map((volunteer) => (
-                <div key={volunteer.id} className="inline-block" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
-                  <div className="p-4">
-                    <BadgeID volunteer={volunteer} />
-                  </div>
+            
+            {/* Chunk volunteers into groups of 4 */}
+            {Array.from({ length: Math.ceil(selectedVolunteers.length / 4) }).map((_, pageIndex) => (
+              <div key={pageIndex} className="page-break w-full">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-8 justify-items-center w-full py-4">
+                  {selectedVolunteers.slice(pageIndex * 4, pageIndex * 4 + 4).map((volunteer) => (
+                    <div key={volunteer.id} className="inline-block" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+                      <BadgeID volunteer={volunteer} />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
