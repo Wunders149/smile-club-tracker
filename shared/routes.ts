@@ -153,7 +153,11 @@ export const api = {
           })),
           totalVolunteers: z.number(),
           maleCount: z.number(),
-          femaleCount: z.number()
+          femaleCount: z.number(),
+          eventTypeBreakdown: z.array(z.object({
+            type: z.string(),
+            count: z.number()
+          })),
         }),
       },
     },

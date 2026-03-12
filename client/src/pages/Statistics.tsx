@@ -194,6 +194,42 @@ export default function Statistics() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Event Type Breakdown */}
+          <Card className="rounded-2xl border-border/50 shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Users className="w-5 h-5 text-orange-500" /> Events by Type
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                {stats.eventTypeBreakdown?.length > 0 ? (
+                  stats.eventTypeBreakdown.map((item: any, i: number) => {
+                    const totalEvents = stats.eventTypeBreakdown.reduce((sum: number, e: any) => sum + e.count, 0);
+                    return (
+                      <div key={i} className="flex items-center justify-between group">
+                        <span className="text-sm text-muted-foreground font-medium group-hover:text-foreground transition-colors">
+                          {item.type}
+                        </span>
+                        <div className="flex items-center gap-3">
+                          <div className="w-24 sm:w-32 bg-muted rounded-full h-2 overflow-hidden">
+                            <div 
+                              className="bg-orange-500/60 h-full rounded-full transition-all duration-500 group-hover:bg-orange-500" 
+                              style={{ width: `${(item.count / totalEvents * 100)}%` }}
+                            ></div>
+                          </div>
+                          <span className="font-bold text-foreground w-6 text-right text-sm">{item.count}</span>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="text-center py-12 text-muted-foreground italic">No events recorded</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Position Breakdown remains as bars because it can be many items */}

@@ -157,6 +157,13 @@ export class DatabaseStorage implements IStorage {
     const allEvents = await db.select().from(events);
     const allAttendances = await db.select().from(attendances);
     
+    const eventTypeBreakdown = allEvents.reduce((acc, e) => {
+      const existing = acc.find(t => t.type === e.type);
+      if (existing) existing.count++;
+      else acc.push({ type: e.type, count: 1 });
+      return acc;
+    }, [] as { type: string; count: number }[]).sort((a, b) => b.count - a.count);
+
     const commitmentMap = new Map<string, number>();
     allEvents.forEach(ev => {
       const dateStr = ev.date.toISOString().split('T')[0];
@@ -173,6 +180,7 @@ export class DatabaseStorage implements IStorage {
       genderBreakdown,
       fieldStudyBreakdown,
       positionBreakdown,
+      eventTypeBreakdown,
       commitmentTrend,
       totalVolunteers: allVolunteers.length,
       maleCount,
