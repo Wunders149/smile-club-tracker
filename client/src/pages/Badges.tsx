@@ -1,13 +1,15 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { useVolunteers } from "@/hooks/use-volunteers";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Printer, User, Download } from "lucide-react";
+import { Printer, User, CheckCircle2, Circle } from "lucide-react";
 import { useReactToPrint } from "react-to-print";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function Badges() {
   const { data: volunteers, isLoading } = useVolunteers();
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const printRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = useReactToPrint({
@@ -15,20 +17,58 @@ export default function Badges() {
     documentTitle: "Volunteer_Badges",
   });
 
+  const toggleSelect = (id: number) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const selectAll = () => {
+    if (volunteers) {
+      setSelectedIds(volunteers.map(v => v.id));
+    }
+  };
+
+  const deselectAll = () => {
+    setSelectedIds([]);
+  };
+
+  const selectedVolunteers = volunteers?.filter(v => selectedIds.includes(v.id)) || [];
+
   return (
     <Layout>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-display font-bold text-foreground">Volunteer Badges</h1>
-            <p className="text-muted-foreground mt-1">Generate and print ID badges for the team.</p>
+            <p className="text-muted-foreground mt-1">Select and print ID badges for the team.</p>
           </div>
-          <Button 
-            onClick={() => handlePrint()} 
-            disabled={!volunteers?.length}
-            className="rounded-xl shadow-lg shadow-primary/20"
-          >
-            <Printer className="w-4 h-4 mr-2" /> Print All Badges
+          <div className="flex items-center gap-2">
+            {selectedIds.length > 0 && (
+              <Button 
+                variant="outline"
+                onClick={deselectAll}
+                className="rounded-xl border-dashed"
+              >
+                Clear ({selectedIds.length})
+              </Button>
+            )}
+            <Button 
+              onClick={() => handlePrint()} 
+              disabled={selectedIds.length === 0}
+              className="rounded-xl shadow-lg shadow-primary/20"
+            >
+              <Printer className="w-4 h-4 mr-2" /> Print Selected ({selectedIds.length})
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4 py-2 border-b border-border/50">
+          <Button variant="ghost" size="sm" onClick={selectAll} className="text-xs font-medium h-8">
+            <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> Select All
+          </Button>
+          <Button variant="ghost" size="sm" onClick={deselectAll} className="text-xs font-medium h-8 text-muted-foreground">
+            <Circle className="w-3.5 h-3.5 mr-1.5" /> Deselect All
           </Button>
         </div>
 
@@ -42,7 +82,12 @@ export default function Badges() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {volunteers.map((volunteer) => (
-              <BadgeCard key={volunteer.id} volunteer={volunteer} />
+              <BadgeCard 
+                key={volunteer.id} 
+                volunteer={volunteer} 
+                isSelected={selectedIds.includes(volunteer.id)}
+                onSelect={() => toggleSelect(volunteer.id)}
+              />
             ))}
           </div>
         )}
@@ -51,7 +96,7 @@ export default function Badges() {
         <div className="hidden">
           <div ref={printRef} className="p-8 space-y-8 bg-white print:block">
             <div className="grid grid-cols-2 gap-x-12 gap-y-16 justify-items-center">
-              {volunteers?.map((volunteer) => (
+              {selectedVolunteers.map((volunteer) => (
                 <div key={volunteer.id} className="print-break-inside-avoid">
                   <BadgeID volunteer={volunteer} />
                 </div>
@@ -64,20 +109,33 @@ export default function Badges() {
   );
 }
 
-function BadgeCard({ volunteer }: { volunteer: any }) {
+function BadgeCard({ volunteer, isSelected, onSelect }: { volunteer: any, isSelected: boolean, onSelect: () => void }) {
   const componentRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     contentRef: componentRef,
   });
 
   return (
-    <Card className="p-4 flex flex-col items-center gap-4 bg-card border-border/50 shadow-md group hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden">
-      <div className="scale-75 origin-top -mb-16">
+    <Card 
+      className={`p-4 flex flex-col items-center gap-4 bg-card border-2 transition-all duration-300 rounded-2xl overflow-hidden relative
+        ${isSelected ? 'border-primary shadow-lg ring-1 ring-primary/20' : 'border-transparent shadow-md hover:border-border/50 hover:shadow-xl'}
+      `}
+    >
+      <div className="absolute top-4 left-4 z-20">
+        <Checkbox 
+          checked={isSelected} 
+          onCheckedChange={onSelect}
+          className="w-5 h-5 rounded-md data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+        />
+      </div>
+      
+      <div className="scale-75 origin-top -mb-16 cursor-pointer" onClick={onSelect}>
         <BadgeID volunteer={volunteer} ref={componentRef} />
       </div>
+      
       <div className="w-full flex gap-2 mt-2">
         <Button variant="outline" size="sm" className="flex-1 rounded-xl" onClick={() => handlePrint()}>
-          <Printer className="w-3.5 h-3.5 mr-2" /> Print
+          <Printer className="w-3.5 h-3.5 mr-2" /> Print One
         </Button>
       </div>
     </Card>
