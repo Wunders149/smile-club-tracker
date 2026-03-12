@@ -94,11 +94,25 @@ export default function Badges() {
 
         {/* Hidden Print Container */}
         <div className="hidden">
-          <div ref={printRef} className="p-8 space-y-8 bg-white print:block">
-            <div className="grid grid-cols-2 gap-x-12 gap-y-16 justify-items-center">
+          <div ref={printRef} className="p-0 bg-white print:block">
+            <style>{`
+              @page {
+                size: auto;
+                margin: 15mm;
+              }
+              @media print {
+                body {
+                  print-color-adjust: exact;
+                  -webkit-print-color-adjust: exact;
+                }
+              }
+            `}</style>
+            <div className="grid grid-cols-2 gap-x-8 gap-y-12 justify-items-center w-full">
               {selectedVolunteers.map((volunteer) => (
-                <div key={volunteer.id} className="print-break-inside-avoid">
-                  <BadgeID volunteer={volunteer} />
+                <div key={volunteer.id} className="inline-block" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
+                  <div className="p-4">
+                    <BadgeID volunteer={volunteer} />
+                  </div>
                 </div>
               ))}
             </div>
