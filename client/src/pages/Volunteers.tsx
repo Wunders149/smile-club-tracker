@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Layout } from "@/components/Layout";
 import { useVolunteers, useCreateVolunteer, useUpdateVolunteer, useDeleteVolunteer } from "@/hooks/use-volunteers";
 import { POSITIONS } from "@shared/schema";
@@ -8,13 +8,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Plus, MoreVertical, Edit2, Trash2, Mail, Phone, GraduationCap, Users } from "lucide-react";
+import { Plus, MoreVertical, Edit2, Trash2, Mail, Phone, GraduationCap, Users, Upload, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertVolunteerSchema, type Volunteer, GENDERS } from "@shared/schema";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import imageCompression from 'browser-image-compression';
+import { uploadVolunteerPhoto } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
 
 type FormValues = z.infer<typeof insertVolunteerSchema>;
 
@@ -23,10 +26,13 @@ export default function Volunteers() {
   const createMut = useCreateVolunteer();
   const updateMut = useUpdateVolunteer();
   const deleteMut = useDeleteVolunteer();
+  const { toast } = useToast();
 
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingVol, setEditingVol] = useState<Volunteer | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(insertVolunteerSchema),
@@ -42,6 +48,39 @@ export default function Volunteers() {
       major: vol.major || "", position: vol.position, gender: vol.gender || undefined
     });
     setEditingVol(vol);
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      // Compression options
+      const options = {
+        maxSizeMB: 0.1, // Max 100KB
+        maxWidthOrHeight: 800,
+        useWebWorker: true,
+      };
+
+      toast({ title: "Compressing", description: "Reducing image size for better performance..." });
+      const compressedFile = await imageCompression(file, options);
+      
+      toast({ title: "Uploading", description: "Saving photo to cloud storage..." });
+      const publicUrl = await uploadVolunteerPhoto(compressedFile);
+      
+      form.setValue("photo", publicUrl);
+      toast({ title: "Success", description: "Photo uploaded successfully!" });
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      toast({ 
+        title: "Upload Failed", 
+        description: error.message || "Failed to upload photo. Check your connection.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const onSubmit = async (data: FormValues) => {
@@ -102,9 +141,47 @@ export default function Volunteers() {
                         <FormMessage/>
                       </FormItem>
                     )} />
+                    
                     <FormField control={form.control} name="photo" render={({ field }) => (
-                      <FormItem><FormLabel>Photo URL (optional)</FormLabel><FormControl><Input placeholder="https://..." className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
+                      <FormItem>
+                        <FormLabel>Profile Photo</FormLabel>
+                        <FormControl>
+                          <div className="flex flex-col gap-3">
+                            <div className="flex items-center gap-3">
+                              {field.value ? (
+                                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20">
+                                  <img src={field.value} alt="Preview" className="w-full h-full object-cover" />
+                                </div>
+                              ) : (
+                                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+                                  <Users className="w-6 h-6" />
+                                </div>
+                              )}
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                className="rounded-xl border-dashed"
+                                disabled={isUploading}
+                                onClick={() => fileInputRef.current?.click()}
+                              >
+                                {isUploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+                                {field.value ? "Change Photo" : "Upload Photo"}
+                              </Button>
+                              <input 
+                                type="file" 
+                                ref={fileInputRef}
+                                className="hidden" 
+                                accept="image/*"
+                                onChange={handleFileChange}
+                              />
+                            </div>
+                            <input type="hidden" {...field} value={field.value || ''} />
+                          </div>
+                        </FormControl>
+                        <FormMessage/>
+                      </FormItem>
                     )} />
+
                     <FormField control={form.control} name="studyField" render={({ field }) => (
                       <FormItem><FormLabel>Study Field (optional)</FormLabel><FormControl><Input placeholder="Medicine, IT..." className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
                     )} />
@@ -125,7 +202,7 @@ export default function Volunteers() {
                     )} />
                   </div>
                   <DialogFooter className="pt-4">
-                    <Button type="submit" disabled={createMut.isPending} className="rounded-xl px-8 w-full sm:w-auto">
+                    <Button type="submit" disabled={createMut.isPending || isUploading} className="rounded-xl px-8 w-full sm:w-auto">
                       {createMut.isPending ? "Creating..." : "Save Volunteer"}
                     </Button>
                   </DialogFooter>
@@ -165,9 +242,47 @@ export default function Volunteers() {
                         <FormMessage/>
                       </FormItem>
                     )} />
+                    
                     <FormField control={form.control} name="photo" render={({ field }) => (
-                      <FormItem><FormLabel>Photo URL</FormLabel><FormControl><Input className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
+                      <FormItem>
+                        <FormLabel>Profile Photo</FormLabel>
+                        <FormControl>
+                          <div className="flex flex-col gap-3">
+                            <div className="flex items-center gap-3">
+                              {field.value ? (
+                                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20">
+                                  <img src={field.value} alt="Preview" className="w-full h-full object-cover" />
+                                </div>
+                              ) : (
+                                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+                                  <Users className="w-6 h-6" />
+                                </div>
+                              )}
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                className="rounded-xl border-dashed"
+                                disabled={isUploading}
+                                onClick={() => fileInputRef.current?.click()}
+                              >
+                                {isUploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+                                {field.value ? "Change Photo" : "Upload Photo"}
+                              </Button>
+                              <input 
+                                type="file" 
+                                ref={fileInputRef}
+                                className="hidden" 
+                                accept="image/*"
+                                onChange={handleFileChange}
+                              />
+                            </div>
+                            <input type="hidden" {...field} value={field.value || ''} />
+                          </div>
+                        </FormControl>
+                        <FormMessage/>
+                      </FormItem>
                     )} />
+
                     <FormField control={form.control} name="studyField" render={({ field }) => (
                       <FormItem><FormLabel>Study Field</FormLabel><FormControl><Input className="rounded-xl" {...field} value={field.value || ''}/></FormControl><FormMessage/></FormItem>
                     )} />
@@ -188,7 +303,7 @@ export default function Volunteers() {
                     )} />
                   </div>
                   <DialogFooter className="pt-4">
-                    <Button type="submit" disabled={updateMut.isPending} className="rounded-xl px-8 w-full sm:w-auto">
+                    <Button type="submit" disabled={updateMut.isPending || isUploading} className="rounded-xl px-8 w-full sm:w-auto">
                       {updateMut.isPending ? "Saving..." : "Update Details"}
                     </Button>
                   </DialogFooter>
