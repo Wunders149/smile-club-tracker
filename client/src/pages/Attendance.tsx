@@ -196,16 +196,20 @@ export default function Attendance() {
 
         {/* Printable Roster */}
         <div className="hidden">
-          <div ref={printRef} className="p-10 bg-white text-black font-sans w-full">
+          <div ref={printRef} className="p-10 bg-white text-black font-sans w-full print:block print:fixed print:inset-0 print:z-[9999] print:bg-white">
             <style>{`
               @page {
                 size: auto;
                 margin: 20mm;
               }
               @media print {
+                #root {
+                  display: none !important;
+                }
                 body {
                   margin: 0;
                   padding: 0;
+                  background: white !important;
                 }
                 tr {
                   page-break-inside: avoid;
