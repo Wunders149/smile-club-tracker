@@ -151,6 +151,10 @@ export const api = {
             field: z.string().nullable(),
             count: z.number()
           })),
+          medicalBreakdown: z.array(z.object({
+            category: z.string(),
+            count: z.number()
+          })),
           totalVolunteers: z.number(),
           totalEvents: z.number(),
           maleCount: z.number(),

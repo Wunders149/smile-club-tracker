@@ -30,6 +30,11 @@ export default function Statistics() {
     value: g.count
   }));
 
+  const medicalData = stats.medicalBreakdown.map((m: any) => ({
+    name: m.category,
+    value: m.count
+  }));
+
   return (
     <Layout>
       <div className="space-y-8 max-w-6xl mx-auto">
@@ -175,6 +180,37 @@ export default function Statistics() {
                       {genderData.map((_entry: any, index: number) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
+                    </Pie>
+                    <RechartsTooltip />
+                    <Legend verticalAlign="bottom" height={36}/>
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Medical vs Non-Medical Pie Chart */}
+          <Card className="rounded-2xl border-border/50 shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <PieChartIcon className="w-5 h-5 text-red-500" /> Medical vs Non-Medical
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={medicalData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      <Cell key="cell-0" fill="#ef4444" /> {/* Red for medical */}
+                      <Cell key="cell-1" fill="#3b82f6" /> {/* Blue for non-medical */}
                     </Pie>
                     <RechartsTooltip />
                     <Legend verticalAlign="bottom" height={36}/>

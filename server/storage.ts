@@ -142,6 +142,17 @@ export class DatabaseStorage implements IStorage {
       else acc.push({ field: v.studyField || null, count: 1 });
       return acc;
     }, [] as { field: string | null; count: number }[]).map(({ field, count }) => ({ field, count }));
+
+    const medicalKeywords = ['med', 'chir', 'dent', 'pharma', 'infir', 'sage', 'health', 'sant', 'soin'];
+    const medicalCount = allVolunteers.filter(v => {
+      const field = (v.studyField || '').toLowerCase();
+      return medicalKeywords.some(k => field.includes(k));
+    }).length;
+
+    const medicalBreakdown = [
+      { category: 'Medical Study', count: medicalCount },
+      { category: 'Non-Medical Study', count: allVolunteers.length - medicalCount }
+    ];
     
     const positionBreakdown = allVolunteers.reduce((acc, v) => {
       const existing = acc.find(p => p.position === v.position);
@@ -179,6 +190,7 @@ export class DatabaseStorage implements IStorage {
     return {
       genderBreakdown,
       fieldStudyBreakdown,
+      medicalBreakdown,
       positionBreakdown,
       eventTypeBreakdown,
       commitmentTrend,

@@ -120,6 +120,7 @@ export type RankingRecord = {
 export type StatisticsData = {
   genderBreakdown: { gender: string | null; count: number }[];
   fieldStudyBreakdown: { field: string | null; count: number }[];
+  medicalBreakdown: { category: string; count: number }[];
   positionBreakdown: { position: string; count: number }[];
   eventTypeBreakdown: { type: string; count: number }[];
   commitmentTrend: { date: string; points: number }[];
