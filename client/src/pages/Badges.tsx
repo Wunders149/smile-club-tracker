@@ -38,59 +38,61 @@ export default function Badges() {
   return (
     <Layout>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-display font-bold text-foreground">Volunteer Badges</h1>
-            <p className="text-muted-foreground mt-1">Select and print ID badges for the team.</p>
-          </div>
-          <div className="flex items-center gap-2">
-            {selectedIds.length > 0 && (
+        <div className="no-print">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-display font-bold text-foreground">Volunteer Badges</h1>
+              <p className="text-muted-foreground mt-1">Select and print ID badges for the team.</p>
+            </div>
+            <div className="flex items-center gap-2">
+              {selectedIds.length > 0 && (
+                <Button 
+                  variant="outline"
+                  onClick={deselectAll}
+                  className="rounded-xl border-dashed"
+                >
+                  Clear ({selectedIds.length})
+                </Button>
+              )}
               <Button 
-                variant="outline"
-                onClick={deselectAll}
-                className="rounded-xl border-dashed"
+                onClick={() => handlePrint()} 
+                disabled={selectedIds.length === 0}
+                className="rounded-xl shadow-lg shadow-primary/20"
               >
-                Clear ({selectedIds.length})
+                <Printer className="w-4 h-4 mr-2" /> Print Selected ({selectedIds.length})
               </Button>
-            )}
-            <Button 
-              onClick={() => handlePrint()} 
-              disabled={selectedIds.length === 0}
-              className="rounded-xl shadow-lg shadow-primary/20"
-            >
-              <Printer className="w-4 h-4 mr-2" /> Print Selected ({selectedIds.length})
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 py-2 border-b border-border/50">
+            <Button variant="ghost" size="sm" onClick={selectAll} className="text-xs font-medium h-8">
+              <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> Select All
+            </Button>
+            <Button variant="ghost" size="sm" onClick={deselectAll} className="text-xs font-medium h-8 text-muted-foreground">
+              <Circle className="w-3.5 h-3.5 mr-1.5" /> Deselect All
             </Button>
           </div>
-        </div>
 
-        <div className="flex items-center gap-4 py-2 border-b border-border/50">
-          <Button variant="ghost" size="sm" onClick={selectAll} className="text-xs font-medium h-8">
-            <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> Select All
-          </Button>
-          <Button variant="ghost" size="sm" onClick={deselectAll} className="text-xs font-medium h-8 text-muted-foreground">
-            <Circle className="w-3.5 h-3.5 mr-1.5" /> Deselect All
-          </Button>
+          {isLoading ? (
+            <div className="text-center py-12 text-muted-foreground">Loading volunteers...</div>
+          ) : !volunteers?.length ? (
+            <div className="text-center py-12 border-2 border-dashed rounded-2xl">
+              <User className="w-12 h-12 text-muted mx-auto mb-3" />
+              <p className="text-muted-foreground">No volunteers found to generate badges.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pt-6">
+              {volunteers.map((volunteer) => (
+                <BadgeCard 
+                  key={volunteer.id} 
+                  volunteer={volunteer} 
+                  isSelected={selectedIds.includes(volunteer.id)}
+                  onSelect={() => toggleSelect(volunteer.id)}
+                />
+              ))}
+            </div>
+          )}
         </div>
-
-        {isLoading ? (
-          <div className="text-center py-12 text-muted-foreground">Loading volunteers...</div>
-        ) : !volunteers?.length ? (
-          <div className="text-center py-12 border-2 border-dashed rounded-2xl">
-            <User className="w-12 h-12 text-muted mx-auto mb-3" />
-            <p className="text-muted-foreground">No volunteers found to generate badges.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {volunteers.map((volunteer) => (
-              <BadgeCard 
-                key={volunteer.id} 
-                volunteer={volunteer} 
-                isSelected={selectedIds.includes(volunteer.id)}
-                onSelect={() => toggleSelect(volunteer.id)}
-              />
-            ))}
-          </div>
-        )}
 
         {/* Hidden Print Container */}
         <div className="print-only">
@@ -101,7 +103,7 @@ export default function Badges() {
                 margin: 10mm;
               }
               @media print {
-                .page-break {
+                .page-break:not(:last-child) {
                   page-break-after: always;
                   break-after: page;
                 }

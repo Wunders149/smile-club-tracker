@@ -119,55 +119,42 @@
 
 /* Global Print Styles */
 @media print {
-  /* Reset layout for printing */
-  html, body {
-    height: auto !important;
-    overflow: visible !important;
-    background: white !important;
-    color: black !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  /* Force all parents of print-only to be visible and not clip content */
-  #root, 
-  #root > div, 
-  main, 
-  div[class*="max-w-7xl"] {
-    display: block !important;
-    overflow: visible !important;
-    height: auto !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-    width: 100% !important;
-    position: static !important;
-  }
-
-  /* Hide UI elements */
+  /* Hide everything marked no-print */
+  .no-print, 
   aside, 
   nav, 
   button, 
-  .no-print, 
-  [role="dialog"], 
-  header,
-  .lg\\:hidden.fixed.top-0 { /* Mobile header */
+  header, 
+  [role="dialog"],
+  .lg\\:hidden.fixed.top-0 {
     display: none !important;
   }
 
-  /* Special handling for the content we want to hide while printing */
-  /* We hide the sibling elements of the print-only container within their parents */
-  .space-y-6 > *:not(.print-only),
-  .flex.flex-col > *:not(.print-only) {
-    display: none !important;
-  }
-
-  .print-only {
+  /* Show everything marked print-only */
+  .print-only, 
+  .print-only * {
     display: block !important;
     visibility: visible !important;
-    position: relative !important;
+  }
+
+  /* Layout resets */
+  html, body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
     width: 100% !important;
-    z-index: 1 !important;
+    overflow: visible !important;
+  }
+
+  #root, main, div[class*="max-w-7xl"] {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    position: static !important;
   }
 }
 
