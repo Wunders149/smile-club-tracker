@@ -549,75 +549,72 @@ export default function Events() {
 
         {/* Printable Annual Calendar */}
         <div className="print-only">
-          <div ref={printRef} className="p-12 bg-white text-black w-full min-h-screen font-sans flex flex-col">
+          <div ref={printRef} className="p-8 bg-white text-black w-full font-sans">
             <style>{`
               @page {
                 size: landscape;
-                margin: 15mm;
+                margin: 10mm;
               }
               @media print {
-                .month-section {
-                  break-inside: auto;
-                  margin-bottom: 40px;
-                  display: block;
-                  page-break-inside: auto;
-                }
-                .month-header {
-                  break-after: avoid;
-                  page-break-after: avoid;
-                }
-                .event-row {
-                  break-inside: avoid;
-                  page-break-inside: avoid;
-                  border-bottom: 0.5px solid #f0f0f0;
-                }
-                .event-row:last-child {
-                  border-bottom: none;
+                body {
+                  print-color-adjust: exact;
+                  -webkit-print-color-adjust: exact;
+                  background: white !important;
                 }
                 .annual-grid {
                   display: block;
                   column-count: 2;
-                  column-gap: 60px;
+                  column-gap: 40px;
                   width: 100%;
                 }
                 .month-section {
-                  column-break-inside: avoid; /* Keep months together if possible */
-                  break-inside: avoid-column;
+                  display: table; /* Table ensures thead repeats on page/column breaks */
+                  width: 100%;
+                  border-collapse: collapse;
+                  break-inside: auto;
+                  margin-bottom: 25px;
                 }
-                body {
-                  print-color-adjust: exact;
-                  -webkit-print-color-adjust: exact;
+                .month-header-row {
+                  display: table-header-group;
+                }
+                .event-row {
+                  display: table-row;
+                  break-inside: avoid;
+                  border-bottom: 0.5px solid #eee;
+                }
+                .event-row:last-child {
+                  border-bottom: none;
                 }
               }
             `}</style>
             
-            <div className="flex justify-between items-center mb-12 border-b-2 border-gray-900 pb-8">
-              <div className="flex items-center gap-6">
-                <img src="/smile-club-logo.png" alt="Logo" className="h-20 object-contain" />
+            <div className="flex justify-between items-center mb-10 border-b-2 border-gray-900 pb-6">
+              <div className="flex items-center gap-4">
+                <img src="/smile-club-logo.png" alt="Logo" className="h-14 object-contain" />
                 <div>
-                  <h1 className="text-3xl font-bold tracking-tighter uppercase text-gray-900">Activity Calendar</h1>
-                  <p className="text-gray-500 font-medium tracking-wide">Smile Club Mahajanga</p>
+                  <h1 className="text-2xl font-bold tracking-tighter uppercase text-gray-900">Activity Calendar</h1>
+                  <p className="text-xs text-gray-500 font-medium uppercase tracking-widest">Smile Club Mahajanga</p>
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-6xl font-black text-gray-900 leading-none">{new Date().getFullYear()}</div>
-                <div className="text-xs font-bold uppercase tracking-[0.2em] text-primary mt-1">Official Document</div>
+                <div className="text-5xl font-black text-gray-900 leading-none">{new Date().getFullYear()}</div>
+                <div className="text-[8px] font-bold uppercase tracking-[0.2em] text-primary mt-1">Official Club Document</div>
               </div>
             </div>
 
-            <div className="annual-grid flex-1">
+            <div className="annual-grid">
               {months.map(month => {
                 const monthEvents = eventsByMonth[month] || [];
                 if (monthEvents.length === 0) return null;
 
                 return (
-                  <table key={month} className="month-section w-full border-collapse mb-10">
-                    <thead>
+                  <table key={month} className="month-section">
+                    <thead className="month-header-row">
                       <tr>
-                        <th className="text-left p-0 pb-4">
-                          <div className="flex items-baseline justify-between border-b border-gray-900">
-                            <h3 className="text-2xl font-black uppercase italic tracking-tighter text-gray-900">{month}</h3>
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{monthEvents.length} activities</span>
+                        <th className="text-left p-0 pb-2">
+                          <div className="flex items-baseline justify-between border-b border-gray-900/20">
+                            <h3 className="text-xl font-black uppercase italic tracking-tighter text-gray-900">{month}</h3>
+                            <span className="text-[8px] font-bold uppercase tracking-widest text-gray-400">{monthEvents.length} activities</span>
                           </div>
                         </th>
                       </tr>
@@ -625,19 +622,19 @@ export default function Events() {
                     <tbody>
                       {monthEvents.map(ev => (
                         <tr key={ev.id} className="event-row">
-                          <td className="py-3 px-1">
-                            <div className="flex items-start gap-4">
-                              <div className="text-lg font-bold text-primary tabular-nums min-w-[24px] pt-0.5">
+                          <td className="py-2 px-0.5">
+                            <div className="flex items-start gap-3">
+                              <div className="text-base font-bold text-primary tabular-nums min-w-[20px]">
                                 {format(new Date(ev.date), 'dd')}
                               </div>
-                              <div className="flex-1">
-                                <div className="font-bold text-gray-900 leading-tight mb-1 uppercase text-sm tracking-tight">{ev.name}</div>
-                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] font-medium text-gray-500 uppercase tracking-wider">
-                                  <span className="text-primary/80 font-bold">{ev.type}</span>
+                              <div className="flex-1 min-w-0">
+                                <div className="font-bold text-gray-900 leading-tight mb-0.5 uppercase text-[11px] truncate">{ev.name}</div>
+                                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[9px] font-medium text-gray-500 uppercase tracking-tight">
+                                  <span className="text-primary/70 font-bold">{ev.type}</span>
                                   {ev.venue && (
                                     <>
                                       <span className="text-gray-300">•</span>
-                                      <span>{ev.venue}</span>
+                                      <span className="truncate max-w-[120px]">{ev.venue}</span>
                                     </>
                                   )}
                                   <span className="text-gray-300">•</span>
@@ -654,14 +651,14 @@ export default function Events() {
               })}
             </div>
 
-            <div className="mt-auto flex justify-between items-end text-[9px] font-bold uppercase tracking-[0.15em] text-gray-400 border-t border-gray-100 pt-6 pb-4">
+            <div className="mt-12 flex justify-between items-end text-[8px] font-bold uppercase tracking-[0.1em] text-gray-400 border-t border-gray-100 pt-4">
               <div>
                 <p>Generated {format(new Date(), 'yyyy.MM.dd HH:mm')}</p>
-                <p className="mt-1 text-gray-300">Smile Club Mahajanga Tracker Internal System</p>
+                <p className="mt-0.5 text-gray-300">Smile Club Tracker Internal System</p>
               </div>
               <div className="text-right">
-                <p className="text-gray-900 mb-1">For the patients</p>
-                <p className="text-[7px] text-gray-300 tracking-[0.3em]">Confidential activity log</p>
+                <p className="text-gray-900">For the patients</p>
+                <p className="text-[6px] text-gray-300 tracking-[0.2em]">Confidential activity log</p>
               </div>
             </div>
           </div>
