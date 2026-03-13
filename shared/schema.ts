@@ -4,10 +4,14 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const POSITIONS = [
-  "President", "Vice President", "Financial Officer", "Fundraising Officer",
+  "President", "Vice President", "Past President", "Financial Officer", "Fundraising Officer",
   "Communication Officer", "Education Officer", "Administration Officer",
   "Assisting Board Member", "Active Volunteer", "Student Volunteer",
   "Medical Volunteer", "Advisor"
+] as const;
+
+export const DEPARTMENTS = [
+  "Administration", "Education", "Fundraising", "Finance", "Communications", "None"
 ] as const;
 
 export const EVENT_TYPES = [
@@ -48,6 +52,7 @@ export const volunteers = pgTable("volunteers", {
   studyField: text("study_field"),
   major: text("major"),
   position: text("position").notNull(),
+  department: text("department").default("None"),
   gender: text("gender"),
   createdAt: timestamp("created_at").defaultNow(),
 });

@@ -12,7 +12,7 @@ import { Plus, MoreVertical, Edit2, Trash2, Mail, Phone, GraduationCap, Users, U
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertVolunteerSchema, type Volunteer, GENDERS } from "@shared/schema";
+import { insertVolunteerSchema, type Volunteer, GENDERS, POSITIONS, DEPARTMENTS } from "@shared/schema";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import imageCompression from 'browser-image-compression';
@@ -37,7 +37,7 @@ export default function Volunteers() {
   const form = useForm<FormValues>({
     resolver: zodResolver(insertVolunteerSchema),
     defaultValues: {
-      fullName: "", contact: "", address: "", email: "", photo: "", studyField: "", major: "", position: POSITIONS[8], gender: undefined
+      fullName: "", contact: "", address: "", email: "", photo: "", studyField: "", major: "", position: POSITIONS[8], gender: undefined, department: "None"
     }
   });
 
@@ -45,11 +45,10 @@ export default function Volunteers() {
     form.reset({
       fullName: vol.fullName, contact: vol.contact, address: vol.address,
       email: vol.email, photo: vol.photo || "", studyField: vol.studyField || "",
-      major: vol.major || "", position: vol.position, gender: vol.gender || undefined
+      major: vol.major || "", position: vol.position, gender: vol.gender || undefined, department: vol.department || "None"
     });
     setEditingVol(vol);
   };
-
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -143,6 +142,17 @@ export default function Volunteers() {
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl><SelectTrigger className="rounded-xl"><SelectValue placeholder="Select position" /></SelectTrigger></FormControl>
                           <SelectContent>{POSITIONS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                        </Select>
+                        <FormMessage/>
+                      </FormItem>
+                    )} />
+
+                    <FormField control={form.control} name="department" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Department (for Organigram)</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value || "None"}>
+                          <FormControl><SelectTrigger className="rounded-xl"><SelectValue placeholder="Select department" /></SelectTrigger></FormControl>
+                          <SelectContent>{DEPARTMENTS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
                         </Select>
                         <FormMessage/>
                       </FormItem>
@@ -244,6 +254,17 @@ export default function Volunteers() {
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl><SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger></FormControl>
                           <SelectContent>{POSITIONS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                        </Select>
+                        <FormMessage/>
+                      </FormItem>
+                    )} />
+
+                    <FormField control={form.control} name="department" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Department</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value || "None"}>
+                          <FormControl><SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger></FormControl>
+                          <SelectContent>{DEPARTMENTS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
                         </Select>
                         <FormMessage/>
                       </FormItem>

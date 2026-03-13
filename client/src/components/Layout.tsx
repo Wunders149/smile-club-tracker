@@ -9,7 +9,8 @@ import {
   Menu,
   BarChart3,
   CloudUpload,
-  Contact
+  Contact,
+  Network
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -21,8 +22,9 @@ const NAV_ITEMS = [
   { href: "/volunteers", label: "Volunteers", icon: Users },
   { href: "/events", label: "Events", icon: CalendarDays },
   { href: "/attendance", label: "Attendance", icon: CheckSquare },
-  { href: "/rankings", label: "Rankings", icon: Trophy },
+  {href: "/rankings", label: "Rankings", icon: Trophy },
   { href: "/statistics", label: "Statistics", icon: BarChart3 },
+  { href: "/organigram", label: "Organigram", icon: Network },
   { href: "/badges", label: "Badges", icon: Contact },
 ];
 
