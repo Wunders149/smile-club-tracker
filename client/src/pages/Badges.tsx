@@ -94,7 +94,7 @@ export default function Badges() {
 
         {/* Hidden Print Container */}
         <div className="print-only">
-          <div ref={printRef} className="p-0 bg-white">
+          <div ref={printRef} className="bg-white">
             <style>{`
               @page {
                 size: A4;
@@ -104,7 +104,6 @@ export default function Badges() {
                 .page-break {
                   page-break-after: always;
                   break-after: page;
-                  margin-bottom: 20px;
                 }
                 body {
                   print-color-adjust: exact;
