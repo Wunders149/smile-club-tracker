@@ -183,6 +183,7 @@ export class DatabaseStorage implements IStorage {
       eventTypeBreakdown,
       commitmentTrend,
       totalVolunteers: allVolunteers.length,
+      totalEvents: allEvents.length,
       maleCount,
       femaleCount
     };

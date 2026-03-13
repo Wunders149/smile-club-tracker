@@ -119,6 +119,7 @@ export type StatisticsData = {
   eventTypeBreakdown: { type: string; count: number }[];
   commitmentTrend: { date: string; points: number }[];
   totalVolunteers: number;
+  totalEvents: number;
   maleCount: number;
   femaleCount: number;
 };

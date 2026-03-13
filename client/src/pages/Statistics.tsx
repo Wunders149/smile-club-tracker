@@ -1,7 +1,7 @@
 import { Layout } from "@/components/Layout";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart3, Users, PieChart as PieChartIcon, TrendingUp } from "lucide-react";
+import { BarChart3, Users, PieChart as PieChartIcon, TrendingUp, CalendarDays } from "lucide-react";
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Legend
@@ -30,11 +30,6 @@ export default function Statistics() {
     value: g.count
   }));
 
-  const studyData = stats.fieldStudyBreakdown.map((f: any) => ({
-    name: f.field || 'Unspecified',
-    value: f.count
-  }));
-
   return (
     <Layout>
       <div className="space-y-8 max-w-6xl mx-auto">
@@ -44,30 +39,59 @@ export default function Statistics() {
         </div>
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="rounded-2xl border-border/50 shadow-lg bg-gradient-to-br from-card to-secondary/5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="rounded-2xl border-border/50 shadow-lg bg-gradient-to-br from-card to-primary/5">
             <CardContent className="pt-6">
-              <div className="text-center">
-                <div className="text-5xl font-bold text-primary">{stats.totalVolunteers}</div>
-                <p className="text-muted-foreground mt-2 font-medium">Total Active Volunteers</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-4xl font-bold text-primary">{stats.totalVolunteers}</div>
+                  <p className="text-xs text-muted-foreground mt-1 font-bold uppercase tracking-wider">Volunteers</p>
+                </div>
+                <div className="bg-primary/10 p-3 rounded-xl text-primary">
+                  <Users className="w-6 h-6" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-2xl border-border/50 shadow-lg bg-gradient-to-br from-card to-orange-50/50">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-4xl font-bold text-orange-600">{stats.totalEvents}</div>
+                  <p className="text-xs text-muted-foreground mt-1 font-bold uppercase tracking-wider">Total Events</p>
+                </div>
+                <div className="bg-orange-500/10 p-3 rounded-xl text-orange-500">
+                  <CalendarDays className="w-6 h-6" />
+                </div>
               </div>
             </CardContent>
           </Card>
           
           <Card className="rounded-2xl border-border/50 shadow-lg bg-gradient-to-br from-card to-blue-50/30">
             <CardContent className="pt-6">
-              <div className="text-center">
-                <div className="text-5xl font-bold text-blue-600">{stats.maleCount}</div>
-                <p className="text-muted-foreground mt-2 font-medium text-blue-600/80">Male</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-4xl font-bold text-blue-600">{stats.maleCount}</div>
+                  <p className="text-xs text-muted-foreground mt-1 font-bold uppercase tracking-wider">Male</p>
+                </div>
+                <div className="bg-blue-500/10 p-3 rounded-xl text-blue-500">
+                  <div className="w-6 h-6 font-black flex items-center justify-center">M</div>
+                </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="rounded-2xl border-border/50 shadow-lg bg-gradient-to-br from-card to-pink-50/30">
             <CardContent className="pt-6">
-              <div className="text-center">
-                <div className="text-5xl font-bold text-pink-600">{stats.femaleCount}</div>
-                <p className="text-muted-foreground mt-2 font-medium text-pink-600/80">Female</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-4xl font-bold text-pink-600">{stats.femaleCount}</div>
+                  <p className="text-xs text-muted-foreground mt-1 font-bold uppercase tracking-wider">Female</p>
+                </div>
+                <div className="bg-pink-500/10 p-3 rounded-xl text-pink-500">
+                  <div className="w-6 h-6 font-black flex items-center justify-center">F</div>
+                </div>
               </div>
             </CardContent>
           </Card>

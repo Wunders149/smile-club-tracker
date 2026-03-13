@@ -152,6 +152,7 @@ export const api = {
             count: z.number()
           })),
           totalVolunteers: z.number(),
+          totalEvents: z.number(),
           maleCount: z.number(),
           femaleCount: z.number(),
           eventTypeBreakdown: z.array(z.object({
