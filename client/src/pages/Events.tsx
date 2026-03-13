@@ -593,27 +593,37 @@ export default function Events() {
                 if (monthEvents.length === 0) return null;
 
                 return (
-                  <div key={month} className="month-section">
-                    <h3 className="month-header text-xl font-bold text-primary border-b border-primary/20 mb-3 pb-1 flex justify-between">
-                      {month}
-                      <span className="text-sm font-normal text-gray-400">{monthEvents.length} events</span>
-                    </h3>
-                    <div className="space-y-2">
+                  <table key={month} className="month-section w-full border-collapse">
+                    <thead>
+                      <tr>
+                        <th className="text-left p-0">
+                          <h3 className="month-header text-xl font-bold text-primary border-b border-primary/20 mb-3 pb-1 flex justify-between w-full">
+                            {month}
+                            <span className="text-sm font-normal text-gray-400 no-print-count">{monthEvents.length} events</span>
+                          </h3>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
                       {monthEvents.map(ev => (
-                        <div key={ev.id} className="event-row flex gap-3 p-2 rounded-lg text-sm border border-transparent">
-                          <div className="font-bold text-gray-400 w-6 text-right">{format(new Date(ev.date), 'dd')}</div>
-                          <div className="flex-1">
-                            <div className="font-bold text-gray-900">{ev.name}</div>
-                            <div className="flex gap-3 text-[11px] text-gray-500 mt-0.5">
-                              <span className="font-semibold uppercase text-primary/70">{ev.type}</span>
-                              {ev.venue && <span>• {ev.venue}</span>}
-                              <span>• {format(new Date(ev.date), 'h:mm a')}</span>
+                        <tr key={ev.id} className="event-row">
+                          <td className="p-0">
+                            <div className="flex gap-3 p-2 rounded-lg text-sm border border-transparent">
+                              <div className="font-bold text-gray-400 w-6 text-right">{format(new Date(ev.date), 'dd')}</div>
+                              <div className="flex-1">
+                                <div className="font-bold text-gray-900">{ev.name}</div>
+                                <div className="flex gap-3 text-[11px] text-gray-500 mt-0.5">
+                                  <span className="font-semibold uppercase text-primary/70">{ev.type}</span>
+                                  {ev.venue && <span>• {ev.venue}</span>}
+                                  <span>• {format(new Date(ev.date), 'h:mm a')}</span>
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        </div>
+                          </td>
+                        </tr>
                       ))}
-                    </div>
-                  </div>
+                    </tbody>
+                  </table>
                 );
               })}
             </div>
