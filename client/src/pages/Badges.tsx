@@ -212,7 +212,7 @@ const BadgeID = React.forwardRef<HTMLDivElement, { volunteer: any }>(({ voluntee
       {/* Footer */}
       <div className="mt-auto w-full text-center z-10">
         <div className="py-2 border-t border-gray-100">
-          <p className="italic font-display text-gray-400 text-sm">"For the patients"</p>
+          <p className="italic font-display text-gray-400 text-sm">"For The Patients!"</p>
         </div>
         <div className="h-2 w-full bg-primary absolute bottom-0 left-0" />
       </div>

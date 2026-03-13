@@ -170,7 +170,7 @@ export default function Organigram() {
             />
 
             <div className="mt-auto pt-12 text-[10px] font-bold uppercase tracking-widest text-gray-300 text-center">
-              Changing lives, one smile at a time.
+              For The Patients!!.
             </div>
           </div>
         </div>

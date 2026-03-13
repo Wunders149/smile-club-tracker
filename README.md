@@ -26,7 +26,7 @@ A comprehensive management system for Smile Club Mahajanga, designed to track vo
   - Volunteer Photo
   - Full Name & Position
   - Contact Phone
-  - **"For the patients"** footer.
+  - **"For The Patients!"** footer.
   - Subtle **watermark logo** for authenticity.
 - High-quality print output optimized for standard badge sizes.
 
@@ -107,4 +107,4 @@ For detailed information on handling the Render.com 90-day database reset and ma
 ---
 
 **Built with ❤️ for Smile Club Mahajanga.**
-"Changing lives, one smile at a time."
+"For The Patients!!."
