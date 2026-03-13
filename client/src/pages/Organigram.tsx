@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 export default function Organigram() {
   const { data: volunteers, isLoading } = useVolunteers();
@@ -140,37 +141,64 @@ export default function Organigram() {
 
         {/* Printable version */}
         <div className="print-only">
-          <div ref={printRef} className="p-10 bg-white text-black w-full min-h-screen">
+          <div ref={printRef} className="p-0 bg-white text-black w-full font-sans">
             <style>{`
-              @page { size: landscape; margin: 10mm; }
+              @page {
+                size: landscape;
+                margin: 15mm;
+              }
               @media print {
-                body { print-color-adjust: exact; -webkit-print-color-adjust: exact; background: white !important; }
-                .org-box { border: 1.5px solid #000 !important; }
-                .connector-line { background-color: #000 !important; }
+                body {
+                  print-color-adjust: exact;
+                  -webkit-print-color-adjust: exact;
+                  background: white !important;
+                }
+                .print-header {
+                  break-after: avoid;
+                  page-break-after: avoid;
+                }
+                .org-node {
+                  break-inside: avoid;
+                }
               }
             `}</style>
             
-            <div className="flex justify-between items-center mb-12 border-b-2 border-gray-900 pb-6">
-              <img src="/smile-club-logo.png" alt="Logo" className="h-16" />
+            <div className="print-header flex justify-between items-center mb-8 border-b-2 border-gray-900 pb-6">
+              <div className="flex items-center gap-4">
+                <img src="/smile-club-logo.png" alt="Logo" className="h-12 object-contain" />
+                <div>
+                  <h1 className="text-xl font-bold tracking-tighter uppercase text-gray-900">Organizational Structure</h1>
+                  <p className="text-[10px] text-gray-500 font-medium uppercase tracking-widest">Smile Club Mahajanga</p>
+                </div>
+              </div>
               <div className="text-right">
-                <h1 className="text-2xl font-black uppercase tracking-tighter">Organizational Structure</h1>
-                <p className="text-sm font-bold text-primary">Smile Club Mahajanga • {new Date().getFullYear()}</p>
+                <div className="text-4xl font-black text-gray-900 leading-none">{new Date().getFullYear()}</div>
+                <div className="text-[7px] font-bold uppercase tracking-[0.2em] text-primary mt-1">Official Club Document</div>
               </div>
             </div>
 
-            <OrgChart 
-              volunteers={volunteers}
-              president={president} 
-              vicePresident={vicePresident} 
-              pastPresident={pastPresident}
-              advisor={advisor}
-              executiveHeads={executiveHeads}
-              getCommitteeMembers={getCommitteeMembers}
-              isPrint
-            />
+            <div className="py-4">
+              <OrgChart 
+                volunteers={volunteers}
+                president={president} 
+                vicePresident={vicePresident} 
+                pastPresident={pastPresident}
+                advisor={advisor}
+                executiveHeads={executiveHeads}
+                getCommitteeMembers={getCommitteeMembers}
+                isPrint
+              />
+            </div>
 
-            <div className="mt-auto pt-12 text-[10px] font-bold uppercase tracking-widest text-gray-300 text-center">
-              For The Patients!!.
+            <div className="mt-8 pt-6 border-t border-gray-100 flex justify-between items-end text-[7px] font-bold uppercase tracking-[0.1em] text-gray-400">
+              <div>
+                <p>Generated {format(new Date(), 'yyyy.MM.dd HH:mm')}</p>
+                <p className="mt-0.5 text-gray-300">Smile Club Tracker Internal System</p>
+              </div>
+              <div className="text-right">
+                <p className="text-gray-900">For The Patients!</p>
+                <p className="text-[5px] text-gray-300 tracking-[0.2em]">Confidential activity log</p>
+              </div>
             </div>
           </div>
         </div>
@@ -273,7 +301,7 @@ function OrgChart({ volunteers, president, vicePresident, pastPresident, advisor
 
 function OrgNode({ person, title, primary }: { person?: Volunteer, title: string, primary?: boolean }) {
   return (
-    <div className="flex flex-col items-center">
+    <div className="org-node flex flex-col items-center">
       <div className={`
         min-w-[200px] p-5 rounded-2xl border-2 text-center shadow-lg relative
         ${primary ? 'border-primary bg-primary text-white shadow-primary/20' : 'border-primary/20 bg-card text-foreground'}
