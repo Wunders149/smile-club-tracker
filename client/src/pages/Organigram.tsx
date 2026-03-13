@@ -1,14 +1,21 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Layout } from "@/components/Layout";
-import { useVolunteers } from "@/hooks/use-volunteers";
+import { useVolunteers, useUpdateVolunteer } from "@/hooks/use-volunteers";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Printer, User, Network } from "lucide-react";
+import { Printer, User, Network, Check, Search } from "lucide-react";
 import { useReactToPrint } from "react-to-print";
-import { type Volunteer } from "@shared/schema";
+import { type Volunteer, DEPARTMENTS } from "@shared/schema";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
 export default function Organigram() {
   const { data: volunteers, isLoading } = useVolunteers();
+  const updateMut = useUpdateVolunteer();
+  const [selectedDept, setSelectedDept] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const printRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = useReactToPrint({
@@ -33,27 +40,29 @@ export default function Organigram() {
   ];
 
   const getCommitteeMembers = (dept: string) => {
-    return volunteers?.filter(v => 
+    return (volunteers?.filter(v => 
       v.department === dept && 
       !v.position.includes("Officer") && 
       v.position !== "President" && 
       v.position !== "Vice President"
-    ) || [];
+    ) || []).sort((a, b) => {
+      // Assisting Board Member at the top
+      if (a.position === "Assisting Board Member" && b.position !== "Assisting Board Member") return -1;
+      if (a.position !== "Assisting Board Member" && b.position === "Assisting Board Member") return 1;
+      return a.fullName.localeCompare(b.fullName);
+    });
   };
 
-  const OrgBox = ({ person, title, isSide }: { person?: Volunteer, title: string, isSide?: boolean }) => (
-    <div className={`flex flex-col items-center ${isSide ? 'opacity-80' : ''}`}>
-      <div className={`
-        min-w-[180px] p-4 rounded-2xl border-2 bg-card text-center shadow-md relative
-        ${isSide ? 'border-dashed border-muted-foreground/30' : 'border-primary/20'}
-      `}>
-        <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">{title}</div>
-        <div className="font-bold text-foreground truncate px-2">
-          {person ? person.fullName : <span className="text-muted-foreground/40 italic">Vacant</span>}
-        </div>
-      </div>
-    </div>
-  );
+  const handleToggleVolunteer = async (volunteer: Volunteer) => {
+    if (!selectedDept) return;
+    const newDept = volunteer.department === selectedDept ? "None" : selectedDept;
+    await updateMut.mutateAsync({ id: volunteer.id, department: newDept });
+  };
+
+  const filteredVolunteers = volunteers?.filter(v => 
+    v.fullName.toLowerCase().includes(searchQuery.toLowerCase()) &&
+    v.position !== "President" && v.position !== "Vice President" && !v.position.includes("Officer")
+  ) || [];
 
   return (
     <Layout>
@@ -77,8 +86,57 @@ export default function Organigram() {
             advisor={advisor}
             executiveHeads={executiveHeads}
             getCommitteeMembers={getCommitteeMembers}
+            onCommitteeClick={(dept: string) => setSelectedDept(dept)}
           />
         </Card>
+
+        {/* Selection Dialog */}
+        <Dialog open={!!selectedDept} onOpenChange={(open) => !open && setSelectedDept(null)}>
+          <DialogContent className="sm:max-w-[500px] rounded-3xl">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-display">Manage {selectedDept} Committee</DialogTitle>
+              <DialogDescription>Add or remove volunteers from this committee.</DialogDescription>
+            </DialogHeader>
+            
+            <div className="relative mt-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input 
+                placeholder="Search volunteers..." 
+                className="pl-9 rounded-xl"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            <ScrollArea className="h-[400px] mt-4 pr-4">
+              <div className="space-y-2">
+                {filteredVolunteers.map((vol) => (
+                  <button
+                    key={vol.id}
+                    onClick={() => handleToggleVolunteer(vol)}
+                    className={cn(
+                      "w-full flex items-center justify-between p-3 rounded-xl border transition-all",
+                      vol.department === selectedDept 
+                        ? "bg-primary/5 border-primary/20 shadow-sm" 
+                        : "bg-card border-border/50 hover:border-primary/20"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+                        {vol.photo ? <img src={vol.photo} className="w-full h-full object-cover" /> : <User className="w-4 h-4" />}
+                      </div>
+                      <div className="text-left">
+                        <p className="text-sm font-bold">{vol.fullName}</p>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{vol.position}</p>
+                      </div>
+                    </div>
+                    {vol.department === selectedDept && <Check className="w-4 h-4 text-primary" />}
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
 
         {/* Printable version */}
         <div className="print-only">
@@ -121,7 +179,7 @@ export default function Organigram() {
   );
 }
 
-function OrgChart({ volunteers, president, vicePresident, pastPresident, advisor, executiveHeads, getCommitteeMembers, isPrint }: any) {
+function OrgChart({ volunteers, president, vicePresident, pastPresident, advisor, executiveHeads, getCommitteeMembers, onCommitteeClick, isPrint }: any) {
   return (
     <div className="flex flex-col items-center gap-12 w-full">
       {/* Top Level: President & Vice President */}
@@ -174,13 +232,29 @@ function OrgChart({ volunteers, president, vicePresident, pastPresident, advisor
                 {/* Committee members */}
                 <div className="w-0.5 h-6 bg-border/50" />
                 <div className="w-full px-2">
-                  <div className="bg-muted/30 rounded-xl p-3 border border-border/50">
-                    <div className="text-[8px] font-black uppercase tracking-tighter text-muted-foreground/60 mb-2 border-b border-border/50 pb-1">Committee</div>
+                  <div 
+                    onClick={() => !isPrint && onCommitteeClick(head.dept)}
+                    className={cn(
+                      "bg-muted/30 rounded-xl p-3 border border-border/50 transition-all group/box",
+                      !isPrint && "cursor-pointer hover:bg-primary/[0.03] hover:border-primary/30"
+                    )}
+                  >
+                    <div className="text-[8px] font-black uppercase tracking-tighter text-muted-foreground/60 mb-2 border-b border-border/50 pb-1 flex justify-between items-center">
+                      <span>Committee</span>
+                      {!isPrint && <div className="text-[7px] bg-primary/10 text-primary px-1 rounded opacity-0 group-hover/box:opacity-100 transition-opacity">Click to Manage</div>}
+                    </div>
                     <div className="space-y-1.5">
                       {committee.length > 0 ? committee.map((m: any) => (
-                        <div key={m.id} className="text-[10px] font-medium leading-tight flex items-center gap-1.5">
-                          <div className="w-1 h-1 rounded-full bg-primary/40" />
+                        <div key={m.id} className={cn(
+                          "text-[10px] leading-tight flex items-center gap-1.5",
+                          m.position === "Assisting Board Member" ? "font-bold text-primary" : "font-medium text-foreground/80"
+                        )}>
+                          <div className={cn(
+                            "w-1 h-1 rounded-full",
+                            m.position === "Assisting Board Member" ? "bg-primary" : "bg-primary/40"
+                          )} />
                           {m.fullName}
+                          {m.position === "Assisting Board Member" && <span className="text-[7px] uppercase tracking-tighter opacity-60"> (ABM)</span>}
                         </div>
                       )) : (
                         <div className="text-[9px] text-muted-foreground/40 italic">No members</div>
