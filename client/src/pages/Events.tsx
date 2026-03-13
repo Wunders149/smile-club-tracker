@@ -549,26 +549,40 @@ export default function Events() {
 
         {/* Printable Annual Calendar */}
         <div className="print-only">
-          <div ref={printRef} className="p-12 bg-white text-black w-full min-h-screen font-sans">
+          <div ref={printRef} className="p-12 bg-white text-black w-full min-h-screen font-sans flex flex-col">
             <style>{`
               @page {
                 size: landscape;
-                margin: 12mm;
+                margin: 15mm;
               }
               @media print {
                 .month-section {
                   break-inside: auto;
                   margin-bottom: 40px;
+                  display: block;
+                  page-break-inside: auto;
                 }
                 .month-header {
                   break-after: avoid;
+                  page-break-after: avoid;
                 }
                 .event-row {
                   break-inside: avoid;
+                  page-break-inside: avoid;
                   border-bottom: 0.5px solid #f0f0f0;
                 }
                 .event-row:last-child {
                   border-bottom: none;
+                }
+                .annual-grid {
+                  display: block;
+                  column-count: 2;
+                  column-gap: 60px;
+                  width: 100%;
+                }
+                .month-section {
+                  column-break-inside: avoid; /* Keep months together if possible */
+                  break-inside: avoid-column;
                 }
                 body {
                   print-color-adjust: exact;
@@ -591,13 +605,13 @@ export default function Events() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-x-16 gap-y-12">
+            <div className="annual-grid flex-1">
               {months.map(month => {
                 const monthEvents = eventsByMonth[month] || [];
                 if (monthEvents.length === 0) return null;
 
                 return (
-                  <table key={month} className="month-section w-full border-collapse">
+                  <table key={month} className="month-section w-full border-collapse mb-10">
                     <thead>
                       <tr>
                         <th className="text-left p-0 pb-4">
@@ -640,7 +654,7 @@ export default function Events() {
               })}
             </div>
 
-            <div className="fixed bottom-10 left-12 right-12 flex justify-between items-end text-[9px] font-bold uppercase tracking-[0.15em] text-gray-400 border-t border-gray-100 pt-6">
+            <div className="mt-auto flex justify-between items-end text-[9px] font-bold uppercase tracking-[0.15em] text-gray-400 border-t border-gray-100 pt-6 pb-4">
               <div>
                 <p>Generated {format(new Date(), 'yyyy.MM.dd HH:mm')}</p>
                 <p className="mt-1 text-gray-300">Smile Club Mahajanga Tracker Internal System</p>
