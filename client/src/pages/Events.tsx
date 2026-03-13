@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Layout } from "@/components/Layout";
 import { useEvents, useCreateEvent, useUpdateEvent, useDeleteEvent } from "@/hooks/use-events";
 import { useVolunteers } from "@/hooks/use-volunteers";
@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Plus, MoreVertical, Edit2, Trash2, CalendarDays, MapPin, LayoutGrid, Calendar as CalendarIcon, User, Search } from "lucide-react";
+import { Plus, MoreVertical, Edit2, Trash2, CalendarDays, MapPin, LayoutGrid, Calendar as CalendarIcon, User, Search, Printer } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,6 +23,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
+import { useReactToPrint } from "react-to-print";
 
 // Re-create schema to handle datetime-local string properly before sending
 const formSchema = insertEventSchema.extend({
@@ -47,6 +48,12 @@ export default function Events() {
   const [view, setView] = useState<"grid" | "calendar">("grid");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [speakerSearchOpen, setSpeakerSearchOpen] = useState(false);
+  
+  const printRef = useRef<HTMLDivElement>(null);
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: `Annual_Events_${new Date().getFullYear()}`,
+  });
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -65,7 +72,6 @@ export default function Events() {
 
   const onDateChange = (newDate: Date) => {
     form.setValue("date", newDate);
-    // Automatically set end time to 1 hour later for NEW events or if end time not touched
     const currentEnd = form.getValues("endTime");
     if (!editingEvent && (!currentEnd || currentEnd.getTime() <= newDate.getTime())) {
       form.setValue("endTime", addHours(newDate, 1));
@@ -98,6 +104,19 @@ export default function Events() {
 
   const eventDays = events?.map(ev => new Date(ev.date)) || [];
 
+  // Group events by month for the annual printout
+  const eventsByMonth = events ? [...events].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).reduce((acc, ev) => {
+    const month = format(new Date(ev.date), 'MMMM');
+    if (!acc[month]) acc[month] = [];
+    acc[month].push(ev);
+    return acc;
+  }, {} as Record<string, Event[]>) : {};
+
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
   return (
     <Layout>
       <div className="space-y-6">
@@ -108,6 +127,15 @@ export default function Events() {
           </div>
           
           <div className="flex items-center gap-3">
+            <Button 
+              variant="outline"
+              onClick={() => handlePrint()}
+              disabled={!events?.length}
+              className="rounded-xl border-primary/20 text-primary hover:bg-primary/5 h-10"
+            >
+              <Printer className="w-4 h-4 mr-2" /> Print Annual Calendar
+            </Button>
+
             <div className="bg-muted p-1 rounded-xl flex items-center mr-2">
               <Button 
                 variant={view === "grid" ? "secondary" : "ghost"} 
@@ -129,7 +157,7 @@ export default function Events() {
 
             <Button 
               onClick={handleOpenAdd}
-              className="bg-primary hover:bg-primary/90 text-white font-medium rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 px-6"
+              className="bg-primary hover:bg-primary/90 text-white font-medium rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 px-6 h-10"
             >
               <Plus className="w-4 h-4 mr-2" /> Add Event
             </Button>
@@ -181,7 +209,7 @@ export default function Events() {
                             <Input 
                               type="datetime-local" 
                               className="rounded-xl" 
-                              value={field.value ? new Date(new Date(field.value).getTime() - new Date(field.value).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
+                              value={field.value ? new Date(new Date(field.value).getTime() - field.value.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
                               onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
                             />
                           </FormControl>
@@ -315,7 +343,7 @@ export default function Events() {
                             <Input 
                               type="datetime-local" 
                               className="rounded-xl" 
-                              value={field.value ? new Date(new Date(field.value).getTime() - new Date(field.value).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
+                              value={field.value ? new Date(new Date(field.value).getTime() - field.value.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
                               onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
                             />
                           </FormControl>
@@ -516,6 +544,74 @@ export default function Events() {
             </div>
           </div>
         )}
+
+        {/* Printable Annual Calendar */}
+        <div className="print-only">
+          <div ref={printRef} className="p-8 bg-white text-black w-full min-h-screen">
+            <style>{`
+              @page {
+                size: landscape;
+                margin: 15mm;
+              }
+              @media print {
+                .month-section {
+                  break-inside: avoid;
+                  margin-bottom: 30px;
+                }
+                .event-row:nth-child(even) {
+                  background-color: #f9fafb;
+                }
+              }
+            `}</style>
+            
+            <div className="flex justify-between items-end mb-10 border-b-4 border-primary pb-6">
+              <div>
+                <img src="/smile-club-logo.png" alt="Logo" className="h-20 mb-4" />
+                <h1 className="text-4xl font-bold uppercase tracking-tighter">Annual Activity Calendar</h1>
+              </div>
+              <div className="text-right">
+                <p className="text-5xl font-black text-primary/20">{new Date().getFullYear()}</p>
+                <p className="text-gray-500 font-medium">Smile Club Mahajanga</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-x-12 gap-y-10">
+              {months.map(month => {
+                const monthEvents = eventsByMonth[month] || [];
+                if (monthEvents.length === 0) return null;
+
+                return (
+                  <div key={month} className="month-section">
+                    <h3 className="text-xl font-bold text-primary border-b border-primary/20 mb-3 pb-1 flex justify-between">
+                      {month}
+                      <span className="text-sm font-normal text-gray-400">{monthEvents.length} events</span>
+                    </h3>
+                    <div className="space-y-2">
+                      {monthEvents.map(ev => (
+                        <div key={ev.id} className="event-row flex gap-3 p-2 rounded-lg text-sm border border-transparent">
+                          <div className="font-bold text-gray-400 w-6 text-right">{format(new Date(ev.date), 'dd')}</div>
+                          <div className="flex-1">
+                            <div className="font-bold text-gray-900">{ev.name}</div>
+                            <div className="flex gap-3 text-[11px] text-gray-500 mt-0.5">
+                              <span className="font-semibold uppercase text-primary/70">{ev.type}</span>
+                              {ev.venue && <span>• {ev.venue}</span>}
+                              <span>• {format(new Date(ev.date), 'h:mm a')}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="fixed bottom-8 left-8 right-8 flex justify-between items-center text-[10px] text-gray-300 border-t border-gray-100 pt-4">
+              <p>Generated on {format(new Date(), 'MMMM d, yyyy')}</p>
+              <p className="italic uppercase tracking-widest font-bold text-primary/20">For the patients</p>
+            </div>
+          </div>
+        </div>
 
         <AlertDialog open={showAddPrompt} onOpenChange={setShowAddPrompt}>
           <AlertDialogContent className="rounded-2xl">
