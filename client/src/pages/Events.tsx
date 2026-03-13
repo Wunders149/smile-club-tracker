@@ -555,8 +555,14 @@ export default function Events() {
               }
               @media print {
                 .month-section {
-                  break-inside: avoid;
+                  break-inside: auto;
                   margin-bottom: 30px;
+                }
+                .month-header {
+                  break-after: avoid;
+                }
+                .event-row {
+                  break-inside: avoid;
                 }
                 .event-row:nth-child(even) {
                   background-color: #f9fafb;
@@ -582,7 +588,7 @@ export default function Events() {
 
                 return (
                   <div key={month} className="month-section">
-                    <h3 className="text-xl font-bold text-primary border-b border-primary/20 mb-3 pb-1 flex justify-between">
+                    <h3 className="month-header text-xl font-bold text-primary border-b border-primary/20 mb-3 pb-1 flex justify-between">
                       {month}
                       <span className="text-sm font-normal text-gray-400">{monthEvents.length} events</span>
                     </h3>
