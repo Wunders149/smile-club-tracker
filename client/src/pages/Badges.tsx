@@ -93,25 +93,22 @@ export default function Badges() {
         )}
 
         {/* Hidden Print Container */}
-        <div className="hidden">
-          <div ref={printRef} className="p-0 bg-white print:block print:fixed print:inset-0 print:z-[9999] print:bg-white">
+        <div className="print-only">
+          <div ref={printRef} className="p-0 bg-white">
             <style>{`
               @page {
                 size: A4;
                 margin: 10mm;
               }
               @media print {
-                #root {
-                  display: none !important;
+                .page-break {
+                  page-break-after: always;
+                  break-after: page;
+                  margin-bottom: 20px;
                 }
                 body {
                   print-color-adjust: exact;
                   -webkit-print-color-adjust: exact;
-                  background: white !important;
-                }
-                .page-break {
-                  page-break-after: always;
-                  break-after: page;
                 }
               }
             `}</style>
