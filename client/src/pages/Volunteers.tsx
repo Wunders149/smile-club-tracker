@@ -268,15 +268,14 @@ export default function Volunteers() {
                   <TableHead className="w-[300px] font-bold text-foreground uppercase text-xs tracking-wider">Volunteer</TableHead>
                   <TableHead className="font-bold text-foreground uppercase text-xs tracking-wider">Contact & Location</TableHead>
                   <TableHead className="font-bold text-foreground uppercase text-xs tracking-wider">Position</TableHead>
-                  <TableHead className="font-bold text-foreground uppercase text-xs tracking-wider">Department</TableHead>
                   <TableHead className="w-[100px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  <TableRow><TableCell colSpan={5} className="text-center py-12 text-muted-foreground italic">Loading volunteers...</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={4} className="text-center py-12 text-muted-foreground italic">Loading volunteers...</TableCell></TableRow>
                 ) : filteredVolunteers.length === 0 ? (
-                  <TableRow><TableCell colSpan={5} className="text-center py-16 text-muted-foreground italic">
+                  <TableRow><TableCell colSpan={4} className="text-center py-16 text-muted-foreground italic">
                     <div className="flex flex-col items-center gap-2">
                       <Users className="w-8 h-8 opacity-20" />
                       No volunteers found
@@ -309,11 +308,6 @@ export default function Volunteers() {
                       <TableCell>
                         <span className="px-3 py-1 rounded-full bg-secondary/10 text-secondary-foreground text-xs font-bold uppercase tracking-wider border border-secondary/20">
                           {vol.position}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <span className="px-3 py-1 rounded-full bg-primary/5 text-primary text-xs font-bold border border-primary/10 italic">
-                          {vol.department || "None"}
                         </span>
                       </TableCell>
                       <TableCell>
