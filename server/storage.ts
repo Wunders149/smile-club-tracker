@@ -114,11 +114,22 @@ export class DatabaseStorage implements IStorage {
   // --- Rankings ---
   async getVolunteerRankings(): Promise<RankingRecord[]> {
     const allVolunteers = await db.select().from(volunteers);
+    const currentYear = new Date().getFullYear();
     
+    // Get all events for the current year
+    const yearEvents = await db.select().from(events);
+    const yearEventIds = yearEvents
+      .filter(e => new Date(e.date).getFullYear() === currentYear)
+      .map(e => e.id);
+
     const rankings: RankingRecord[] = [];
     for (const vol of allVolunteers) {
       const volAttendances = await db.select().from(attendances).where(eq(attendances.volunteerId, vol.id));
-      const totalPoints = volAttendances.reduce((sum, att) => sum + getAttendancePoints(att.status as any), 0);
+      
+      // Only count attendances for events that happened this year
+      const filteredAttendances = volAttendances.filter(a => yearEventIds.includes(a.eventId));
+      
+      const totalPoints = filteredAttendances.reduce((sum, att) => sum + getAttendancePoints(att.status as any), 0);
       rankings.push({ volunteer: vol, totalPoints });
     }
     
