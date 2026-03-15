@@ -561,19 +561,12 @@ export default function Events() {
                   -webkit-print-color-adjust: exact;
                   background: white !important;
                 }
-                .annual-grid {
-                  display: block;
-                  column-count: 2;
-                  column-gap: 50px;
-                  width: 100%;
-                  margin-top: 20px;
-                }
                 .month-section {
                   display: table;
                   width: 100%;
                   border-collapse: collapse;
                   break-inside: auto;
-                  margin-bottom: 30px;
+                  margin-bottom: 40px;
                   page-break-inside: auto;
                 }
                 .month-header-row {
@@ -591,25 +584,30 @@ export default function Events() {
                 .print-header {
                   break-after: avoid;
                   page-break-after: avoid;
+                  margin-bottom: 30px;
+                }
+                .annual-container {
+                  display: block;
+                  width: 100%;
                 }
               }
             `}</style>
             
-            <div className="print-header flex justify-between items-center mb-8 border-b-2 border-gray-900 pb-6">
+            <div className="print-header flex justify-between items-center border-b-2 border-gray-900 pb-6">
               <div className="flex items-center gap-4">
-                <img src="/smile-club-logo.png" alt="Logo" className="h-12 object-contain" />
+                <img src="/smile-club-logo.png" alt="Logo" className="h-14 object-contain" />
                 <div>
-                  <h1 className="text-xl font-bold tracking-tighter uppercase text-gray-900">Activity Calendar</h1>
+                  <h1 className="text-2xl font-bold tracking-tighter uppercase text-gray-900">Activity Calendar</h1>
                   <p className="text-[10px] text-gray-500 font-medium uppercase tracking-widest">Smile Club Mahajanga</p>
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-4xl font-black text-gray-900 leading-none">{new Date().getFullYear()}</div>
-                <div className="text-[7px] font-bold uppercase tracking-[0.2em] text-primary mt-1">Official Club Document</div>
+                <div className="text-5xl font-black text-gray-900 leading-none">{new Date().getFullYear()}</div>
+                <div className="text-[8px] font-bold uppercase tracking-[0.2em] text-primary mt-1">Official Club Document</div>
               </div>
             </div>
 
-            <div className="annual-grid">
+            <div className="annual-container">
               {months.map(month => {
                 const monthEvents = eventsByMonth[month] || [];
                 if (monthEvents.length === 0) return null;
@@ -618,10 +616,10 @@ export default function Events() {
                   <table key={month} className="month-section">
                     <thead className="month-header-row">
                       <tr>
-                        <th className="text-left p-0 pb-2">
-                          <div className="flex items-baseline justify-between border-b border-gray-900/20">
-                            <h3 className="text-lg font-black uppercase italic tracking-tighter text-gray-900">{month}</h3>
-                            <span className="text-[7px] font-bold uppercase tracking-widest text-gray-400">{monthEvents.length} activities</span>
+                        <th className="text-left p-0 pb-3">
+                          <div className="flex items-baseline justify-between border-b border-gray-900/30">
+                            <h3 className="text-xl font-black uppercase italic tracking-tighter text-gray-900">{month}</h3>
+                            <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">{monthEvents.length} activities</span>
                           </div>
                         </th>
                       </tr>
@@ -629,19 +627,19 @@ export default function Events() {
                     <tbody>
                       {monthEvents.map(ev => (
                         <tr key={ev.id} className="event-row">
-                          <td className="py-1.5 px-0.5">
-                            <div className="flex items-start gap-3">
-                              <div className="text-sm font-bold text-primary tabular-nums min-w-[18px]">
+                          <td className="py-2.5 px-1">
+                            <div className="flex items-start gap-4">
+                              <div className="text-base font-bold text-primary tabular-nums min-w-[24px]">
                                 {format(new Date(ev.date), 'dd')}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="font-bold text-gray-900 leading-tight mb-0.5 uppercase text-[10px] truncate">{ev.name}</div>
-                                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[8px] font-medium text-gray-500 uppercase tracking-tight">
+                                <div className="font-bold text-gray-900 leading-tight mb-0.5 uppercase text-xs tracking-tight">{ev.name}</div>
+                                <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[9px] font-medium text-gray-500 uppercase tracking-tight">
                                   <span className="text-primary/70 font-bold">{ev.type}</span>
                                   {ev.venue && (
                                     <>
                                       <span className="text-gray-300">•</span>
-                                      <span className="truncate max-w-[150px]">{ev.venue}</span>
+                                      <span>{ev.venue}</span>
                                     </>
                                   )}
                                   <span className="text-gray-300">•</span>
@@ -658,14 +656,14 @@ export default function Events() {
               })}
             </div>
 
-            <div className="mt-8 pt-6 border-t border-gray-100 flex justify-between items-end text-[7px] font-bold uppercase tracking-[0.1em] text-gray-400">
+            <div className="mt-12 pt-8 border-t border-gray-100 flex justify-between items-end text-[8px] font-bold uppercase tracking-[0.15em] text-gray-400">
               <div>
                 <p>Generated {format(new Date(), 'yyyy.MM.dd HH:mm')}</p>
-                <p className="mt-0.5 text-gray-300">Smile Club Tracker Internal System</p>
+                <p className="mt-1 text-gray-300">Smile Club Tracker Internal System</p>
               </div>
               <div className="text-right">
-                <p className="text-gray-900">For The Patients!</p>
-                <p className="text-[5px] text-gray-300 tracking-[0.2em]">Confidential activity log</p>
+                <p className="text-gray-900 mb-1">For The Patients!</p>
+                <p className="text-[6px] text-gray-300 tracking-[0.3em]">Confidential activity log</p>
               </div>
             </div>
           </div>
