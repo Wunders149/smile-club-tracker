@@ -28,7 +28,7 @@ export interface IStorage {
   recordAttendances(eventId: number, records: { volunteerId: number; status: string }[]): Promise<boolean>;
 
   // Rankings
-  getVolunteerRankings(): Promise<RankingRecord[]>;
+  getVolunteerRankings(year?: number): Promise<RankingRecord[]>;
 
   // Statistics
   getStatistics(): Promise<StatisticsData>;
@@ -112,25 +112,30 @@ export class DatabaseStorage implements IStorage {
   }
 
   // --- Rankings ---
-  async getVolunteerRankings(): Promise<RankingRecord[]> {
+  async getVolunteerRankings(year?: number): Promise<RankingRecord[]> {
     const allVolunteers = await db.select().from(volunteers);
-    const currentYear = new Date().getFullYear();
+    const targetYear = year || new Date().getFullYear();
     
-    // Get all events for the current year
+    // Get all events for the target year
     const yearEvents = await db.select().from(events);
     const yearEventIds = yearEvents
-      .filter(e => new Date(e.date).getFullYear() === currentYear)
+      .filter(e => new Date(e.date).getFullYear() === targetYear)
       .map(e => e.id);
 
     const rankings: RankingRecord[] = [];
     for (const vol of allVolunteers) {
       const volAttendances = await db.select().from(attendances).where(eq(attendances.volunteerId, vol.id));
       
-      // Only count attendances for events that happened this year
+      // Only count attendances for events that happened in the target year
       const filteredAttendances = volAttendances.filter(a => yearEventIds.includes(a.eventId));
       
       const totalPoints = filteredAttendances.reduce((sum, att) => sum + getAttendancePoints(att.status as any), 0);
-      rankings.push({ volunteer: vol, totalPoints });
+      
+      // Only include volunteers who have at least one attendance record in that year, 
+      // or if it's the current year include everyone
+      if (totalPoints > 0 || targetYear === new Date().getFullYear()) {
+        rankings.push({ volunteer: vol, totalPoints });
+      }
     }
     
     return rankings.sort((a, b) => b.totalPoints - a.totalPoints);

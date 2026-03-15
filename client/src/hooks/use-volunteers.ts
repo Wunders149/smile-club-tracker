@@ -16,11 +16,14 @@ export function useVolunteers() {
   });
 }
 
-export function useVolunteerRankings() {
+export function useVolunteerRankings(year?: number) {
   return useQuery<RankingRecord[]>({
-    queryKey: [api.volunteers.ranking.path],
+    queryKey: [api.volunteers.ranking.path, year],
     queryFn: async () => {
-      const res = await fetch(api.volunteers.ranking.path, { credentials: "include" });
+      const url = year 
+        ? `${api.volunteers.ranking.path}?year=${year}` 
+        : api.volunteers.ranking.path;
+      const res = await fetch(url, { credentials: "include" });
       if (!res.ok) throw new Error("Failed to fetch rankings");
       return (await res.json()) as RankingRecord[];
     },

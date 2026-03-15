@@ -28,7 +28,8 @@ export async function registerRoutes(
   });
 
   app.get(api.volunteers.ranking.path, async (req, res) => {
-    const data = await storage.getVolunteerRankings();
+    const year = req.query.year ? Number(req.query.year) : undefined;
+    const data = await storage.getVolunteerRankings(year);
     res.json(data);
   });
 

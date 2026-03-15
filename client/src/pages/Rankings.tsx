@@ -1,11 +1,17 @@
+import { useState } from "react";
 import { Layout } from "@/components/Layout";
 import { useVolunteerRankings } from "@/hooks/use-volunteers";
 import { Card, CardContent } from "@/components/ui/card";
-import { Trophy, Medal, Star } from "lucide-react";
+import { Trophy, Medal, Star, Calendar } from "lucide-react";
 import { motion } from "framer-motion";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function Rankings() {
-  const { data: rankings, isLoading } = useVolunteerRankings();
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState<number>(currentYear);
+  const { data: rankings, isLoading } = useVolunteerRankings(selectedYear);
+
+  const years = [currentYear, currentYear - 1];
 
   return (
     <Layout>
@@ -16,14 +22,35 @@ export default function Rankings() {
           </div>
           <h1 className="text-4xl font-display font-bold text-foreground">Volunteer Rankings</h1>
           <p className="text-muted-foreground mt-3 text-lg">Celebrating the dedication of our amazing Smile Club members.</p>
+          
+          <div className="flex justify-center mt-8">
+            <div className="flex items-center gap-3 bg-muted/50 p-1.5 rounded-2xl border border-border/50">
+              <div className="pl-3 text-muted-foreground flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                <span className="text-sm font-bold uppercase tracking-wider">Year:</span>
+              </div>
+              <Select value={selectedYear.toString()} onValueChange={(v) => setSelectedYear(Number(v))}>
+                <SelectTrigger className="w-[140px] rounded-xl border-none bg-card shadow-sm h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  {years.map(y => (
+                    <SelectItem key={y} value={y.toString()} className="rounded-lg">
+                      {y} Ranking
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
 
         {isLoading ? (
-          <div className="text-center py-12 text-muted-foreground">Loading rankings...</div>
+          <div className="text-center py-12 text-muted-foreground italic animate-pulse">Fetching {selectedYear} leaderboard...</div>
         ) : !rankings?.length ? (
           <div className="text-center py-16 bg-card rounded-3xl border border-border/50">
             <Star className="w-12 h-12 text-muted mx-auto mb-3" />
-            <p className="font-medium text-lg">No attendances recorded yet</p>
+            <p className="font-medium text-lg">No records found for {selectedYear}</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -54,7 +81,7 @@ export default function Rankings() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  key={volunteer.id}
+                  key={`${selectedYear}-${volunteer.id}`}
                 >
                   <Card className={`border rounded-2xl overflow-hidden ${cardStyle}`}>
                     <CardContent className="p-4 sm:p-6 flex items-center gap-4">
