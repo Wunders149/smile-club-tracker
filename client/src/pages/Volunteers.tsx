@@ -1,14 +1,13 @@
 import { useState, useRef } from "react";
 import { Layout } from "@/components/Layout";
 import { useVolunteers, useCreateVolunteer, useUpdateVolunteer, useDeleteVolunteer } from "@/hooks/use-volunteers";
-import { POSITIONS } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Plus, MoreVertical, Edit2, Trash2, Mail, Phone, GraduationCap, Users, Upload, Loader2 } from "lucide-react";
+import { Plus, MoreVertical, Edit2, Trash2, Mail, Phone, GraduationCap, Users, Upload, Loader2, Search, MapPin } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,6 +31,7 @@ export default function Volunteers() {
   const [editingVol, setEditingVol] = useState<Volunteer | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<FormValues>({
@@ -49,6 +49,7 @@ export default function Volunteers() {
     });
     setEditingVol(vol);
   };
+
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -99,6 +100,13 @@ export default function Volunteers() {
     form.reset();
   };
 
+  const filteredVolunteers = volunteers?.filter(vol => 
+    vol.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    vol.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    vol.position.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (vol.department && vol.department.toLowerCase().includes(searchQuery.toLowerCase()))
+  ) || [];
+
   return (
     <Layout>
       <div className="space-y-6">
@@ -108,333 +116,217 @@ export default function Volunteers() {
             <p className="text-muted-foreground mt-1">Manage the amazing team behind Smile Club.</p>
           </div>
           
-          <Dialog open={isAddOpen} onOpenChange={(open) => {
-            setIsAddOpen(open);
-            if (!open) form.reset();
-          }}>
-            <DialogTrigger asChild>
-              <Button className="bg-primary hover:bg-primary/90 text-white font-medium rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 px-6">
-                <Plus className="w-4 h-4 mr-2" /> Add Volunteer
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] bg-card rounded-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="font-display text-2xl">Add New Volunteer</DialogTitle>
-              </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField control={form.control} name="fullName" render={({ field }) => (
-                      <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="John Doe" className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
-                    )} />
-                    <FormField control={form.control} name="email" render={({ field }) => (
-                      <FormItem><FormLabel>Email</FormLabel><FormControl><Input placeholder="john@example.com" type="email" className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
-                    )} />
-                    <FormField control={form.control} name="contact" render={({ field }) => (
-                      <FormItem><FormLabel>Contact Number</FormLabel><FormControl><Input placeholder="+261 34 00 000 00" className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
-                    )} />
-                    <FormField control={form.control} name="address" render={({ field }) => (
-                      <FormItem><FormLabel>Address</FormLabel><FormControl><Input placeholder="Mahajanga" className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
-                    )} />
-                    <FormField control={form.control} name="position" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Position</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl><SelectTrigger className="rounded-xl"><SelectValue placeholder="Select position" /></SelectTrigger></FormControl>
-                          <SelectContent>{POSITIONS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-                        </Select>
-                        <FormMessage/>
-                      </FormItem>
-                    )} />
+          <div className="flex items-center gap-3">
+            <div className="relative w-64 hidden md:block">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input 
+                placeholder="Search volunteers..." 
+                className="pl-9 rounded-xl border-border/50 bg-card focus:ring-primary/20"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
 
-                    <FormField control={form.control} name="department" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Department (for Organigram)</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value || "None"}>
-                          <FormControl><SelectTrigger className="rounded-xl"><SelectValue placeholder="Select department" /></SelectTrigger></FormControl>
-                          <SelectContent>{DEPARTMENTS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
-                        </Select>
-                        <FormMessage/>
-                      </FormItem>
-                    )} />
-                    
-                    <FormField control={form.control} name="photo" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Profile Photo</FormLabel>
-                        <FormControl>
-                          <div className="flex flex-col gap-3">
-                            <div className="flex items-center gap-3">
-                              {field.value ? (
-                                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20">
-                                  <img src={field.value} alt="Preview" className="w-full h-full object-cover" />
-                                </div>
-                              ) : (
-                                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
-                                  <Users className="w-6 h-6" />
-                                </div>
-                              )}
-                              <Button 
-                                type="button" 
-                                variant="outline" 
-                                className="rounded-xl border-dashed"
-                                disabled={isUploading}
-                                onClick={() => fileInputRef.current?.click()}
-                              >
-                                {isUploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
-                                {field.value ? "Change Photo" : "Upload Photo"}
-                              </Button>
-                              <input 
-                                type="file" 
-                                ref={fileInputRef}
-                                className="hidden" 
-                                accept="image/*"
-                                onChange={handleFileChange}
-                              />
+            <Dialog open={isAddOpen} onOpenChange={(open) => {
+              setIsAddOpen(open);
+              if (!open) form.reset();
+            }}>
+              <DialogTrigger asChild>
+                <Button className="bg-primary hover:bg-primary/90 text-white font-medium rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 px-6">
+                  <Plus className="w-4 h-4 mr-2" /> Add Volunteer
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[600px] bg-card rounded-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="font-display text-2xl">Add New Volunteer</DialogTitle>
+                </DialogHeader>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField control={form.control} name="fullName" render={({ field }) => (
+                        <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="John Doe" className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
+                      )} />
+                      <FormField control={form.control} name="email" render={({ field }) => (
+                        <FormItem><FormLabel>Email</FormLabel><FormControl><Input placeholder="john@example.com" type="email" className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
+                      )} />
+                      <FormField control={form.control} name="contact" render={({ field }) => (
+                        <FormItem><FormLabel>Contact Number</FormLabel><FormControl><Input placeholder="+261 34 00 000 00" className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
+                      )} />
+                      <FormField control={form.control} name="address" render={({ field }) => (
+                        <FormItem><FormLabel>Address</FormLabel><FormControl><Input placeholder="Mahajanga" className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
+                      )} />
+                      <FormField control={form.control} name="position" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Position</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl><SelectTrigger className="rounded-xl"><SelectValue placeholder="Select position" /></SelectTrigger></FormControl>
+                            <SelectContent>{POSITIONS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                          </Select>
+                          <FormMessage/>
+                        </FormItem>
+                      )} />
+
+                      <FormField control={form.control} name="department" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Department (for Organigram)</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value || "None"}>
+                            <FormControl><SelectTrigger className="rounded-xl"><SelectValue placeholder="Select department" /></SelectTrigger></FormControl>
+                            <SelectContent>{DEPARTMENTS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
+                          </Select>
+                          <FormMessage/>
+                        </FormItem>
+                      )} />
+                      
+                      <FormField control={form.control} name="photo" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Profile Photo</FormLabel>
+                          <FormControl>
+                            <div className="flex flex-col gap-3">
+                              <div className="flex items-center gap-3">
+                                {field.value ? (
+                                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20">
+                                    <img src={field.value} alt="Preview" className="w-full h-full object-cover" />
+                                  </div>
+                                ) : (
+                                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+                                    <Users className="w-6 h-6" />
+                                  </div>
+                                )}
+                                <Button 
+                                  type="button" 
+                                  variant="outline" 
+                                  className="rounded-xl border-dashed"
+                                  disabled={isUploading}
+                                  onClick={() => fileInputRef.current?.click()}
+                                >
+                                  {isUploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+                                  {field.value ? "Change Photo" : "Upload Photo"}
+                                </Button>
+                                <input 
+                                  type="file" 
+                                  ref={fileInputRef}
+                                  className="hidden" 
+                                  accept="image/*"
+                                  onChange={handleFileChange}
+                                />
+                              </div>
+                              <input type="hidden" {...field} value={field.value || ''} />
                             </div>
-                            <input type="hidden" {...field} value={field.value || ''} />
-                          </div>
-                        </FormControl>
-                        <FormMessage/>
-                      </FormItem>
-                    )} />
+                          </FormControl>
+                          <FormMessage/>
+                        </FormItem>
+                      )} />
 
-                    <FormField control={form.control} name="studyField" render={({ field }) => (
-                      <FormItem><FormLabel>Study Field (optional)</FormLabel><FormControl><Input placeholder="Medicine, IT..." className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
-                    )} />
-                    <FormField control={form.control} name="major" render={({ field }) => (
-                      <FormItem><FormLabel>Major (optional)</FormLabel><FormControl><Input placeholder="Surgery, Software..." className="rounded-xl" {...field} value={field.value || ''}/></FormControl><FormMessage/></FormItem>
-                    )} />
-                    <FormField control={form.control} name="gender" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Gender</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value || ''}>
-                          <FormControl><SelectTrigger className="rounded-xl"><SelectValue placeholder="Select gender" /></SelectTrigger></FormControl>
-                          <SelectContent>
-                            {GENDERS.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage/>
-                      </FormItem>
-                    )} />
-                  </div>
-                  <DialogFooter className="pt-4">
-                    <Button type="submit" disabled={createMut.isPending || isUploading} className="rounded-xl px-8 w-full sm:w-auto">
-                      {createMut.isPending ? "Creating..." : "Save Volunteer"}
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
-
-          {/* Edit Dialog */}
-          <Dialog open={!!editingVol} onOpenChange={(open) => { if (!open) setEditingVol(null); }}>
-             <DialogContent className="sm:max-w-[600px] bg-card rounded-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="font-display text-2xl">Edit Volunteer</DialogTitle>
-              </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField control={form.control} name="fullName" render={({ field }) => (
-                      <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
-                    )} />
-                    <FormField control={form.control} name="email" render={({ field }) => (
-                      <FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
-                    )} />
-                    <FormField control={form.control} name="contact" render={({ field }) => (
-                      <FormItem><FormLabel>Contact</FormLabel><FormControl><Input className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
-                    )} />
-                    <FormField control={form.control} name="address" render={({ field }) => (
-                      <FormItem><FormLabel>Address</FormLabel><FormControl><Input className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
-                    )} />
-                    <FormField control={form.control} name="position" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Position</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl><SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger></FormControl>
-                          <SelectContent>{POSITIONS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-                        </Select>
-                        <FormMessage/>
-                      </FormItem>
-                    )} />
-
-                    <FormField control={form.control} name="department" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Department</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value || "None"}>
-                          <FormControl><SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger></FormControl>
-                          <SelectContent>{DEPARTMENTS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
-                        </Select>
-                        <FormMessage/>
-                      </FormItem>
-                    )} />
-                    
-                    <FormField control={form.control} name="photo" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Profile Photo</FormLabel>
-                        <FormControl>
-                          <div className="flex flex-col gap-3">
-                            <div className="flex items-center gap-3">
-                              {field.value ? (
-                                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20">
-                                  <img src={field.value} alt="Preview" className="w-full h-full object-cover" />
-                                </div>
-                              ) : (
-                                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
-                                  <Users className="w-6 h-6" />
-                                </div>
-                              )}
-                              <Button 
-                                type="button" 
-                                variant="outline" 
-                                className="rounded-xl border-dashed"
-                                disabled={isUploading}
-                                onClick={() => fileInputRef.current?.click()}
-                              >
-                                {isUploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
-                                {field.value ? "Change Photo" : "Upload Photo"}
-                              </Button>
-                              <input 
-                                type="file" 
-                                ref={fileInputRef}
-                                className="hidden" 
-                                accept="image/*"
-                                onChange={handleFileChange}
-                              />
-                            </div>
-                            <input type="hidden" {...field} value={field.value || ''} />
-                          </div>
-                        </FormControl>
-                        <FormMessage/>
-                      </FormItem>
-                    )} />
-
-                    <FormField control={form.control} name="studyField" render={({ field }) => (
-                      <FormItem><FormLabel>Study Field</FormLabel><FormControl><Input className="rounded-xl" {...field} value={field.value || ''}/></FormControl><FormMessage/></FormItem>
-                    )} />
-                    <FormField control={form.control} name="major" render={({ field }) => (
-                      <FormItem><FormLabel>Major</FormLabel><FormControl><Input className="rounded-xl" {...field} value={field.value || ''}/></FormControl><FormMessage/></FormItem>
-                    )} />
-                    <FormField control={form.control} name="gender" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Gender</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value || ''}>
-                          <FormControl><SelectTrigger className="rounded-xl"><SelectValue placeholder="Select gender" /></SelectTrigger></FormControl>
-                          <SelectContent>
-                            {GENDERS.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage/>
-                      </FormItem>
-                    )} />
-                  </div>
-                  <DialogFooter className="pt-4">
-                    <Button type="submit" disabled={updateMut.isPending || isUploading} className="rounded-xl px-8 w-full sm:w-auto">
-                      {updateMut.isPending ? "Saving..." : "Update Details"}
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
-
-          {/* Delete Alert */}
-          <AlertDialog open={!!deletingId} onOpenChange={(open) => { if (!open) setDeletingId(null); }}>
-            <AlertDialogContent className="rounded-2xl">
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete the volunteer and remove their attendance records.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
-                <AlertDialogAction 
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl"
-                  onClick={async () => {
-                    if (deletingId) {
-                      const volunteerToDelete = volunteers?.find(v => v.id === deletingId);
-                      if (volunteerToDelete?.photo && volunteerToDelete.photo.includes('supabase.co')) {
-                        await deleteVolunteerPhoto(volunteerToDelete.photo);
-                      }
-                      await deleteMut.mutateAsync(deletingId);
-                    }
-                    setDeletingId(null);
-                  }}
-                >
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+                      <FormField control={form.control} name="studyField" render={({ field }) => (
+                        <FormItem><FormLabel>Study Field (optional)</FormLabel><FormControl><Input placeholder="Medicine, IT..." className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
+                      )} />
+                      <FormField control={form.control} name="major" render={({ field }) => (
+                        <FormItem><FormLabel>Major (optional)</FormLabel><FormControl><Input placeholder="Surgery, Software..." className="rounded-xl" {...field} value={field.value || ''}/></FormControl><FormMessage/></FormItem>
+                      )} />
+                      <FormField control={form.control} name="gender" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Gender</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value || ''}>
+                            <FormControl><SelectTrigger className="rounded-xl"><SelectValue placeholder="Select gender" /></SelectTrigger></FormControl>
+                            <SelectContent>
+                              {GENDERS.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage/>
+                        </FormItem>
+                      )} />
+                    </div>
+                    <DialogFooter className="pt-4">
+                      <Button type="submit" disabled={createMut.isPending || isUploading} className="rounded-xl px-8 w-full sm:w-auto">
+                        {createMut.isPending ? "Creating..." : "Save Volunteer"}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
-        {/* Table */}
-        <div className="bg-card rounded-2xl shadow-lg shadow-black/5 border border-border/50 overflow-hidden">
+        <div className="md:hidden">
+          <div className="relative w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input 
+              placeholder="Search volunteers..." 
+              className="pl-9 rounded-xl border-border/50 bg-card"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="bg-card rounded-3xl border border-border/50 shadow-xl overflow-hidden">
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader className="bg-muted/50">
-                <TableRow>
-                  <TableHead className="font-semibold text-foreground">Volunteer</TableHead>
-                  <TableHead className="font-semibold text-foreground">Contact</TableHead>
-                  <TableHead className="font-semibold text-foreground">Position</TableHead>
-                  <TableHead className="font-semibold text-foreground">Education</TableHead>
-                  <TableHead className="w-[80px] text-right">Actions</TableHead>
+              <TableHeader className="bg-muted/30">
+                <TableRow className="hover:bg-transparent border-border/50">
+                  <TableHead className="w-[300px] font-bold text-foreground uppercase text-xs tracking-wider">Volunteer</TableHead>
+                  <TableHead className="font-bold text-foreground uppercase text-xs tracking-wider">Contact & Location</TableHead>
+                  <TableHead className="font-bold text-foreground uppercase text-xs tracking-wider">Position</TableHead>
+                  <TableHead className="font-bold text-foreground uppercase text-xs tracking-wider">Department</TableHead>
+                  <TableHead className="w-[100px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Loading volunteers...</TableCell></TableRow>
-                ) : !volunteers?.length ? (
-                  <TableRow><TableCell colSpan={5} className="text-center py-12">
-                    <Users className="w-12 h-12 text-muted mx-auto mb-3" />
-                    <p className="text-muted-foreground font-medium">No volunteers yet</p>
+                  <TableRow><TableCell colSpan={5} className="text-center py-12 text-muted-foreground italic">Loading volunteers...</TableCell></TableRow>
+                ) : filteredVolunteers.length === 0 ? (
+                  <TableRow><TableCell colSpan={5} className="text-center py-16 text-muted-foreground italic">
+                    <div className="flex flex-col items-center gap-2">
+                      <Users className="w-8 h-8 opacity-20" />
+                      No volunteers found
+                    </div>
                   </TableCell></TableRow>
                 ) : (
-                  volunteers.map((vol) => (
-                    <TableRow key={vol.id} className="hover:bg-muted/20 transition-colors">
+                  filteredVolunteers.map((vol) => (
+                    <TableRow key={vol.id} className="hover:bg-muted/5 border-border/50 transition-colors group">
                       <TableCell>
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold overflow-hidden border border-primary/20">
-                            {vol.photo ? <img src={vol.photo} alt={vol.fullName} className="w-full h-full object-cover" /> : vol.fullName.charAt(0).toUpperCase()}
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center font-bold text-primary text-xl overflow-hidden shadow-sm group-hover:shadow-md transition-all">
+                            {vol.photo ? <img src={vol.photo} alt={vol.fullName} className="w-full h-full object-cover" /> : vol.fullName.charAt(0)}
                           </div>
                           <div>
                             <p className="font-bold text-foreground">{vol.fullName}</p>
-                            <p className="text-xs text-muted-foreground">{vol.address}</p>
+                            <p className="text-xs text-muted-foreground flex items-center gap-1">
+                              <GraduationCap className="w-3 h-3" />
+                              {vol.studyField} {vol.major && `• ${vol.major}`}
+                            </p>
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="text-sm">
-                          <div className="flex items-center gap-1.5 text-foreground"><Phone className="w-3.5 h-3.5 text-muted-foreground"/> {vol.contact}</div>
-                          <div className="flex items-center gap-1.5 text-muted-foreground mt-0.5"><Mail className="w-3.5 h-3.5"/> {vol.email}</div>
+                        <div className="space-y-1">
+                          <p className="text-sm flex items-center gap-2 text-muted-foreground group-hover:text-foreground transition-colors"><Mail className="w-3.5 h-3.5 text-primary/60" /> {vol.email}</p>
+                          <p className="text-sm flex items-center gap-2 text-muted-foreground group-hover:text-foreground transition-colors"><Phone className="w-3.5 h-3.5 text-primary/60" /> {vol.contact}</p>
+                          <p className="text-sm flex items-center gap-2 text-muted-foreground group-hover:text-foreground transition-colors"><MapPin className="w-3.5 h-3.5 text-primary/60" /> {vol.address}</p>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-secondary/10 text-secondary-foreground">
+                        <span className="px-3 py-1 rounded-full bg-secondary/10 text-secondary-foreground text-xs font-bold uppercase tracking-wider border border-secondary/20">
                           {vol.position}
                         </span>
                       </TableCell>
                       <TableCell>
-                        {(vol.studyField || vol.major) ? (
-                          <div className="flex items-start gap-1.5 text-sm text-muted-foreground">
-                            <GraduationCap className="w-4 h-4 mt-0.5 shrink-0" />
-                            <span>{vol.studyField} {vol.major && `(${vol.major})`}</span>
-                          </div>
-                        ) : <span className="text-muted-foreground text-sm">-</span>}
+                        <span className="px-3 py-1 rounded-full bg-primary/5 text-primary text-xs font-bold border border-primary/10 italic">
+                          {vol.department || "None"}
+                        </span>
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted"><MoreVertical className="w-4 h-4" /></Button>
+                            <Button variant="ghost" size="icon" className="rounded-xl hover:bg-muted group-hover:bg-muted"><MoreVertical className="w-4 h-4" /></Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="rounded-xl shadow-xl">
                             <DropdownMenuItem className="gap-2 cursor-pointer" onClick={() => onEdit(vol)}>
-                              <Edit2 className="w-4 h-4" /> Edit
+                              <Edit2 className="w-4 h-4" /> Edit Profile
                             </DropdownMenuItem>
                             <DropdownMenuItem className="gap-2 text-destructive focus:text-destructive cursor-pointer" onClick={() => setDeletingId(vol.id)}>
-                              <Trash2 className="w-4 h-4" /> Delete
+                              <Trash2 className="w-4 h-4" /> Delete Volunteer
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -446,6 +338,147 @@ export default function Volunteers() {
             </Table>
           </div>
         </div>
+
+        {/* Edit Dialog */}
+        <Dialog open={!!editingVol} onOpenChange={(open) => { if (!open) setEditingVol(null); }}>
+           <DialogContent className="sm:max-w-[600px] bg-card rounded-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="font-display text-2xl">Edit Volunteer</DialogTitle>
+            </DialogHeader>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField control={form.control} name="fullName" render={({ field }) => (
+                    <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
+                  )} />
+                  <FormField control={form.control} name="email" render={({ field }) => (
+                    <FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
+                  )} />
+                  <FormField control={form.control} name="contact" render={({ field }) => (
+                    <FormItem><FormLabel>Contact</FormLabel><FormControl><Input className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
+                  )} />
+                  <FormField control={form.control} name="address" render={({ field }) => (
+                    <FormItem><FormLabel>Address</FormLabel><FormControl><Input className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
+                  )} />
+                  <FormField control={form.control} name="position" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Position</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl><SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger></FormControl>
+                        <SelectContent>{POSITIONS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                      </Select>
+                      <FormMessage/>
+                    </FormItem>
+                  )} />
+
+                  <FormField control={form.control} name="department" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Department</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value || "None"}>
+                        <FormControl><SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger></FormControl>
+                        <SelectContent>{DEPARTMENTS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
+                      </Select>
+                      <FormMessage/>
+                    </FormItem>
+                  )} />
+                  
+                  <FormField control={form.control} name="photo" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Profile Photo</FormLabel>
+                      <FormControl>
+                        <div className="flex flex-col gap-3">
+                          <div className="flex items-center gap-3">
+                            {field.value ? (
+                              <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20">
+                                <img src={field.value} alt="Preview" className="w-full h-full object-cover" />
+                              </div>
+                            ) : (
+                              <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+                                <Users className="w-6 h-6" />
+                              </div>
+                            )}
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              className="rounded-xl border-dashed"
+                              disabled={isUploading}
+                              onClick={() => fileInputRef.current?.click()}
+                            >
+                              {isUploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+                              {field.value ? "Change Photo" : "Upload Photo"}
+                            </Button>
+                            <input 
+                              type="file" 
+                              ref={fileInputRef}
+                              className="hidden" 
+                              accept="image/*"
+                              onChange={handleFileChange}
+                            />
+                          </div>
+                          <input type="hidden" {...field} value={field.value || ''} />
+                        </div>
+                      </FormControl>
+                      <FormMessage/>
+                    </FormItem>
+                  )} />
+
+                  <FormField control={form.control} name="studyField" render={({ field }) => (
+                    <FormItem><FormLabel>Study Field</FormLabel><FormControl><Input className="rounded-xl" {...field} value={field.value || ''}/></FormControl><FormMessage/></FormItem>
+                  )} />
+                  <FormField control={form.control} name="major" render={({ field }) => (
+                    <FormItem><FormLabel>Major</FormLabel><FormControl><Input className="rounded-xl" {...field} value={field.value || ''}/></FormControl><FormMessage/></FormItem>
+                  )} />
+                  <FormField control={form.control} name="gender" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Gender</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value || ''}>
+                        <FormControl><SelectTrigger className="rounded-xl"><SelectValue placeholder="Select gender" /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          {GENDERS.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage/>
+                    </FormItem>
+                  )} />
+                </div>
+                <DialogFooter className="pt-4">
+                  <Button type="submit" disabled={updateMut.isPending || isUploading} className="rounded-xl px-8 w-full sm:w-auto">
+                    {updateMut.isPending ? "Saving..." : "Update Details"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+
+        <AlertDialog open={!!deletingId} onOpenChange={(open) => { if (!open) setDeletingId(null); }}>
+          <AlertDialogContent className="rounded-2xl">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the volunteer and remove their attendance records.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+              <button
+                className="inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                onClick={async () => {
+                  if (deletingId) {
+                    const volunteerToDelete = volunteers?.find(v => v.id === deletingId);
+                    if (volunteerToDelete?.photo && volunteerToDelete.photo.includes('supabase.co')) {
+                      await deleteVolunteerPhoto(volunteerToDelete.photo);
+                    }
+                    await deleteMut.mutateAsync(deletingId);
+                  }
+                  setDeletingId(null);
+                }}
+              >
+                Delete
+              </button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </Layout>
   );
