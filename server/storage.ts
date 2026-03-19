@@ -46,6 +46,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createVolunteer(volunteer: InsertVolunteer): Promise<Volunteer> {
+    // 1. Check for duplicate email (only if provided)
+    if (volunteer.email && volunteer.email.trim() !== "") {
+      const [existingByEmail] = await db.select().from(volunteers).where(eq(volunteers.email, volunteer.email));
+      if (existingByEmail) {
+        throw new Error("A volunteer with this email already exists.");
+      }
+    }
+
+    // 2. Check for duplicate Name + Contact combination (for everyone)
+    const [existingByNameContact] = await db.select().from(volunteers).where(
+      sql`${volunteers.fullName} = ${volunteer.fullName} AND ${volunteers.contact} = ${volunteer.contact}`
+    );
+    
+    if (existingByNameContact) {
+      throw new Error("A volunteer with this name and contact already exists.");
+    }
+
     const [created] = await db.insert(volunteers).values(volunteer).returning();
     return created;
   }
@@ -59,6 +76,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteVolunteer(id: number): Promise<void> {
+    // 1. Delete all attendance records associated with this volunteer first
+    await db.delete(attendances).where(eq(attendances.volunteerId, id));
+    
+    // 2. Delete the volunteer
     await db.delete(volunteers).where(eq(volunteers.id, id));
   }
 

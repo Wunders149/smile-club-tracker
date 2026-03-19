@@ -48,12 +48,16 @@ export async function registerRoutes(
       // Sync backup to GitHub
       createBackup().catch(err => console.error("Auto-backup failed:", err));
       res.status(201).json(item);
-    } catch (err) {
+    } catch (err: any) {
       if (err instanceof z.ZodError) {
         return res.status(400).json({
           message: err.errors[0].message,
           field: err.errors[0].path.join('.'),
         });
+      }
+      if (err.message === "A volunteer with this email already exists." || 
+          err.message === "A volunteer with this name and contact already exists.") {
+        return res.status(400).json({ message: err.message });
       }
       throw err;
     }
