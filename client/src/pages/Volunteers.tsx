@@ -14,6 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertVolunteerSchema, type Volunteer, GENDERS, POSITIONS, DEPARTMENTS } from "@shared/schema";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Card, CardContent } from "@/components/ui/card";
 import imageCompression from 'browser-image-compression';
 import { uploadVolunteerPhoto, deleteVolunteerPhoto } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
@@ -45,7 +46,7 @@ export default function Volunteers() {
     form.reset({
       fullName: vol.fullName, contact: vol.contact, address: vol.address,
       email: vol.email, photo: vol.photo || "", studyField: vol.studyField || "",
-      major: vol.major || "", position: vol.position, gender: vol.gender || undefined, department: vol.department || "None"
+      major: vol.major || "", position: vol.position, gender: (vol.gender as any) || undefined, department: vol.department || "None"
     });
     setEditingVol(vol);
   };
@@ -56,32 +57,30 @@ export default function Volunteers() {
 
     setIsUploading(true);
     try {
-      // Deleting the current photo if it exists on Supabase
       const currentPhoto = form.getValues("photo");
       if (currentPhoto && currentPhoto.includes('supabase.co')) {
         await deleteVolunteerPhoto(currentPhoto);
       }
 
-      // Compression options
       const options = {
-        maxSizeMB: 0.1, // Max 100KB
+        maxSizeMB: 0.1,
         maxWidthOrHeight: 800,
         useWebWorker: true,
       };
 
-      toast({ title: "Compressing", description: "Reducing image size for better performance..." });
+      toast({ title: "Compressing", description: "Reducing image size..." });
       const compressedFile = await imageCompression(file, options);
       
-      toast({ title: "Uploading", description: "Saving photo to cloud storage..." });
+      toast({ title: "Uploading", description: "Saving photo..." });
       const publicUrl = await uploadVolunteerPhoto(compressedFile);
       
       form.setValue("photo", publicUrl);
-      toast({ title: "Success", description: "Photo uploaded successfully!" });
+      toast({ title: "Success", description: "Photo uploaded!" });
     } catch (error: any) {
       console.error("Upload error:", error);
       toast({ 
         title: "Upload Failed", 
-        description: error.message || "Failed to upload photo. Check your connection.",
+        description: error.message || "Failed to upload photo.",
         variant: "destructive"
       });
     } finally {
@@ -90,14 +89,18 @@ export default function Volunteers() {
   };
 
   const onSubmit = async (data: FormValues) => {
-    if (editingVol) {
-      await updateMut.mutateAsync({ id: editingVol.id, ...data });
-      setEditingVol(null);
-    } else {
-      await createMut.mutateAsync(data);
-      setIsAddOpen(false);
+    try {
+      if (editingVol) {
+        await updateMut.mutateAsync({ id: editingVol.id, ...data });
+        setEditingVol(null);
+      } else {
+        await createMut.mutateAsync(data);
+        setIsAddOpen(false);
+      }
+      form.reset();
+    } catch (err) {
+      // Error handled by mutation hooks
     }
-    form.reset();
   };
 
   const filteredVolunteers = volunteers?.filter(vol => 
@@ -111,17 +114,17 @@ export default function Volunteers() {
     <Layout>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-display font-bold text-foreground">Volunteers</h1>
-            <p className="text-muted-foreground mt-1">Manage the amazing team behind Smile Club.</p>
+          <div className="text-center sm:text-left">
+            <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground">Volunteers</h1>
+            <p className="text-muted-foreground mt-1 text-sm">Manage the amazing team behind Smile Club.</p>
           </div>
           
-          <div className="flex items-center gap-3">
-            <div className="relative w-64 hidden md:block">
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <div className="relative w-full sm:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input 
                 placeholder="Search volunteers..." 
-                className="pl-9 rounded-xl border-border/50 bg-card focus:ring-primary/20"
+                className="pl-9 rounded-xl border-border/50 bg-card focus:ring-primary/20 w-full"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -132,11 +135,11 @@ export default function Volunteers() {
               if (!open) form.reset();
             }}>
               <DialogTrigger asChild>
-                <Button className="bg-primary hover:bg-primary/90 text-white font-medium rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 px-6">
+                <Button className="bg-primary hover:bg-primary/90 text-white font-medium rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 px-6 w-full sm:w-auto">
                   <Plus className="w-4 h-4 mr-2" /> Add Volunteer
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px] bg-card rounded-2xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="sm:max-w-[600px] bg-card rounded-2xl max-h-[90vh] overflow-y-auto w-[95vw]">
                 <DialogHeader>
                   <DialogTitle className="font-display text-2xl">Add New Volunteer</DialogTitle>
                 </DialogHeader>
@@ -168,7 +171,7 @@ export default function Volunteers() {
 
                       <FormField control={form.control} name="department" render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Department (for Organigram)</FormLabel>
+                          <FormLabel>Department</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value || "None"}>
                             <FormControl><SelectTrigger className="rounded-xl"><SelectValue placeholder="Select department" /></SelectTrigger></FormControl>
                             <SelectContent>{DEPARTMENTS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
@@ -178,24 +181,24 @@ export default function Volunteers() {
                       )} />
                       
                       <FormField control={form.control} name="photo" render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="md:col-span-2">
                           <FormLabel>Profile Photo</FormLabel>
                           <FormControl>
                             <div className="flex flex-col gap-3">
                               <div className="flex items-center gap-3">
                                 {field.value ? (
-                                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20">
+                                  <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-primary/20">
                                     <img src={field.value} alt="Preview" className="w-full h-full object-cover" />
                                   </div>
                                 ) : (
-                                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
-                                    <Users className="w-6 h-6" />
+                                  <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground border-2 border-dashed border-border">
+                                    <Users className="w-8 h-8" />
                                   </div>
                                 )}
                                 <Button 
                                   type="button" 
                                   variant="outline" 
-                                  className="rounded-xl border-dashed"
+                                  className="rounded-xl border-dashed h-16 flex-1"
                                   disabled={isUploading}
                                   onClick={() => fileInputRef.current?.click()}
                                 >
@@ -218,10 +221,10 @@ export default function Volunteers() {
                       )} />
 
                       <FormField control={form.control} name="studyField" render={({ field }) => (
-                        <FormItem><FormLabel>Study Field (optional)</FormLabel><FormControl><Input placeholder="Medicine, IT..." className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
+                        <FormItem><FormLabel>Study Field</FormLabel><FormControl><Input placeholder="Medicine, IT..." className="rounded-xl" {...field} value={field.value || ''} /></FormControl><FormMessage/></FormItem>
                       )} />
                       <FormField control={form.control} name="major" render={({ field }) => (
-                        <FormItem><FormLabel>Major (optional)</FormLabel><FormControl><Input placeholder="Surgery, Software..." className="rounded-xl" {...field} value={field.value || ''}/></FormControl><FormMessage/></FormItem>
+                        <FormItem><FormLabel>Major</FormLabel><FormControl><Input placeholder="Surgery, Software..." className="rounded-xl" {...field} value={field.value || ''}/></FormControl><FormMessage/></FormItem>
                       )} />
                       <FormField control={form.control} name="gender" render={({ field }) => (
                         <FormItem>
@@ -237,7 +240,7 @@ export default function Volunteers() {
                       )} />
                     </div>
                     <DialogFooter className="pt-4">
-                      <Button type="submit" disabled={createMut.isPending || isUploading} className="rounded-xl px-8 w-full sm:w-auto">
+                      <Button type="submit" disabled={createMut.isPending || isUploading} className="rounded-xl px-8 w-full sm:w-auto h-12">
                         {createMut.isPending ? "Creating..." : "Save Volunteer"}
                       </Button>
                     </DialogFooter>
@@ -248,19 +251,8 @@ export default function Volunteers() {
           </div>
         </div>
 
-        <div className="md:hidden">
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search volunteers..." 
-              className="pl-9 rounded-xl border-border/50 bg-card"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className="bg-card rounded-3xl border border-border/50 shadow-xl overflow-hidden">
+        {/* Desktop Table View */}
+        <div className="hidden lg:block bg-card rounded-3xl border border-border/50 shadow-xl overflow-hidden">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader className="bg-muted/30">
@@ -333,9 +325,84 @@ export default function Volunteers() {
           </div>
         </div>
 
+        {/* Mobile/Tablet Card View */}
+        <div className="lg:hidden space-y-4">
+          {isLoading ? (
+            <div className="text-center py-12 text-muted-foreground italic">Loading volunteers...</div>
+          ) : filteredVolunteers.length === 0 ? (
+            <div className="text-center py-16 bg-card rounded-3xl border border-border/50 italic">
+              <div className="flex flex-col items-center gap-2">
+                <Users className="w-8 h-8 opacity-20" />
+                No volunteers found
+              </div>
+            </div>
+          ) : (
+            filteredVolunteers.map((vol) => (
+              <Card key={vol.id} className="rounded-2xl border-border/50 shadow-sm overflow-hidden active:scale-[0.98] transition-all">
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center font-bold text-primary text-2xl overflow-hidden shadow-sm">
+                        {vol.photo ? <img src={vol.photo} alt={vol.fullName} className="w-full h-full object-cover" /> : vol.fullName.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="font-bold text-foreground text-lg leading-tight">{vol.fullName}</p>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          <span className="px-2 py-0.5 rounded-full bg-secondary/10 text-secondary-foreground text-[10px] font-bold uppercase tracking-wider border border-secondary/20">
+                            {vol.position}
+                          </span>
+                          {vol.department && vol.department !== "None" && (
+                            <span className="px-2 py-0.5 rounded-full bg-primary/5 text-primary text-[10px] font-bold border border-primary/10">
+                              {vol.department}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl bg-muted/50"><MoreVertical className="w-5 h-5" /></Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="rounded-xl shadow-xl min-w-[160px]">
+                        <DropdownMenuItem className="gap-3 py-3 cursor-pointer" onClick={() => onEdit(vol)}>
+                          <Edit2 className="w-4 h-4" /> Edit Profile
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="gap-3 py-3 text-destructive focus:text-destructive cursor-pointer" onClick={() => setDeletingId(vol.id)}>
+                          <Trash2 className="w-4 h-4" /> Delete Volunteer
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                  
+                  <div className="mt-4 grid grid-cols-1 gap-3 pt-4 border-t border-border/10">
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground bg-muted/20 p-2 rounded-xl">
+                      <Phone className="w-4 h-4 text-primary/60" />
+                      <span className="font-medium text-foreground">{vol.contact}</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground p-2">
+                      <Mail className="w-4 h-4 text-primary/60" />
+                      <span className="truncate">{vol.email}</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground p-2">
+                      <MapPin className="w-4 h-4 text-primary/60" />
+                      <span className="truncate">{vol.address}</span>
+                    </div>
+                    {vol.studyField && (
+                      <div className="flex items-center gap-3 text-sm text-muted-foreground p-2">
+                        <GraduationCap className="w-4 h-4 text-primary/60" />
+                        <span className="truncate">{vol.studyField} {vol.major && `• ${vol.major}`}</span>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          ))}
+        </div>
+
         {/* Edit Dialog */}
         <Dialog open={!!editingVol} onOpenChange={(open) => { if (!open) setEditingVol(null); }}>
-           <DialogContent className="sm:max-w-[600px] bg-card rounded-2xl max-h-[90vh] overflow-y-auto">
+           <DialogContent className="sm:max-w-[600px] bg-card rounded-2xl max-h-[90vh] overflow-y-auto w-[95vw]">
             <DialogHeader>
               <DialogTitle className="font-display text-2xl">Edit Volunteer</DialogTitle>
             </DialogHeader>
@@ -377,24 +444,24 @@ export default function Volunteers() {
                   )} />
                   
                   <FormField control={form.control} name="photo" render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="md:col-span-2">
                       <FormLabel>Profile Photo</FormLabel>
                       <FormControl>
                         <div className="flex flex-col gap-3">
                           <div className="flex items-center gap-3">
                             {field.value ? (
-                              <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20">
+                              <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-primary/20">
                                 <img src={field.value} alt="Preview" className="w-full h-full object-cover" />
                               </div>
                             ) : (
-                              <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
-                                <Users className="w-6 h-6" />
+                              <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground border-2 border-dashed border-border">
+                                <Users className="w-8 h-8" />
                               </div>
                             )}
                             <Button 
                               type="button" 
                               variant="outline" 
-                              className="rounded-xl border-dashed"
+                              className="rounded-xl border-dashed h-16 flex-1"
                               disabled={isUploading}
                               onClick={() => fileInputRef.current?.click()}
                             >
@@ -436,7 +503,7 @@ export default function Volunteers() {
                   )} />
                 </div>
                 <DialogFooter className="pt-4">
-                  <Button type="submit" disabled={updateMut.isPending || isUploading} className="rounded-xl px-8 w-full sm:w-auto">
+                  <Button type="submit" disabled={updateMut.isPending || isUploading} className="rounded-xl px-8 w-full sm:w-auto h-12">
                     {updateMut.isPending ? "Saving..." : "Update Details"}
                   </Button>
                 </DialogFooter>
@@ -446,17 +513,17 @@ export default function Volunteers() {
         </Dialog>
 
         <AlertDialog open={!!deletingId} onOpenChange={(open) => { if (!open) setDeletingId(null); }}>
-          <AlertDialogContent className="rounded-2xl">
+          <AlertDialogContent className="rounded-2xl w-[95vw]">
             <AlertDialogHeader>
               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
               <AlertDialogDescription>
                 This action cannot be undone. This will permanently delete the volunteer and remove their attendance records.
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
-              <button
-                className="inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            <AlertDialogFooter className="flex flex-col gap-2">
+              <AlertDialogCancel className="rounded-xl mt-0">Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl"
                 onClick={async () => {
                   if (deletingId) {
                     const volunteerToDelete = volunteers?.find(v => v.id === deletingId);
@@ -469,7 +536,7 @@ export default function Volunteers() {
                 }}
               >
                 Delete
-              </button>
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

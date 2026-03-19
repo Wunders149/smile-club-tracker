@@ -15,22 +15,22 @@ export default function Rankings() {
 
   return (
     <Layout>
-      <div className="space-y-8 max-w-4xl mx-auto">
-        <div className="text-center py-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent/20 text-accent mb-4">
-            <Trophy className="w-8 h-8" />
+      <div className="space-y-6 md:space-y-8 max-w-4xl mx-auto">
+        <div className="text-center py-4 md:py-8">
+          <div className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 rounded-full bg-accent/20 text-accent mb-4">
+            <Trophy className="w-6 h-6 md:w-8 md:h-8" />
           </div>
-          <h1 className="text-4xl font-display font-bold text-foreground">Volunteer Rankings</h1>
-          <p className="text-muted-foreground mt-3 text-lg">Celebrating the dedication of our amazing Smile Club members.</p>
+          <h1 className="text-2xl md:text-4xl font-display font-bold text-foreground">Volunteer Rankings</h1>
+          <p className="text-muted-foreground mt-2 md:mt-3 text-base md:text-lg px-4">Celebrating the dedication of our amazing Smile Club members.</p>
           
-          <div className="flex justify-center mt-8">
-            <div className="flex items-center gap-3 bg-muted/50 p-1.5 rounded-2xl border border-border/50">
+          <div className="flex justify-center mt-6 md:mt-8">
+            <div className="flex items-center gap-2 md:gap-3 bg-muted/50 p-1 rounded-2xl border border-border/50">
               <div className="pl-3 text-muted-foreground flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                <span className="text-sm font-bold uppercase tracking-wider">Year:</span>
+                <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                <span className="text-[10px] md:text-sm font-bold uppercase tracking-wider">Year:</span>
               </div>
               <Select value={selectedYear.toString()} onValueChange={(v) => setSelectedYear(Number(v))}>
-                <SelectTrigger className="w-[140px] rounded-xl border-none bg-card shadow-sm h-9">
+                <SelectTrigger className="w-[110px] md:w-[140px] rounded-xl border-none bg-card shadow-sm h-8 md:h-9 text-xs md:text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
@@ -48,16 +48,15 @@ export default function Rankings() {
         {isLoading ? (
           <div className="text-center py-12 text-muted-foreground italic animate-pulse">Fetching {selectedYear} leaderboard...</div>
         ) : !rankings?.length ? (
-          <div className="text-center py-16 bg-card rounded-3xl border border-border/50">
-            <Star className="w-12 h-12 text-muted mx-auto mb-3" />
+          <div className="text-center py-16 bg-card rounded-3xl border border-border/50 mx-4">
+            <Star className="w-12 h-12 text-muted mx-auto mb-3 opacity-20" />
             <p className="font-medium text-lg">No records found for {selectedYear}</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3 md:space-y-4 px-2 md:px-0">
             {rankings.map((record, index) => {
               const { volunteer, totalPoints } = record;
               
-              // Top 3 styling logic
               const isFirst = index === 0;
               const isSecond = index === 1;
               const isThird = index === 2;
@@ -66,7 +65,7 @@ export default function Rankings() {
               let badgeStyle = "bg-muted text-muted-foreground border-border";
               
               if (isFirst) {
-                cardStyle = "bg-gradient-to-r from-yellow-500/10 to-transparent border-yellow-500/30 scale-[1.02] shadow-xl shadow-yellow-500/10 z-10 relative";
+                cardStyle = "bg-gradient-to-r from-yellow-500/10 to-transparent border-yellow-500/30 sm:scale-[1.02] shadow-xl shadow-yellow-500/10 z-10 relative";
                 badgeStyle = "bg-yellow-100 text-yellow-700 border-yellow-400";
               } else if (isSecond) {
                 cardStyle = "bg-gradient-to-r from-slate-300/20 to-transparent border-slate-300/50";
@@ -84,37 +83,37 @@ export default function Rankings() {
                   key={`${selectedYear}-${volunteer.id}`}
                 >
                   <Card className={`border rounded-2xl overflow-hidden ${cardStyle}`}>
-                    <CardContent className="p-4 sm:p-6 flex items-center gap-4">
+                    <CardContent className="p-3 md:p-6 flex items-center gap-3 md:gap-4">
                       {/* Rank Number/Icon */}
                       <div className={`
-                        w-12 h-12 rounded-2xl flex items-center justify-center font-display font-bold text-xl border-2 shrink-0
+                        w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center font-display font-bold text-lg md:text-xl border-2 shrink-0
                         ${badgeStyle}
                       `}>
-                        {isFirst ? <Medal className="w-6 h-6" /> : `#${index + 1}`}
+                        {isFirst ? <Medal className="w-5 h-5 md:w-6 md:h-6" /> : `#${index + 1}`}
                       </div>
                       
                       {/* Info */}
-                      <div className="flex-1 min-w-0 flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold overflow-hidden shrink-0 hidden sm:flex">
+                      <div className="flex-1 min-w-0 flex items-center gap-3 md:gap-4">
+                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold overflow-hidden shrink-0 hidden sm:flex">
                            {volunteer.photo ? <img src={volunteer.photo} alt={volunteer.fullName} className="w-full h-full object-cover" /> : volunteer.fullName.charAt(0)}
                         </div>
-                        <div>
-                          <h3 className="font-bold text-lg text-foreground truncate">{volunteer.fullName}</h3>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
-                            <span>{volunteer.position}</span>
-                            <span className="w-1 h-1 rounded-full bg-muted-foreground/50"></span>
-                            <span>{volunteer.studyField || 'Member'}</span>
+                        <div className="min-w-0">
+                          <h3 className="font-bold text-base md:text-lg text-foreground truncate">{volunteer.fullName}</h3>
+                          <div className="flex items-center gap-1.5 text-[10px] md:text-sm text-muted-foreground mt-0.5">
+                            <span className="truncate">{volunteer.position}</span>
+                            <span className="w-1 h-1 rounded-full bg-muted-foreground/30 shrink-0"></span>
+                            <span className="truncate">{volunteer.studyField || 'Member'}</span>
                           </div>
                         </div>
                       </div>
 
                       {/* Score */}
-                      <div className="text-right shrink-0">
-                        <div className="font-display font-bold text-3xl text-primary leading-none">
+                      <div className="text-right shrink-0 ml-2">
+                        <div className="font-display font-bold text-2xl md:text-3xl text-primary leading-none">
                           {totalPoints}
                         </div>
-                        <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mt-1">
-                          Points
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mt-1">
+                          Pts
                         </div>
                       </div>
                     </CardContent>
