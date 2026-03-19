@@ -203,7 +203,11 @@ export class DatabaseStorage implements IStorage {
     
     // Commitment Trend
     const allEvents = await db.select().from(events);
-    const allAttendances = await db.select().from(attendances);
+    const rawAttendances = await db.select().from(attendances);
+    
+    // Filter attendances to only include those from existing volunteers
+    const volunteerIds = new Set(allVolunteers.map(v => v.id));
+    const allAttendances = rawAttendances.filter(a => volunteerIds.has(a.volunteerId));
     
     const eventTypeBreakdown = allEvents.reduce((acc, e) => {
       const existing = acc.find(t => t.type === e.type);
