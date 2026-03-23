@@ -119,25 +119,17 @@
 
 /* Global Print Styles */
 @media print, .is-printing {
-  /* Scorched earth approach for mobile browsers */
+  /* Basic resets for the document */
   html, body {
-    height: auto !important;
-    overflow: visible !important;
     background: white !important;
     margin: 0 !important;
     padding: 0 !important;
+    height: auto !important;
+    width: 100% !important;
+    overflow: visible !important;
   }
 
-  body.is-printing #root > div:not(.print-only),
-  body.is-printing aside,
-  body.is-printing nav,
-  body.is-printing header,
-  body.is-printing .no-print {
-    display: none !important;
-  }
-
-  /* Hide the entire app structure by default */
-  #root > div, 
+  /* Hide specific UI elements that should never be printed */
   aside, 
   nav, 
   header, 
@@ -145,37 +137,39 @@
   button,
   .no-print,
   [role="dialog"],
-  .lg\\:hidden.fixed.top-0,
-  main > div:first-child {
+  .lg\\:hidden.fixed.top-0 {
     display: none !important;
+    visibility: hidden !important;
     height: 0 !important;
+    width: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
     overflow: hidden !important;
   }
 
-  /* Force show the print-only container and its children */
-  .print-only, 
-  .print-only * {
+  /* Reset layout structure to prevent interference with printing */
+  #root, 
+  #root > div,
+  .min-h-screen,
+  main,
+  .max-w-7xl,
+  .space-y-6 {
     display: block !important;
-    visibility: visible !important;
-    height: auto !important;
-    overflow: visible !important;
-  }
-
-  /* Reset main container for printing */
-  main {
-    display: block !important;
+    position: static !important;
     margin: 0 !important;
     padding: 0 !important;
     width: 100% !important;
-    position: static !important;
+    height: auto !important;
     overflow: visible !important;
     min-height: auto !important;
+    box-shadow: none !important;
+    border: none !important;
   }
 
-  /* Ensure the print container starts at the top */
+  /* Force the print-only container to be visible and at the top */
   .print-only {
+    display: block !important;
+    visibility: visible !important;
     position: absolute !important;
     top: 0 !important;
     left: 0 !important;
@@ -185,24 +179,31 @@
     padding: 0 !important;
   }
 
-  /* Extreme reset for mobile browsers that struggle with nested display:none */
-  @media (max-width: 1024px) {
-    #root, .min-h-screen, main {
-      display: block !important;
-      position: static !important;
-      overflow: visible !important;
-    }
-    
-    /* Ensure no padding-top from the mobile header is left over */
-    main {
-      padding-top: 0 !important;
-    }
+  /* Ensure the content inside print-only is also visible */
+  .print-only * {
+    visibility: visible !important;
   }
 
-  /* Avoid unwanted page breaks */
+  /* Fix for mobile header padding which often leaves a white gap */
+  main {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  /* Fix for scaled previews in UI (like the BadgeCard) */
+  .scale-75 {
+    transform: none !important;
+  }
+
   img {
     max-width: 100% !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
+}
+
+.print-only {
+  display: none;
 }
 
 .print-only {

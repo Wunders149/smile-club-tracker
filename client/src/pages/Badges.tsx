@@ -149,6 +149,12 @@ function BadgeCard({ volunteer, isSelected, onSelect }: { volunteer: any, isSele
   const componentRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     contentRef: componentRef,
+    onBeforeGetContent: async () => {
+      document.body.classList.add('is-printing');
+    },
+    onAfterPrint: () => {
+      document.body.classList.remove('is-printing');
+    }
   });
 
   return (
