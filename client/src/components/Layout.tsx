@@ -10,7 +10,8 @@ import {
   BarChart3,
   CloudUpload,
   Contact,
-  Network
+  Network,
+  RotateCcw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -26,6 +27,7 @@ const NAV_ITEMS = [
   { href: "/statistics", label: "Statistics", icon: BarChart3 },
   { href: "/organigram", label: "Organigram", icon: Network },
   { href: "/badges", label: "Badges", icon: Contact },
+  { href: "/badge-back", label: "Badge Back", icon: RotateCcw },
 ];
 
 export function Layout({ children }: { children: ReactNode }) {

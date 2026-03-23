@@ -1,9 +1,10 @@
 import { useRef, useState } from "react";
+import { Link } from "wouter";
 import { Layout } from "@/components/Layout";
 import { useVolunteers } from "@/hooks/use-volunteers";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Printer, User, CheckCircle2, Circle } from "lucide-react";
+import { Printer, User, CheckCircle2, Circle, RotateCcw } from "lucide-react";
 import { useReactToPrint } from "react-to-print";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -45,6 +46,11 @@ export default function Badges() {
               <p className="text-muted-foreground mt-1">Select and print ID badges for the team.</p>
             </div>
             <div className="flex items-center gap-2">
+              <Link href="/badge-back">
+                <Button variant="outline" className="rounded-xl border-primary/20 text-primary hover:bg-primary/5">
+                  <RotateCcw className="w-4 h-4 mr-2" /> Badge Backs
+                </Button>
+              </Link>
               {selectedIds.length > 0 && (
                 <Button 
                   variant="outline"

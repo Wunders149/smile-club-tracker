@@ -12,6 +12,7 @@ import Attendance from "./pages/Attendance";
 import Rankings from "./pages/Rankings";
 import Statistics from "./pages/Statistics";
 import Badges from "./pages/Badges";
+import BadgeBack from "./pages/BadgeBack";
 import Organigram from "./pages/Organigram";
 
 function Router() {
@@ -24,6 +25,7 @@ function Router() {
       <Route path="/rankings" component={Rankings} />
       <Route path="/statistics" component={Statistics} />
       <Route path="/badges" component={Badges} />
+      <Route path="/badge-back" component={BadgeBack} />
       <Route path="/organigram" component={Organigram} />
       <Route component={NotFound} />
     </Switch>
