@@ -180,10 +180,16 @@ export class DatabaseStorage implements IStorage {
       return acc;
     }, [] as { field: string | null; count: number }[]).map(({ field, count }) => ({ field, count }));
 
-    const medicalKeywords = ['med', 'chir', 'dent', 'pharma', 'infir', 'sage', 'health', 'sant', 'soin'];
+    const medicalKeywords = [
+      'medec', 'medic', 'chir', 'dent', 'pharma', 'infir', 'sage-f', 
+      'health', 'santé', 'sante', 'soins', 'kiné', 'kine', 'obstet',
+      'biomed', 'paramed'
+    ];
     const medicalCount = allVolunteers.filter(v => {
+      const isMedicalPosition = v.position === 'Medical Volunteer';
       const field = (v.studyField || '').toLowerCase();
-      return medicalKeywords.some(k => field.includes(k));
+      const matchesKeyword = medicalKeywords.some(k => field.includes(k));
+      return isMedicalPosition || matchesKeyword;
     }).length;
 
     const medicalBreakdown = [
