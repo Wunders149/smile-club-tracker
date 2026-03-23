@@ -12,11 +12,12 @@ export default function BadgeBack() {
   const handlePrint = useReactToPrint({
     contentRef: printRef,
     documentTitle: "Volunteer_Badge_Backs",
-    onBeforeGetContent: async () => {
-      document.body.classList.add('is-printing');
+    bodyClass: "is-printing",
+    onBeforePrint: async () => {
+      // Logic if needed
     },
     onAfterPrint: () => {
-      document.body.classList.remove('is-printing');
+      // Logic if needed
     }
   });
 

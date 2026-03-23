@@ -7,6 +7,7 @@ import {
   getAttendancePoints
 } from "@shared/schema";
 import { eq, sql, desc } from "drizzle-orm";
+import { sendAttendanceEmail } from "./email";
 
 export interface IStorage {
   // Volunteers
@@ -127,6 +128,24 @@ export class DatabaseStorage implements IStorage {
         status: r.status
       }));
       await db.insert(attendances).values(inserts);
+    }
+    
+    // Send email to those who attended (not absent)
+    const event = await this.getEvent(eventId);
+    if (event) {
+      const year = new Date(event.date).getFullYear();
+      const rankings = await this.getVolunteerRankings(year);
+      
+      const attendees = records.filter(r => r.status !== 'absent');
+      for (const att of attendees) {
+        const rankIndex = rankings.findIndex(r => r.volunteer.id === att.volunteerId);
+        if (rankIndex !== -1) {
+          const rankRecord = rankings[rankIndex];
+          // Pass the 1-based index as the ranking
+          sendAttendanceEmail(rankRecord.volunteer, rankIndex + 1, rankRecord.totalPoints, event.name)
+            .catch(err => console.error(`Failed to send email to ${rankRecord.volunteer.email}:`, err));
+        }
+      }
     }
     
     return true;

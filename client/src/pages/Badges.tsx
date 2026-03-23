@@ -16,11 +16,12 @@ export default function Badges() {
   const handlePrint = useReactToPrint({
     contentRef: printRef,
     documentTitle: "Volunteer_Badges",
-    onBeforeGetContent: async () => {
-      document.body.classList.add('is-printing');
+    bodyClass: "is-printing",
+    onBeforePrint: async () => {
+      // Logic if needed before print
     },
     onAfterPrint: () => {
-      document.body.classList.remove('is-printing');
+      // Logic if needed after print
     }
   });
 
@@ -149,12 +150,7 @@ function BadgeCard({ volunteer, isSelected, onSelect }: { volunteer: any, isSele
   const componentRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     contentRef: componentRef,
-    onBeforeGetContent: async () => {
-      document.body.classList.add('is-printing');
-    },
-    onAfterPrint: () => {
-      document.body.classList.remove('is-printing');
-    }
+    bodyClass: "is-printing",
   });
 
   return (

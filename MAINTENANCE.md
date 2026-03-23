@@ -41,6 +41,8 @@ Ensure these are always set in your Render Web Service:
 | Key | Value | Description |
 | :--- | :--- | :--- |
 | `DATABASE_URL` | `postgres://...` | Connection string for Render PostgreSQL. |
+| `RESEND_API_KEY` | `re_...` | API Key from Resend.com for sending emails. |
+| `FROM_EMAIL` | `...` | (Optional) Verified sender email in Resend. Defaults to onboarding@resend.dev. |
 | `GITHUB_TOKEN` | `ghp_...` | Your GitHub Personal Access Token (with `repo` scope). |
 | `GITHUB_REPO` | `Wunders149/smile-club-backups` | Your private backup repository. |
 | `GITHUB_PATH` | `data.json` | The filename for your backup. |
