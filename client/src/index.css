@@ -118,43 +118,90 @@
 }
 
 /* Global Print Styles */
-@media print {
-  /* Hide everything marked no-print */
-  .no-print, 
-  aside, 
-  nav, 
-  button, 
-  header, 
-  [role="dialog"],
-  .lg\\:hidden.fixed.top-0 {
+@media print, .is-printing {
+  /* Scorched earth approach for mobile browsers */
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body.is-printing #root > div:not(.print-only),
+  body.is-printing aside,
+  body.is-printing nav,
+  body.is-printing header,
+  body.is-printing .no-print {
     display: none !important;
   }
 
-  /* Show everything marked print-only */
+  /* Hide the entire app structure by default */
+  #root > div, 
+  aside, 
+  nav, 
+  header, 
+  footer,
+  button,
+  .no-print,
+  [role="dialog"],
+  .lg\\:hidden.fixed.top-0,
+  main > div:first-child {
+    display: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* Force show the print-only container and its children */
   .print-only, 
   .print-only * {
     display: block !important;
     visibility: visible !important;
-  }
-
-  /* Layout resets */
-  html, body {
-    background: white !important;
-    margin: 0 !important;
-    padding: 0 !important;
     height: auto !important;
-    width: 100% !important;
     overflow: visible !important;
   }
 
-  #root, main, div[class*="max-w-7xl"] {
+  /* Reset main container for printing */
+  main {
     display: block !important;
     margin: 0 !important;
     padding: 0 !important;
     width: 100% !important;
-    height: auto !important;
-    overflow: visible !important;
     position: static !important;
+    overflow: visible !important;
+    min-height: auto !important;
+  }
+
+  /* Ensure the print container starts at the top */
+  .print-only {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    z-index: 9999 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Extreme reset for mobile browsers that struggle with nested display:none */
+  @media (max-width: 1024px) {
+    #root, .min-h-screen, main {
+      display: block !important;
+      position: static !important;
+      overflow: visible !important;
+    }
+    
+    /* Ensure no padding-top from the mobile header is left over */
+    main {
+      padding-top: 0 !important;
+    }
+  }
+
+  /* Avoid unwanted page breaks */
+  img {
+    max-width: 100% !important;
   }
 }
 

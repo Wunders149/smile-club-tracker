@@ -16,6 +16,12 @@ export default function Badges() {
   const handlePrint = useReactToPrint({
     contentRef: printRef,
     documentTitle: "Volunteer_Badges",
+    onBeforeGetContent: async () => {
+      document.body.classList.add('is-printing');
+    },
+    onAfterPrint: () => {
+      document.body.classList.remove('is-printing');
+    }
   });
 
   const toggleSelect = (id: number) => {
