@@ -1,11 +1,13 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Printer, RotateCcw } from "lucide-react";
 import { useReactToPrint } from "react-to-print";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function BadgeBack() {
   const printRef = useRef<HTMLDivElement>(null);
+  const [count, setCount] = useState("4");
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
@@ -27,12 +29,26 @@ export default function BadgeBack() {
               <h1 className="text-3xl font-display font-bold text-foreground">Badge Backs</h1>
               <p className="text-muted-foreground mt-1">Print the reverse side for volunteer ID badges.</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <div className="flex items-center gap-2 bg-card border border-border/50 rounded-xl p-1 pl-3">
+                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Quantity:</span>
+                <Select value={count} onValueChange={setCount}>
+                  <SelectTrigger className="w-20 border-none shadow-none focus:ring-0 h-9 rounded-lg">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl">
+                    <SelectItem value="1">1 Back</SelectItem>
+                    <SelectItem value="2">2 Backs</SelectItem>
+                    <SelectItem value="3">3 Backs</SelectItem>
+                    <SelectItem value="4">4 Backs</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <Button 
                 onClick={() => handlePrint()} 
-                className="rounded-xl shadow-lg shadow-primary/20"
+                className="rounded-xl shadow-lg shadow-primary/20 w-full sm:w-auto"
               >
-                <Printer className="w-4 h-4 mr-2" /> Print Page (4 Backs)
+                <Printer className="w-4 h-4 mr-2" /> Print {count} {parseInt(count) > 1 ? 'Backs' : 'Back'}
               </Button>
             </div>
           </div>
@@ -72,7 +88,7 @@ export default function BadgeBack() {
             
             <div className="page-break w-full">
               <div className="grid grid-cols-2 gap-x-4 gap-y-8 justify-items-center w-full py-4">
-                {[1, 2, 3, 4].map((i) => (
+                {Array.from({ length: parseInt(count) }).map((_, i) => (
                   <div key={i} className="inline-block" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                     <BadgeBackID />
                   </div>
