@@ -215,7 +215,9 @@ const BadgeID = React.forwardRef<HTMLDivElement, { volunteer: any }>(({ voluntee
 
       {/* Details */}
       <div className="text-center z-10 flex-1 flex flex-col justify-center">
-        <h2 className="text-lg font-bold uppercase tracking-tight leading-tight px-1">{volunteer.fullName}</h2>
+        <h2 className="text-lg font-bold uppercase tracking-tight leading-tight px-1">
+          {volunteer.displayName || volunteer.fullName}
+        </h2>
         <div className="h-0.5 w-10 bg-primary mx-auto my-1.5 rounded-full" />
         <p className="text-[11px] font-semibold text-primary uppercase tracking-widest mb-1.5">{volunteer.position}</p>
         <div className="space-y-0.5">

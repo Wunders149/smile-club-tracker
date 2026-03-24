@@ -45,6 +45,7 @@ export function getAttendancePoints(status: typeof ATTENDANCE_STATUS[number]): n
 export const volunteers = pgTable("volunteers", {
   id: serial("id").primaryKey(),
   fullName: text("full_name").notNull(),
+  displayName: text("display_name"),
   contact: text("contact").notNull(),
   address: text("address").notNull(),
   email: text("email").notNull(),

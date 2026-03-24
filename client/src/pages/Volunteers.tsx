@@ -38,13 +38,13 @@ export default function Volunteers() {
   const form = useForm<FormValues>({
     resolver: zodResolver(insertVolunteerSchema),
     defaultValues: {
-      fullName: "", contact: "", address: "", email: "", photo: "", studyField: "", major: "", position: POSITIONS[8], gender: undefined, department: "None"
+      fullName: "", displayName: "", contact: "", address: "", email: "", photo: "", studyField: "", major: "", position: POSITIONS[8], gender: undefined, department: "None"
     }
   });
 
   const onEdit = (vol: Volunteer) => {
     form.reset({
-      fullName: vol.fullName, contact: vol.contact, address: vol.address,
+      fullName: vol.fullName, displayName: vol.displayName || "", contact: vol.contact, address: vol.address,
       email: vol.email, photo: vol.photo || "", studyField: vol.studyField || "",
       major: vol.major || "", position: vol.position, gender: (vol.gender as any) || undefined, department: vol.department || "None"
     });
@@ -148,6 +148,13 @@ export default function Volunteers() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField control={form.control} name="fullName" render={({ field }) => (
                         <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="John Doe" className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
+                      )} />
+                      <FormField control={form.control} name="displayName" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Display Name (for Badge)</FormLabel>
+                          <FormControl><Input placeholder="John" className="rounded-xl" {...field} value={field.value || ''}/></FormControl>
+                          <FormMessage/>
+                        </FormItem>
                       )} />
                       <FormField control={form.control} name="email" render={({ field }) => (
                         <FormItem><FormLabel>Email</FormLabel><FormControl><Input placeholder="john@example.com" type="email" className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
@@ -411,6 +418,13 @@ export default function Volunteers() {
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField control={form.control} name="fullName" render={({ field }) => (
                     <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
+                  )} />
+                  <FormField control={form.control} name="displayName" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Display Name (for Badge)</FormLabel>
+                      <FormControl><Input placeholder="John" className="rounded-xl" {...field} value={field.value || ''}/></FormControl>
+                      <FormMessage/>
+                    </FormItem>
                   )} />
                   <FormField control={form.control} name="email" render={({ field }) => (
                     <FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" className="rounded-xl" {...field} /></FormControl><FormMessage/></FormItem>
