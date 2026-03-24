@@ -186,49 +186,49 @@ const BadgeID = React.forwardRef<HTMLDivElement, { volunteer: any }>(({ voluntee
   return (
     <div 
       ref={ref}
-      className="w-[300px] h-[450px] bg-white border-[1px] border-gray-200 shadow-lg relative flex flex-col items-center p-6 text-black font-sans overflow-hidden"
+      className="w-[7.9cm] h-[9.9cm] bg-white border-[1px] border-gray-200 shadow-lg relative flex flex-col items-center p-4 text-black font-sans overflow-hidden"
       style={{ printColorAdjust: 'exact', WebkitPrintColorAdjust: 'exact' }}
     >
       {/* Background Accent */}
-      <div className="absolute top-0 left-0 w-full h-24 bg-primary/5 -skew-y-6 -translate-y-8" />
+      <div className="absolute top-0 left-0 w-full h-16 bg-primary/5 -skew-y-6 -translate-y-6" />
       
       {/* Watermark Logo */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none grayscale">
-        <img src="/smile-club-logo.png" alt="" className="w-64 object-contain" />
+        <img src="/smile-club-logo.png" alt="" className="w-48 object-contain" />
       </div>
 
       {/* Logo */}
-      <div className="z-10 mt-2 mb-6">
-        <img src="/smile-club-logo.png" alt="Logo" className="h-16 object-contain" />
+      <div className="z-10 mt-1 mb-4">
+        <img src="/smile-club-logo.png" alt="Logo" className="h-12 object-contain" />
       </div>
 
       {/* Photo */}
-      <div className="w-36 h-36 rounded-2xl overflow-hidden border-4 border-white shadow-xl z-10 bg-gray-50 mb-4 ring-1 ring-gray-100">
+      <div className="w-28 h-28 rounded-2xl overflow-hidden border-4 border-white shadow-xl z-10 bg-gray-50 mb-3 ring-1 ring-gray-100">
         {volunteer.photo ? (
           <img src={volunteer.photo} alt={volunteer.fullName} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
-            <User className="w-16 h-16" />
+            <User className="w-12 h-12" />
           </div>
         )}
       </div>
 
       {/* Details */}
       <div className="text-center z-10 flex-1 flex flex-col justify-center">
-        <h2 className="text-xl font-bold uppercase tracking-tight leading-tight px-2">{volunteer.fullName}</h2>
-        <div className="h-0.5 w-12 bg-primary mx-auto my-2 rounded-full" />
-        <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-2">{volunteer.position}</p>
+        <h2 className="text-lg font-bold uppercase tracking-tight leading-tight px-1">{volunteer.fullName}</h2>
+        <div className="h-0.5 w-10 bg-primary mx-auto my-1.5 rounded-full" />
+        <p className="text-[11px] font-semibold text-primary uppercase tracking-widest mb-1.5">{volunteer.position}</p>
         <div className="space-y-0.5">
-          <p className="text-[10px] text-gray-500 font-medium">{volunteer.contact}</p>
+          <p className="text-[9px] text-gray-500 font-medium">{volunteer.contact}</p>
         </div>
       </div>
 
       {/* Footer */}
       <div className="mt-auto w-full text-center z-10">
-        <div className="py-2 border-t border-gray-100">
-          <p className="italic font-display text-gray-400 text-sm">"For The Patients!"</p>
+        <div className="py-1.5 border-t border-gray-100">
+          <p className="italic font-display text-gray-400 text-xs">"For The Patients!"</p>
         </div>
-        <div className="h-2 w-full bg-primary absolute bottom-0 left-0" />
+        <div className="h-1.5 w-full bg-primary absolute bottom-0 left-0" />
       </div>
     </div>
   );

@@ -106,48 +106,48 @@ export default function BadgeBack() {
 function BadgeBackID() {
   return (
     <div 
-      className="w-[300px] h-[450px] bg-white border-[1px] border-gray-200 shadow-lg relative flex flex-col items-center justify-center p-8 text-black font-sans overflow-hidden"
+      className="w-[7.9cm] h-[9.9cm] bg-white border-[1px] border-gray-200 shadow-lg relative flex flex-col items-center justify-center p-6 text-black font-sans overflow-hidden"
       style={{ printColorAdjust: 'exact', WebkitPrintColorAdjust: 'exact' }}
     >
       {/* Background Accent - Mirroring the front */}
-      <div className="absolute bottom-0 left-0 w-full h-24 bg-primary/5 skew-y-6 translate-y-8" />
+      <div className="absolute bottom-0 left-0 w-full h-16 bg-primary/5 skew-y-6 translate-y-6" />
       
       {/* Watermark Logo */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none grayscale">
-        <img src="/smile-club-logo.png" alt="" className="w-64 object-contain" />
+        <img src="/smile-club-logo.png" alt="" className="w-48 object-contain" />
       </div>
 
-      <div className="z-10 flex flex-col items-center gap-12 w-full">
+      <div className="z-10 flex flex-col items-center gap-8 w-full">
         {/* Operation Smile in Madagascar Logo */}
         <div className="w-full flex justify-center">
           <img 
             src="/operation-smile-mada-logo.png" 
             alt="Operation Smile in Madagascar" 
-            className="w-full max-h-[120px] object-contain"
+            className="w-full max-h-[100px] object-contain"
           />
         </div>
 
         {/* Divider */}
-        <div className="h-0.5 w-16 bg-primary/20 rounded-full" />
+        <div className="h-0.5 w-12 bg-primary/20 rounded-full" />
 
         {/* Operation Smile Student Programs Logo */}
         <div className="w-full flex justify-center">
           <img 
             src="/operation-smile-student-programs-logo.png" 
             alt="Operation Smile Student Programs" 
-            className="w-full max-h-[120px] object-contain"
+            className="w-full max-h-[100px] object-contain"
           />
         </div>
       </div>
 
       {/* Footer Text */}
-      <div className="mt-12 text-center z-10">
-        <p className="text-[10px] text-gray-400 font-medium tracking-widest uppercase mb-1">Affiliated with</p>
-        <p className="font-display text-primary text-base font-bold">Smile Club Mahajanga</p>
+      <div className="mt-8 text-center z-10">
+        <p className="text-[9px] text-gray-400 font-medium tracking-widest uppercase mb-1">Affiliated with</p>
+        <p className="font-display text-primary text-sm font-bold">Smile Club Mahajanga</p>
       </div>
 
       {/* Decorative Bottom Bar */}
-      <div className="h-2 w-full bg-primary absolute bottom-0 left-0" />
+      <div className="h-1.5 w-full bg-primary absolute bottom-0 left-0" />
     </div>
   );
 }
