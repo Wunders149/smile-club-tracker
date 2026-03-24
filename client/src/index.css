@@ -120,31 +120,31 @@
 /* Global Print Styles */
 @media print, .is-printing {
   /* Basic resets for the document */
-  html, body {
+  html, body, .is-printing {
     background: white !important;
     margin: 0 !important;
     padding: 0 !important;
     height: auto !important;
     width: 100% !important;
     overflow: visible !important;
+    position: static !important;
+  }
+
+  /* When inside the print iframe (body has .is-printing) */
+  body.is-printing {
+    display: block !important;
   }
 
   /* Hide specific UI elements that should never be printed */
-  aside, 
-  nav, 
-  header, 
-  footer,
-  button,
-  .no-print,
-  [role="dialog"],
-  .lg\\:hidden.fixed.top-0 {
+  body:not(.is-printing) aside,
+  body:not(.is-printing) nav,
+  body:not(.is-printing) header,
+  body:not(.is-printing) .no-print,
+  aside, nav, header, footer, button, .no-print, [role="dialog"], .lg\\:hidden.fixed.top-0 {
     display: none !important;
     visibility: hidden !important;
     height: 0 !important;
     width: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
   }
 
   /* Reset layout structure to prevent interference with printing */
@@ -200,10 +200,6 @@
     print-color-adjust: exact !important;
     -webkit-print-color-adjust: exact !important;
   }
-}
-
-.print-only {
-  display: none;
 }
 
 .print-only {

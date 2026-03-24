@@ -14,10 +14,10 @@ export default function BadgeBack() {
     documentTitle: "Volunteer_Badge_Backs",
     bodyClass: "is-printing",
     onBeforePrint: async () => {
-      // Logic if needed
+      document.body.classList.add('is-printing');
     },
     onAfterPrint: () => {
-      // Logic if needed
+      document.body.classList.remove('is-printing');
     }
   });
 
