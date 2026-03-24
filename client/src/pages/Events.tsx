@@ -51,6 +51,13 @@ export default function Events() {
   const handlePrint = useReactToPrint({
     contentRef: printRef,
     documentTitle: `Annual_Events_${new Date().getFullYear()}`,
+    bodyClass: "is-printing",
+    onBeforePrint: async () => {
+      document.body.classList.add('is-printing');
+    },
+    onAfterPrint: () => {
+      document.body.classList.remove('is-printing');
+    }
   });
 
   const form = useForm<FormValues>({
@@ -531,7 +538,7 @@ export default function Events() {
             <style>{`
               @page {
                 size: landscape;
-                margin: 15mm;
+                margin: 20mm;
               }
               @media print {
                 body {
@@ -542,48 +549,47 @@ export default function Events() {
                 .annual-grid {
                   display: block;
                   column-count: 2;
-                  column-gap: 50px;
+                  column-gap: 60px;
+                  column-fill: auto;
                   width: 100%;
-                  margin-top: 20px;
+                  margin-top: 40px;
                 }
                 .month-section {
-                  display: table;
+                  display: block;
+                  width: 100%;
+                  break-inside: avoid-column;
+                  page-break-inside: avoid;
+                  margin-bottom: 40px;
+                }
+                .month-table {
                   width: 100%;
                   border-collapse: collapse;
-                  break-inside: auto;
-                  margin-bottom: 30px;
-                  page-break-inside: auto;
-                }
-                .month-header-row {
-                  display: table-header-group;
                 }
                 .event-row {
-                  display: table-row;
-                  break-inside: avoid;
-                  page-break-inside: avoid;
-                  border-bottom: 0.5px solid #eee;
+                  border-bottom: 0.5px solid #f0f0f0;
                 }
                 .event-row:last-child {
                   border-bottom: none;
                 }
                 .print-header {
-                  break-after: avoid;
-                  page-break-after: avoid;
+                  margin-bottom: 20px;
+                  padding-bottom: 30px;
+                  border-bottom: 2px solid #000;
                 }
               }
             `}</style>
             
-            <div className="print-header flex justify-between items-center mb-8 border-b-2 border-gray-900 pb-6">
-              <div className="flex items-center gap-4">
-                <img src="/smile-club-logo.png" alt="Logo" className="h-12 object-contain" />
+            <div className="print-header flex justify-between items-end">
+              <div className="flex items-center gap-6">
+                <img src="/smile-club-logo.png" alt="Logo" className="h-16 object-contain" />
                 <div>
-                  <h1 className="text-xl font-bold tracking-tighter uppercase text-gray-900">Activity Calendar</h1>
-                  <p className="text-[10px] text-gray-500 font-medium uppercase tracking-widest">Smile Club Mahajanga</p>
+                  <h1 className="text-2xl font-black tracking-tighter uppercase text-gray-900 leading-none mb-1">Activity Calendar</h1>
+                  <p className="text-[11px] text-gray-500 font-bold uppercase tracking-[0.2em]">Smile Club Mahajanga</p>
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-4xl font-black text-gray-900 leading-none">{new Date().getFullYear()}</div>
-                <div className="text-[7px] font-bold uppercase tracking-[0.2em] text-primary mt-1">Official Club Document</div>
+                <div className="text-5xl font-black text-gray-900 leading-none">{new Date().getFullYear()}</div>
+                <div className="text-[8px] font-bold uppercase tracking-[0.3em] text-primary mt-2">Official Club Document</div>
               </div>
             </div>
 
@@ -593,45 +599,41 @@ export default function Events() {
                 if (monthEvents.length === 0) return null;
 
                 return (
-                  <table key={month} className="month-section">
-                    <thead className="month-header-row">
-                      <tr>
-                        <th className="text-left p-0 pb-2">
-                          <div className="flex items-baseline justify-between border-b border-gray-900/20">
-                            <h3 className="text-lg font-black uppercase italic tracking-tighter text-gray-900">{month}</h3>
-                            <span className="text-[7px] font-bold uppercase tracking-widest text-gray-400">{monthEvents.length} activities</span>
-                          </div>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {monthEvents.map(ev => (
-                        <tr key={ev.id} className="event-row">
-                          <td className="py-1.5 px-0.5">
-                            <div className="flex items-start gap-3">
-                              <div className="text-sm font-bold text-primary tabular-nums min-w-[18px]">
-                                {format(new Date(ev.date), 'dd')}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="font-bold text-gray-900 leading-tight mb-0.5 uppercase text-[10px] truncate">{ev.name}</div>
-                                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[8px] font-medium text-gray-500 uppercase tracking-tight">
-                                  <span className="text-primary/70 font-bold">{ev.type}</span>
-                                  {ev.venue && (
-                                    <>
-                                      <span className="text-gray-300">•</span>
-                                      <span className="truncate max-w-[150px]">{ev.venue}</span>
-                                    </>
-                                  )}
-                                  <span className="text-gray-300">•</span>
-                                  <span>{format(new Date(ev.date), 'h:mm a')}</span>
+                  <div key={month} className="month-section">
+                    <div className="flex items-baseline justify-between border-b-2 border-gray-900/10 mb-3 pb-1">
+                      <h3 className="text-xl font-black uppercase italic tracking-tighter text-gray-900">{month}</h3>
+                      <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">{monthEvents.length} activities</span>
+                    </div>
+                    <table className="month-table">
+                      <tbody>
+                        {monthEvents.map(ev => (
+                          <tr key={ev.id} className="event-row">
+                            <td className="py-2.5 px-1">
+                              <div className="flex items-start gap-4">
+                                <div className="text-base font-bold text-primary tabular-nums min-w-[22px]">
+                                  {format(new Date(ev.date), 'dd')}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="font-bold text-gray-900 leading-tight mb-1 uppercase text-[11px] truncate">{ev.name}</div>
+                                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[9px] font-semibold text-gray-500 uppercase tracking-tight">
+                                    <span className="text-primary/80 font-bold">{ev.type}</span>
+                                    {ev.venue && (
+                                      <>
+                                        <span className="text-gray-300">•</span>
+                                        <span className="truncate max-w-[180px]">{ev.venue}</span>
+                                      </>
+                                    )}
+                                    <span className="text-gray-300">•</span>
+                                    <span>{format(new Date(ev.date), 'h:mm a')}</span>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 );
               })}
             </div>
