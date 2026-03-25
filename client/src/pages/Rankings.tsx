@@ -1,17 +1,68 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Layout } from "@/components/Layout";
 import { useVolunteerRankings } from "@/hooks/use-volunteers";
 import { Card, CardContent } from "@/components/ui/card";
-import { Trophy, Medal, Star, Calendar } from "lucide-react";
+import { Trophy, Medal, Star, Calendar, Download, ImageIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { toPng } from "html-to-image";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Rankings() {
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
   const { data: rankings, isLoading } = useVolunteerRankings(selectedYear);
+  const { toast } = useToast();
+  const rankingRef = useRef<HTMLDivElement>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const years = [currentYear, currentYear - 1];
+
+  const downloadAsImage = async () => {
+    if (!rankingRef.current) return;
+    
+    setIsDownloading(true);
+    toast({
+      title: "Preparing image",
+      description: "Generating your ranking picture...",
+    });
+
+    try {
+      const dataUrl = await toPng(rankingRef.current, {
+        cacheBust: true,
+        backgroundColor: "#fcfaf8",
+        style: {
+          padding: "40px",
+        },
+        onClone: (clonedDoc) => {
+          const watermark = clonedDoc.querySelector('.show-on-export') as HTMLElement;
+          if (watermark) {
+            watermark.style.display = 'flex';
+          }
+        }
+      });
+      
+      const link = document.createElement('a');
+      link.download = `Smile-Club-Rankings-${selectedYear}.png`;
+      link.href = dataUrl;
+      link.click();
+      
+      toast({
+        title: "Success!",
+        description: "Ranking image downloaded successfully.",
+      });
+    } catch (err) {
+      console.error("Failed to download image", err);
+      toast({
+        title: "Download failed",
+        description: "Could not generate the image. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   return (
     <Layout>
@@ -23,14 +74,14 @@ export default function Rankings() {
           <h1 className="text-2xl md:text-4xl font-display font-bold text-foreground">Volunteer Rankings</h1>
           <p className="text-muted-foreground mt-2 md:mt-3 text-base md:text-lg px-4">Celebrating the dedication of our amazing Smile Club members.</p>
           
-          <div className="flex justify-center mt-6 md:mt-8">
-            <div className="flex items-center gap-2 md:gap-3 bg-muted/50 p-1 rounded-2xl border border-border/50">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6 md:mt-8 px-4">
+            <div className="flex items-center gap-2 md:gap-3 bg-muted/50 p-1 rounded-2xl border border-border/50 w-full sm:w-auto">
               <div className="pl-3 text-muted-foreground flex items-center gap-2">
                 <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 <span className="text-[10px] md:text-sm font-bold uppercase tracking-wider">Year:</span>
               </div>
               <Select value={selectedYear.toString()} onValueChange={(v) => setSelectedYear(Number(v))}>
-                <SelectTrigger className="w-[110px] md:w-[140px] rounded-xl border-none bg-card shadow-sm h-8 md:h-9 text-xs md:text-sm">
+                <SelectTrigger className="w-full sm:w-[140px] rounded-xl border-none bg-card shadow-sm h-9 text-xs md:text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
@@ -42,6 +93,25 @@ export default function Rankings() {
                 </SelectContent>
               </Select>
             </div>
+
+            <Button 
+              variant="outline" 
+              onClick={downloadAsImage}
+              disabled={isLoading || !rankings?.length || isDownloading}
+              className="rounded-xl border-primary/20 text-primary hover:bg-primary/5 h-11 w-full sm:w-auto shadow-sm"
+            >
+              {isDownloading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  Generating...
+                </div>
+              ) : (
+                <>
+                  <ImageIcon className="w-4 h-4 mr-2" />
+                  Save as Picture
+                </>
+              )}
+            </Button>
           </div>
         </div>
 
@@ -53,7 +123,21 @@ export default function Rankings() {
             <p className="font-medium text-lg">No records found for {selectedYear}</p>
           </div>
         ) : (
-          <div className="space-y-3 md:space-y-4 px-2 md:px-0">
+          <div ref={rankingRef} className="space-y-3 md:space-y-4 px-2 md:px-0 pb-12">
+            {/* Watermark for Exported Image */}
+            <div className="hidden show-on-export flex items-center justify-between mb-8 pb-4 border-b border-border/50">
+              <div className="flex items-center gap-4">
+                <img src="/smile-club-logo.png" alt="Logo" className="h-10 object-contain" />
+                <div>
+                  <h2 className="text-lg font-display font-bold text-foreground leading-none">Smile Club Mahajanga</h2>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1">Volunteer Leaderboard {selectedYear}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-xs font-bold text-primary uppercase tracking-widest italic">Official Ranking</div>
+              </div>
+            </div>
+
             {rankings.map((record, index) => {
               const { volunteer, totalPoints } = record;
               

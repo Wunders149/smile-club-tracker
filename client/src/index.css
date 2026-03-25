@@ -202,6 +202,20 @@
   }
 }
 
+/* Show on export utility */
+.show-on-export {
+  display: none !important;
+}
+
+.is-printing .show-on-export {
+  display: flex !important;
+}
+
+/* For html-to-image to pick it up, we sometimes need a specific class */
+.ranking-export-mode .show-on-export {
+  display: flex !important;
+}
+
 .print-only {
   display: none;
 }
