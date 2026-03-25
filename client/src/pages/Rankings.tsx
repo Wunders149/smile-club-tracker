@@ -6,10 +6,9 @@ import { Trophy, Medal, Star, Calendar, Download } from "lucide-react";
 import { motion } from "framer-motion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { toPng } from "html-to-image";
+import { toCanvas } from "html-to-image";
 import { useToast } from "@/hooks/use-toast";
 import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas";
 
 export default function Rankings() {
   const currentYear = new Date().getFullYear();
@@ -27,7 +26,7 @@ export default function Rankings() {
     setIsDownloading(true);
     toast({
       title: "Preparing PDF",
-      description: "Generating your ranking document...",
+      description: "Generating high-fidelity document...",
     });
 
     try {
@@ -37,34 +36,49 @@ export default function Rankings() {
         watermark.style.display = 'flex';
       }
 
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      
-      await pdf.html(rankingRef.current, {
-        callback: function (doc) {
-          doc.save(`Smile-Club-Rankings-${selectedYear}.pdf`);
-          
-          // Re-hide the watermark
-          if (watermark) {
-            watermark.style.display = 'none';
-          }
-          
-          setIsDownloading(false);
-          toast({
-            title: "Success!",
-            description: "Ranking PDF downloaded successfully.",
-          });
-        },
-        x: 10,
-        y: 10,
-        width: pdfWidth - 20, // 10mm margin on each side
-        windowWidth: 800, // Fixed width for consistent rendering
-        autoPaging: 'text',
-        html2canvas: {
-          scale: 0.28, // Adjusted for A4 width
-          useCORS: true,
-          logging: false,
+      // Use html-to-image to get a high-quality canvas
+      const canvas = await toCanvas(rankingRef.current, {
+        pixelRatio: 2, // High resolution
+        backgroundColor: "#fcfaf8",
+        style: {
+          padding: "40px",
         }
+      });
+
+      // Re-hide the watermark
+      if (watermark) {
+        watermark.style.display = 'none';
+      }
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+      const imgWidth = pdfWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      // Add first page
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+      heightLeft -= pdfHeight;
+
+      // Add subsequent pages if content is longer than A4
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+        heightLeft -= pdfHeight;
+      }
+
+      pdf.save(`Smile-Club-Rankings-${selectedYear}.pdf`);
+      
+      toast({
+        title: "Success!",
+        description: "Ranking PDF downloaded successfully.",
       });
     } catch (err) {
       console.error("Failed to download PDF", err);
@@ -73,6 +87,7 @@ export default function Rankings() {
         description: "Could not generate the PDF. Please try again.",
         variant: "destructive",
       });
+    } finally {
       setIsDownloading(false);
     }
   };
@@ -160,16 +175,24 @@ export default function Rankings() {
               
               let cardStyle = "bg-card hover:border-border transition-all";
               let badgeStyle = "bg-muted text-muted-foreground border-border";
+              let textStyle = "text-foreground";
+              let subtextStyle = "text-muted-foreground";
               
               if (isFirst) {
-                cardStyle = "bg-gradient-to-r from-yellow-500/10 to-transparent border-yellow-500/30 sm:scale-[1.02] shadow-xl shadow-yellow-500/10 z-10 relative";
-                badgeStyle = "bg-yellow-100 text-yellow-700 border-yellow-400";
+                cardStyle = "bg-slate-950 text-white border-yellow-500/50 sm:scale-[1.02] shadow-xl shadow-yellow-500/20 z-10 relative";
+                badgeStyle = "bg-yellow-500 text-white border-yellow-400";
+                textStyle = "text-white";
+                subtextStyle = "text-slate-300";
               } else if (isSecond) {
-                cardStyle = "bg-gradient-to-r from-slate-300/20 to-transparent border-slate-300/50";
-                badgeStyle = "bg-slate-100 text-slate-700 border-slate-300";
+                cardStyle = "bg-slate-900 text-white border-slate-400/50";
+                badgeStyle = "bg-slate-400 text-white border-slate-300";
+                textStyle = "text-white";
+                subtextStyle = "text-slate-300";
               } else if (isThird) {
-                cardStyle = "bg-gradient-to-r from-orange-500/10 to-transparent border-orange-500/30";
-                badgeStyle = "bg-orange-100 text-orange-800 border-orange-300";
+                cardStyle = "bg-slate-800 text-white border-orange-500/50";
+                badgeStyle = "bg-orange-500 text-white border-orange-400";
+                textStyle = "text-white";
+                subtextStyle = "text-slate-300";
               }
 
               return (
@@ -178,7 +201,6 @@ export default function Rankings() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
                   key={`${selectedYear}-${volunteer.id}`}
-                  style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}
                 >
                   <Card className={`border rounded-2xl overflow-hidden ${cardStyle}`}>
                     <CardContent className="p-3 md:p-6 flex items-center gap-3 md:gap-4">
@@ -192,14 +214,14 @@ export default function Rankings() {
                       
                       {/* Info */}
                       <div className="flex-1 min-w-0 flex items-center gap-3 md:gap-4">
-                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold overflow-hidden shrink-0 hidden sm:flex">
+                        <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full ${isFirst || isSecond || isThird ? 'bg-white/10' : 'bg-primary/10'} text-primary flex items-center justify-center font-bold overflow-hidden shrink-0 hidden sm:flex`}>
                            {volunteer.photo ? <img src={volunteer.photo} alt={volunteer.fullName} className="w-full h-full object-cover" /> : volunteer.fullName.charAt(0)}
                         </div>
                         <div className="min-w-0">
-                          <h3 className="font-bold text-base md:text-lg text-foreground truncate">{volunteer.fullName}</h3>
-                          <div className="flex items-center gap-1.5 text-[10px] md:text-sm text-muted-foreground mt-0.5">
+                          <h3 className={`font-bold text-base md:text-lg ${textStyle} truncate`}>{volunteer.fullName}</h3>
+                          <div className={`flex items-center gap-1.5 text-[10px] md:text-sm ${subtextStyle} mt-0.5`}>
                             <span className="truncate">{volunteer.position}</span>
-                            <span className="w-1 h-1 rounded-full bg-muted-foreground/30 shrink-0"></span>
+                            <span className="w-1 h-1 rounded-full bg-current opacity-30 shrink-0"></span>
                             <span className="truncate">{volunteer.studyField || 'Member'}</span>
                           </div>
                         </div>
@@ -207,10 +229,10 @@ export default function Rankings() {
 
                       {/* Score */}
                       <div className="text-right shrink-0 ml-2">
-                        <div className="font-display font-bold text-2xl md:text-3xl text-primary leading-none">
+                        <div className={`font-display font-bold text-2xl md:text-3xl ${isFirst || isSecond || isThird ? 'text-white' : 'text-primary'} leading-none`}>
                           {totalPoints}
                         </div>
-                        <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mt-1">
+                        <div className={`text-[10px] font-bold uppercase tracking-wider ${subtextStyle} mt-1`}>
                           Pts
                         </div>
                       </div>
