@@ -36,12 +36,17 @@ export default function Rankings() {
         watermark.style.display = 'flex';
       }
 
-      // Use html-to-image to get a high-quality canvas
+      // Capture at a fixed width to ensure horizontal fit regardless of screen size
+      const captureWidth = 1000;
       const canvas = await toCanvas(rankingRef.current, {
-        pixelRatio: 2, // High resolution
+        pixelRatio: 2,
         backgroundColor: "#fcfaf8",
+        width: captureWidth,
         style: {
-          padding: "40px",
+          width: `${captureWidth}px`,
+          margin: '0',
+          padding: '20px', // Extra internal padding for the snapshot
+          transform: 'none',
         }
       });
 
@@ -56,22 +61,28 @@ export default function Rankings() {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       
-      const imgWidth = pdfWidth;
+      const margin = 10; // 10mm margin
+      const usableWidth = pdfWidth - (margin * 2);
+      const usableHeight = pdfHeight - (margin * 2);
+      
+      const imgWidth = usableWidth;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       
       let heightLeft = imgHeight;
-      let position = 0;
+      let page = 0;
 
-      // Add first page
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
-      heightLeft -= pdfHeight;
-
-      // Add subsequent pages if content is longer than A4
+      // Vertical pagination logic
       while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
-        heightLeft -= pdfHeight;
+        if (page > 0) pdf.addPage();
+        
+        // Calculate Y position to "scroll" the image across pages
+        // We start at 'margin' and offset by the height already covered
+        const yPos = margin - (page * usableHeight);
+        
+        pdf.addImage(imgData, 'PNG', margin, yPos, imgWidth, imgHeight, undefined, 'FAST');
+        
+        heightLeft -= usableHeight;
+        page++;
       }
 
       pdf.save(`Smile-Club-Rankings-${selectedYear}.pdf`);
