@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { toPng } from "html-to-image";
 import { useToast } from "@/hooks/use-toast";
 import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
 
 export default function Rankings() {
   const currentYear = new Date().getFullYear();
@@ -30,31 +31,40 @@ export default function Rankings() {
     });
 
     try {
-      const dataUrl = await toPng(rankingRef.current, {
-        cacheBust: true,
-        backgroundColor: "#fcfaf8",
-        style: {
-          padding: "40px",
-        },
-        onClone: (clonedDoc) => {
-          const watermark = clonedDoc.querySelector('.show-on-export') as HTMLElement;
-          if (watermark) {
-            watermark.style.display = 'flex';
-          }
-        }
-      });
-      
+      // Temporarily show the watermark for PDF generation
+      const watermark = rankingRef.current.querySelector('.show-on-export') as HTMLElement;
+      if (watermark) {
+        watermark.style.display = 'flex';
+      }
+
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgProps = pdf.getImageProperties(dataUrl);
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
       
-      pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Smile-Club-Rankings-${selectedYear}.pdf`);
-      
-      toast({
-        title: "Success!",
-        description: "Ranking PDF downloaded successfully.",
+      await pdf.html(rankingRef.current, {
+        callback: function (doc) {
+          doc.save(`Smile-Club-Rankings-${selectedYear}.pdf`);
+          
+          // Re-hide the watermark
+          if (watermark) {
+            watermark.style.display = 'none';
+          }
+          
+          setIsDownloading(false);
+          toast({
+            title: "Success!",
+            description: "Ranking PDF downloaded successfully.",
+          });
+        },
+        x: 10,
+        y: 10,
+        width: pdfWidth - 20, // 10mm margin on each side
+        windowWidth: 800, // Fixed width for consistent rendering
+        autoPaging: 'text',
+        html2canvas: {
+          scale: 0.28, // Adjusted for A4 width
+          useCORS: true,
+          logging: false,
+        }
       });
     } catch (err) {
       console.error("Failed to download PDF", err);
@@ -63,7 +73,6 @@ export default function Rankings() {
         description: "Could not generate the PDF. Please try again.",
         variant: "destructive",
       });
-    } finally {
       setIsDownloading(false);
     }
   };
@@ -169,6 +178,7 @@ export default function Rankings() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
                   key={`${selectedYear}-${volunteer.id}`}
+                  style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}
                 >
                   <Card className={`border rounded-2xl overflow-hidden ${cardStyle}`}>
                     <CardContent className="p-3 md:p-6 flex items-center gap-3 md:gap-4">
