@@ -2,12 +2,13 @@ import { useState, useRef } from "react";
 import { Layout } from "@/components/Layout";
 import { useVolunteerRankings } from "@/hooks/use-volunteers";
 import { Card, CardContent } from "@/components/ui/card";
-import { Trophy, Medal, Star, Calendar, Download, ImageIcon } from "lucide-react";
+import { Trophy, Medal, Star, Calendar, Download } from "lucide-react";
 import { motion } from "framer-motion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { toPng } from "html-to-image";
 import { useToast } from "@/hooks/use-toast";
+import { jsPDF } from "jspdf";
 
 export default function Rankings() {
   const currentYear = new Date().getFullYear();
@@ -19,13 +20,13 @@ export default function Rankings() {
 
   const years = [currentYear, currentYear - 1];
 
-  const downloadAsImage = async () => {
+  const downloadAsPDF = async () => {
     if (!rankingRef.current) return;
     
     setIsDownloading(true);
     toast({
-      title: "Preparing image",
-      description: "Generating your ranking picture...",
+      title: "Preparing PDF",
+      description: "Generating your ranking document...",
     });
 
     try {
@@ -43,20 +44,23 @@ export default function Rankings() {
         }
       });
       
-      const link = document.createElement('a');
-      link.download = `Smile-Club-Rankings-${selectedYear}.png`;
-      link.href = dataUrl;
-      link.click();
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgProps = pdf.getImageProperties(dataUrl);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      
+      pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Smile-Club-Rankings-${selectedYear}.pdf`);
       
       toast({
         title: "Success!",
-        description: "Ranking image downloaded successfully.",
+        description: "Ranking PDF downloaded successfully.",
       });
     } catch (err) {
-      console.error("Failed to download image", err);
+      console.error("Failed to download PDF", err);
       toast({
         title: "Download failed",
-        description: "Could not generate the image. Please try again.",
+        description: "Could not generate the PDF. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -96,7 +100,7 @@ export default function Rankings() {
 
             <Button 
               variant="outline" 
-              onClick={downloadAsImage}
+              onClick={downloadAsPDF}
               disabled={isLoading || !rankings?.length || isDownloading}
               className="rounded-xl border-primary/20 text-primary hover:bg-primary/5 h-11 w-full sm:w-auto shadow-sm"
             >
@@ -107,8 +111,8 @@ export default function Rankings() {
                 </div>
               ) : (
                 <>
-                  <ImageIcon className="w-4 h-4 mr-2" />
-                  Save as Picture
+                  <Download className="w-4 h-4 mr-2" />
+                  Download as PDF
                 </>
               )}
             </Button>
@@ -124,7 +128,7 @@ export default function Rankings() {
           </div>
         ) : (
           <div ref={rankingRef} className="space-y-3 md:space-y-4 px-2 md:px-0 pb-12">
-            {/* Watermark for Exported Image */}
+            {/* Watermark for Exported PDF */}
             <div className="hidden show-on-export flex items-center justify-between mb-8 pb-4 border-b border-border/50">
               <div className="flex items-center gap-4">
                 <img src="/smile-club-logo.png" alt="Logo" className="h-10 object-contain" />
