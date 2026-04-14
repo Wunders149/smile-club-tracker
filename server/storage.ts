@@ -184,56 +184,64 @@ export class DatabaseStorage implements IStorage {
   // --- Statistics ---
   async getStatistics(): Promise<StatisticsData> {
     const allVolunteers = await db.select().from(volunteers);
-    
-    const genderBreakdown = allVolunteers.reduce((acc, v) => {
-      const existing = acc.find(g => g.gender === (v.gender || null));
-      if (existing) existing.count++;
-      else acc.push({ gender: v.gender || null, count: 1 });
-      return acc;
-    }, [] as { gender: string | null; count: number }[]);
-    
-    const fieldStudyBreakdown = allVolunteers.reduce((acc, v) => {
-      const existing = acc.find(f => f.field === (v.studyField || null));
-      if (existing) existing.count++;
-      else acc.push({ field: v.studyField || null, count: 1 });
-      return acc;
-    }, [] as { field: string | null; count: number }[]).map(({ field, count }) => ({ field, count }));
+    const allEvents = await db.select().from(events);
+    const allAttendances = await db.select().from(attendances);
 
+    // ── Volunteer counts ──
+    const maleCount = allVolunteers.filter(v => v.gender === 'Male').length;
+    const femaleCount = allVolunteers.filter(v => v.gender === 'Female').length;
+
+    // ── Gender breakdown (use empty string for null to keep keys clean) ──
+    const genderBreakdown = allVolunteers.reduce((acc, v) => {
+      const key = v.gender ?? '';
+      const existing = acc.find(g => g.gender === key);
+      if (existing) existing.count++;
+      else acc.push({ gender: key, count: 1 });
+      return acc;
+    }, [] as { gender: string; count: number }[]);
+
+    // ── Field of study breakdown ──
+    const fieldStudyBreakdown = allVolunteers.reduce((acc, v) => {
+      const key = v.studyField ?? '';
+      const existing = acc.find(f => f.field === key);
+      if (existing) existing.count++;
+      else acc.push({ field: key, count: 1 });
+      return acc;
+    }, [] as { field: string; count: number }[]);
+
+    // ── Medical classification ──
     const medicalKeywords = [
-      'medec', 'medic', 'chir', 'dent', 'pharma', 'infir', 'sage-f', 
+      'medec', 'medic', 'chir', 'dent', 'pharma', 'infir', 'sage-f',
       'health', 'santé', 'sante', 'soins', 'kiné', 'kine', 'obstet',
       'biomed', 'paramed'
     ];
-    const medicalCount = allVolunteers.filter(v => {
-      const isMedicalPosition = v.position === 'Medical Volunteer';
-      const field = (v.studyField || '').toLowerCase();
-      const matchesKeyword = medicalKeywords.some(k => field.includes(k));
-      return isMedicalPosition || matchesKeyword;
-    }).length;
 
-    const medicalBreakdown = [
-      { category: 'Medical Study', count: medicalCount },
-      { category: 'Non-Medical Study', count: allVolunteers.length - medicalCount }
-    ];
-    
+    let medicalCount = 0;
+    if (allVolunteers.length > 0) {
+      for (const v of allVolunteers) {
+        const isMedicalPosition = v.position === 'Medical Volunteer';
+        const field = (v.studyField || '').toLowerCase();
+        const matchesKeyword = medicalKeywords.some(k => field.includes(k));
+        if (isMedicalPosition || matchesKeyword) medicalCount++;
+      }
+    }
+
+    const medicalBreakdown = allVolunteers.length > 0
+      ? [
+          { category: 'Medical Study', count: medicalCount },
+          { category: 'Non-Medical Study', count: allVolunteers.length - medicalCount }
+        ]
+      : [];
+
+    // ── Position breakdown ──
     const positionBreakdown = allVolunteers.reduce((acc, v) => {
       const existing = acc.find(p => p.position === v.position);
       if (existing) existing.count++;
       else acc.push({ position: v.position, count: 1 });
       return acc;
     }, [] as { position: string; count: number }[]).sort((a, b) => b.count - a.count);
-    
-    const maleCount = allVolunteers.filter(v => v.gender === 'Male').length;
-    const femaleCount = allVolunteers.filter(v => v.gender === 'Female').length;
-    
-    // Commitment Trend
-    const allEvents = await db.select().from(events);
-    const rawAttendances = await db.select().from(attendances);
-    
-    // Filter attendances to only include those from existing volunteers
-    const volunteerIds = new Set(allVolunteers.map(v => v.id));
-    const allAttendances = rawAttendances.filter(a => volunteerIds.has(a.volunteerId));
-    
+
+    // ── Event type breakdown ──
     const eventTypeBreakdown = allEvents.reduce((acc, e) => {
       const existing = acc.find(t => t.type === e.type);
       if (existing) existing.count++;
@@ -241,22 +249,37 @@ export class DatabaseStorage implements IStorage {
       return acc;
     }, [] as { type: string; count: number }[]).sort((a, b) => b.count - a.count);
 
+    // ── Commitment trend — O(n) using a Map keyed by date string ──
+    // Build a lookup of event → date string first
+    const eventDateMap = new Map<number, string>();
+    for (const ev of allEvents) {
+      eventDateMap.set(ev.id, ev.date.toISOString().split('T')[0]);
+    }
+
+    // Build a Set of valid volunteer IDs for orphan filtering
+    const volunteerIds = new Set(allVolunteers.map(v => v.id));
+
+    // Accumulate points per day in a single pass over attendances
     const commitmentMap = new Map<string, number>();
-    allEvents.forEach(ev => {
-      const dateStr = ev.date.toISOString().split('T')[0];
-      const eventAttendances = allAttendances.filter(a => a.eventId === ev.id);
-      const dayPoints = eventAttendances.reduce((sum, a) => sum + getAttendancePoints(a.status as any), 0);
-      commitmentMap.set(dateStr, (commitmentMap.get(dateStr) || 0) + dayPoints);
-    });
+    for (const att of allAttendances) {
+      // Skip orphan attendance records
+      if (!volunteerIds.has(att.volunteerId)) continue;
+      const dateStr = eventDateMap.get(att.eventId);
+      if (!dateStr) continue; // event was deleted or doesn't exist
+      const points = getAttendancePoints(att.status as any);
+      commitmentMap.set(dateStr, (commitmentMap.get(dateStr) || 0) + points);
+    }
 
     const commitmentTrend = Array.from(commitmentMap.entries())
       .map(([date, points]) => ({ date, points }))
       .sort((a, b) => a.date.localeCompare(b.date));
 
-    // Calculate events done and events left
-    const now = new Date();
-    const eventsDone = allEvents.filter(e => new Date(e.date) <= now).length;
-    const eventsLeft = allEvents.filter(e => new Date(e.date) > now).length;
+    // ── Events done / left — compare against start of today ──
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const eventsDone = allEvents.filter(e => new Date(e.date) < startOfToday).length;
+    const eventsLeft = allEvents.filter(e => new Date(e.date) >= startOfToday).length;
 
     return {
       genderBreakdown,

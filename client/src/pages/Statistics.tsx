@@ -1,9 +1,9 @@
 import { Layout } from "@/components/Layout";
-import { useQuery } from "@tanstack/react-query";
+import { useStatistics } from "@/hooks/use-statistics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3, Users, PieChart as PieChartIcon, TrendingUp, CalendarDays } from "lucide-react";
-import { 
-  PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, 
+import {
+  PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip,
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Legend
 } from "recharts";
 import { format } from "date-fns";
@@ -11,25 +11,18 @@ import { format } from "date-fns";
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
 export default function Statistics() {
-  const { data: stats, isLoading } = useQuery({
-    queryKey: ['/api/statistics'],
-    queryFn: async () => {
-      const res = await fetch('/api/statistics');
-      if (!res.ok) throw new Error('Failed to fetch statistics');
-      return res.json();
-    },
-    refetchInterval: 30000,
-  });
+  const { data: stats, isLoading, error } = useStatistics();
 
   if (isLoading) return <Layout><div className="text-center py-12">Loading statistics...</div></Layout>;
+  if (error) return <Layout><div className="text-center py-12 text-destructive">Failed to load statistics. Please try again.</div></Layout>;
   if (!stats) return <Layout><div className="text-center py-12">No data available</div></Layout>;
 
-  const genderData = stats.genderBreakdown.map((g: any) => ({
+  const genderData = stats.genderBreakdown.map((g) => ({
     name: g.gender || 'Unspecified',
     value: g.count
   }));
 
-  const medicalData = stats.medicalBreakdown.map((m: any) => ({
+  const medicalData = stats.medicalBreakdown.map((m) => ({
     name: m.category,
     value: m.count
   }));

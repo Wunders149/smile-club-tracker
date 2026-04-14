@@ -144,24 +144,34 @@ export const api = {
       responses: {
         200: z.object({
           genderBreakdown: z.array(z.object({
-            gender: z.string().nullable(),
+            gender: z.string(),
             count: z.number()
           })),
           fieldStudyBreakdown: z.array(z.object({
-            field: z.string().nullable(),
+            field: z.string(),
             count: z.number()
           })),
           medicalBreakdown: z.array(z.object({
             category: z.string(),
             count: z.number()
           })),
+          positionBreakdown: z.array(z.object({
+            position: z.string(),
+            count: z.number()
+          })),
           totalVolunteers: z.number(),
           totalEvents: z.number(),
+          eventsDone: z.number(),
+          eventsLeft: z.number(),
           maleCount: z.number(),
           femaleCount: z.number(),
           eventTypeBreakdown: z.array(z.object({
             type: z.string(),
             count: z.number()
+          })),
+          commitmentTrend: z.array(z.object({
+            date: z.string(),
+            points: z.number()
           })),
         }),
       },
