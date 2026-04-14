@@ -48,9 +48,19 @@ export default function Volunteers() {
     'biomed', 'paramed', 'nurs'
   ];
 
+  // Non-medical keywords — if studyField contains any of these, NOT medical regardless of position
+  const nonMedicalKeywords = [
+    'high school', 'lycée', 'lycee', 'college', 'college',
+    'informatique', 'computer', 'software', 'programm', 'web',
+    'commerce', 'gestion', 'compta', 'droit', 'law', 'lettres',
+    'histoire', 'géograph', 'philo', 'économie', 'economie',
+    'agri', 'tourisme', 'transport', 'logist', 'architect'
+  ];
+
   const isMedicalVolunteer = (vol: Volunteer) => {
-    if (vol.position === 'Medical Volunteer') return true;
     const field = (vol.studyField || '').toLowerCase();
+    // If studyField explicitly indicates non-medical, exclude
+    if (nonMedicalKeywords.some(k => field.includes(k))) return false;
     return medicalKeywords.some(k => field.includes(k));
   };
 

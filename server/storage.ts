@@ -215,14 +215,21 @@ export class DatabaseStorage implements IStorage {
       'health', 'santé', 'sante', 'soins', 'kiné', 'kine', 'obstet',
       'biomed', 'paramed', 'nurs'
     ];
+    const nonMedicalKeywords = [
+      'high school', 'lycée', 'lycee', 'college',
+      'informatique', 'computer', 'software', 'programm', 'web',
+      'commerce', 'gestion', 'compta', 'droit', 'law', 'lettres',
+      'histoire', 'géograph', 'philo', 'économie', 'economie',
+      'agri', 'tourisme', 'transport', 'logist', 'architect'
+    ];
 
     let medicalCount = 0;
     if (allVolunteers.length > 0) {
       for (const v of allVolunteers) {
-        const isMedicalPosition = v.position === 'Medical Volunteer';
         const field = (v.studyField || '').toLowerCase();
-        const matchesKeyword = medicalKeywords.some(k => field.includes(k));
-        if (isMedicalPosition || matchesKeyword) medicalCount++;
+        // Non-medical studyField always overrides
+        if (nonMedicalKeywords.some(k => field.includes(k))) continue;
+        if (medicalKeywords.some(k => field.includes(k))) medicalCount++;
       }
     }
 
