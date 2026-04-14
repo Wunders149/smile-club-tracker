@@ -702,6 +702,8 @@ export default function Volunteers() {
               @page {
                 size: landscape A4;
                 margin: 15mm;
+                margin-top: 45mm;
+                margin-bottom: 30mm;
               }
               @media print {
                 * {
@@ -714,14 +716,21 @@ export default function Volunteers() {
                   top: 0;
                   left: 15mm;
                   right: 15mm;
+                  height: 30mm;
                   background: white;
-                  z-index: 999;
+                  z-index: 10;
+                }
+                .vol-print-footer {
+                  position: fixed;
+                  bottom: 0;
+                  left: 15mm;
+                  right: 15mm;
+                  height: 15mm;
                 }
                 .vol-print-table {
                   width: 100%;
                   border-collapse: collapse;
                   font-size: 8px;
-                  margin-top: 100px;
                 }
                 .vol-print-table th {
                   background: #111827;
@@ -751,8 +760,8 @@ export default function Volunteers() {
               }
             `}</style>
 
-            {/* Print Header (fixed, repeats on every printed page) */}
-            <div className="vol-print-header flex justify-between items-end mb-5 border-b-2 border-black pb-4">
+            {/* Print Header (repeats on every printed page) */}
+            <div className="vol-print-header flex justify-between items-end border-b border-gray-200 pb-2">
               <div className="flex items-end gap-4">
                 <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="w-16 h-16 object-contain flex-shrink-0" />
                 <div>
@@ -799,8 +808,8 @@ export default function Volunteers() {
               </tbody>
             </table>
 
-            {/* Print Footer */}
-            <div className="mt-6 pt-3 border-t border-gray-300 flex justify-between items-end text-[7px] text-gray-500">
+            {/* Print Footer (repeats on every printed page) */}
+            <div className="vol-print-footer flex justify-between items-end text-[7px] text-gray-500">
               <div>
                 <p>Generated {format(new Date(), 'MMMM d, yyyy HH:mm')}</p>
                 <p className="text-gray-400">Smile Club Mahajanga Tracker System</p>

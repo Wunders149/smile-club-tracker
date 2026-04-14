@@ -176,6 +176,8 @@ export default function Organigram() {
               @page {
                 size: landscape A4;
                 margin: 15mm;
+                margin-top: 40mm;
+                margin-bottom: 25mm;
               }
               @media print {
                 * {
@@ -188,17 +190,25 @@ export default function Organigram() {
                   top: 0;
                   left: 15mm;
                   right: 15mm;
+                  height: 25mm;
                   background: white;
-                  z-index: 999;
+                  z-index: 10;
                 }
-                .print-organigram-container { padding-top: 90px; }
+                .org-print-footer {
+                  position: fixed;
+                  bottom: 0;
+                  left: 15mm;
+                  right: 15mm;
+                  height: 12mm;
+                }
+                .print-organigram-container { width: 100%; }
                 .org-node { break-inside: avoid; page-break-inside: avoid; }
                 .committee-box { break-inside: avoid; page-break-inside: avoid; }
               }
             `}</style>
 
             <div className="print-organigram-container px-6 py-4">
-              <div className="org-print-header flex justify-between items-end mb-6 border-b-2 border-black pb-4">
+              <div className="org-print-header flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
                 <div className="flex items-end gap-4">
                   <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="w-16 h-16 object-contain flex-shrink-0" />
                   <div>
@@ -225,7 +235,7 @@ export default function Organigram() {
                 />
               </div>
 
-              <div className="mt-6 pt-4 border-t border-gray-200 flex justify-between items-end text-[7px] font-semibold uppercase tracking-wider text-gray-500">
+              <div className="org-print-footer flex justify-between items-end text-[7px] font-semibold uppercase tracking-wider text-gray-500">
                 <div>
                   <p>Generated {format(new Date(), 'MMMM d, yyyy')}</p>
                   <p className="text-[6px] text-gray-400">Internal Management System</p>

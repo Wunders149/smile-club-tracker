@@ -584,6 +584,8 @@ export default function Events() {
               @page {
                 size: landscape A4;
                 margin: 12mm;
+                margin-top: 40mm;
+                margin-bottom: 25mm;
               }
               @media print {
                 * {
@@ -596,17 +598,16 @@ export default function Events() {
                   top: 0;
                   left: 12mm;
                   right: 12mm;
+                  height: 28mm;
                   background: white;
-                  z-index: 999;
+                  z-index: 10;
                 }
-                .print-content { padding-top: 100px; }
-                .print-footer {
+                .pta-print-footer {
                   position: fixed;
                   bottom: 0;
                   left: 12mm;
                   right: 12mm;
-                  padding-top: 10px;
-                  border-top: 1px solid #d1d5db;
+                  height: 13mm;
                 }
               }
               .planning-grid {
@@ -665,8 +666,8 @@ export default function Events() {
 
             {/* ── Content ── */}
             <div className="print-content">
-            {/* ── Header (fixed, repeats on every printed page) ── */}
-            <div className="pta-print-header flex justify-between items-end mb-4 border-b-2 border-black pb-4">
+            {/* ── Header (repeats on every printed page) ── */}
+            <div className="pta-print-header flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
               <div className="flex items-end gap-4">
                 <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="w-16 h-16 object-contain flex-shrink-0" />
                 <div>
@@ -775,8 +776,8 @@ export default function Events() {
               })}
             </div>
 
-            {/* ── Footer (fixed at bottom of each page in print) ── */}
-            <div className="print-footer flex justify-between items-end text-[7px] text-gray-500">
+            {/* ── Footer (repeats on every printed page) ── */}
+            <div className="pta-print-footer flex justify-between items-end text-[7px] text-gray-500">
               <div>
                 <p>Generated {format(new Date(), 'MMMM d, yyyy HH:mm')}</p>
                 <p className="text-gray-400">Smile Club Mahajanga Tracker System</p>

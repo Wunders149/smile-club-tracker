@@ -250,6 +250,8 @@ export default function Attendance() {
               @page {
                 size: A4;
                 margin: 20mm;
+                margin-top: 50mm;
+                margin-bottom: 30mm;
               }
               @media print {
                 * {
@@ -266,11 +268,16 @@ export default function Attendance() {
                   top: 0;
                   left: 20mm;
                   right: 20mm;
+                  height: 30mm;
                   background: white;
-                  z-index: 999;
+                  z-index: 10;
                 }
-                .attendance-print-content {
-                  padding-top: 130px;
+                .attendance-print-footer {
+                  position: fixed;
+                  bottom: 0;
+                  left: 20mm;
+                  right: 20mm;
+                  height: 15mm;
                 }
                 .roster-page {
                   page-break-after: always;
@@ -307,8 +314,8 @@ export default function Attendance() {
             `}</style>
 
             <div className="attendance-print-content">
-            {/* Header (fixed, repeats on every printed page) */}
-            <div className="attendance-print-header flex justify-between items-end mb-4 border-b-2 border-black pb-3">
+            {/* Header (repeats on every printed page) */}
+            <div className="attendance-print-header flex justify-between items-end border-b border-gray-200 pb-2">
               <div className="flex items-end gap-4">
                 <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="w-16 h-16 object-contain flex-shrink-0" />
                 <div>
@@ -393,14 +400,14 @@ export default function Attendance() {
 
                       {/* Page footer */}
                       {pageIdx === Math.ceil(volunteers.length / 25) - 1 && (
-                        <div className="mt-8 pt-4 border-t border-gray-300 text-xs text-gray-600 flex justify-between">
+                        <div className="attendance-print-footer flex justify-between items-end text-[10px] text-gray-600">
                           <div>
                             <p className="font-semibold">Total Pages: {Math.ceil(volunteers.length / 25)}</p>
-                            <p className="text-gray-500 text-[10px] mt-1">Generated {format(new Date(), 'MMMM d, yyyy HH:mm')}</p>
+                            <p className="text-gray-500 text-[8px] mt-0.5">Generated {format(new Date(), 'MMMM d, yyyy HH:mm')}</p>
                           </div>
                           <div className="text-right">
                             <p className="font-bold text-black">"For The Patients!"</p>
-                            <p className="text-[10px] text-gray-500">Smile Club Mahajanga Tracker</p>
+                            <p className="text-[8px] text-gray-500">Smile Club Mahajanga Tracker</p>
                           </div>
                         </div>
                       )}
