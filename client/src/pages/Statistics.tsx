@@ -71,6 +71,34 @@ export default function Statistics() {
               </div>
             </CardContent>
           </Card>
+
+          <Card className="rounded-2xl border-border/50 shadow-lg bg-gradient-to-br from-card to-green-50/30">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl md:text-4xl font-bold text-green-600">{stats.eventsDone}</div>
+                  <p className="text-[10px] md:text-xs text-muted-foreground mt-1 font-bold uppercase tracking-wider">Events Done</p>
+                </div>
+                <div className="bg-green-500/10 p-2 md:p-3 rounded-xl text-green-500 shrink-0">
+                  <div className="w-5 h-5 md:w-6 md:h-6 font-black flex items-center justify-center">✓</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-2xl border-border/50 shadow-lg bg-gradient-to-br from-card to-purple-50/30">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl md:text-4xl font-bold text-purple-600">{stats.eventsLeft}</div>
+                  <p className="text-[10px] md:text-xs text-muted-foreground mt-1 font-bold uppercase tracking-wider">Events Left</p>
+                </div>
+                <div className="bg-purple-500/10 p-2 md:p-3 rounded-xl text-purple-500 shrink-0">
+                  <div className="w-5 h-5 md:w-6 md:h-6 font-black flex items-center justify-center">→</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
           
           <Card className="rounded-2xl border-border/50 shadow-lg bg-gradient-to-br from-card to-blue-50/30">
             <CardContent className="pt-6">

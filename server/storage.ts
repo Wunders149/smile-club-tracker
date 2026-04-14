@@ -253,6 +253,11 @@ export class DatabaseStorage implements IStorage {
       .map(([date, points]) => ({ date, points }))
       .sort((a, b) => a.date.localeCompare(b.date));
 
+    // Calculate events done and events left
+    const now = new Date();
+    const eventsDone = allEvents.filter(e => new Date(e.date) <= now).length;
+    const eventsLeft = allEvents.filter(e => new Date(e.date) > now).length;
+
     return {
       genderBreakdown,
       fieldStudyBreakdown,
@@ -262,6 +267,8 @@ export class DatabaseStorage implements IStorage {
       commitmentTrend,
       totalVolunteers: allVolunteers.length,
       totalEvents: allEvents.length,
+      eventsDone,
+      eventsLeft,
       maleCount,
       femaleCount
     };

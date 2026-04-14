@@ -127,6 +127,8 @@ export type StatisticsData = {
   commitmentTrend: { date: string; points: number }[];
   totalVolunteers: number;
   totalEvents: number;
+  eventsDone: number;
+  eventsLeft: number;
   maleCount: number;
   femaleCount: number;
 };

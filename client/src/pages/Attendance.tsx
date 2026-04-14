@@ -15,10 +15,23 @@ import { useReactToPrint } from "react-to-print";
 export default function Attendance() {
   const { data: events, isLoading: loadingEvents } = useEvents();
   const { data: volunteers, isLoading: loadingVols } = useVolunteers();
-  
+
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
   const { data: existingAttendances, isLoading: loadingAttendances } = useEventAttendances(selectedEventId);
   const recordMut = useRecordAttendance();
+
+  // Set default selected event to nearest event to current date
+  useEffect(() => {
+    if (events && events.length > 0 && selectedEventId === null) {
+      const now = new Date();
+      const nearestEvent = events.reduce((prev, curr) => {
+        const prevDiff = Math.abs(new Date(prev.date).getTime() - now.getTime());
+        const currDiff = Math.abs(new Date(curr.date).getTime() - now.getTime());
+        return currDiff < prevDiff ? curr : prev;
+      });
+      setSelectedEventId(nearestEvent.id);
+    }
+  }, [events, selectedEventId]);
 
   const [attendanceState, setAttendanceState] = useState<Record<number, string>>({});
   const [searchQuery, setSearchQuery] = useState("");
