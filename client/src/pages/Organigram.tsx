@@ -175,10 +175,13 @@ export default function Organigram() {
             `}</style>
 
             <div className="print-organigram-container px-6 py-4">
-              <div className="print-header flex justify-between items-start mb-6 border-b-2 border-black pb-4">
-                <div>
-                  <h1 className="text-lg font-black tracking-tighter uppercase text-black leading-none">Organizational Structure</h1>
-                  <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider mt-1">Smile Club Mahajanga • Medical Outreach Organization</p>
+              <div className="print-header flex justify-between items-end mb-6 border-b-2 border-black pb-4">
+                <div className="flex items-end gap-4">
+                  <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="w-16 h-16 object-contain flex-shrink-0" />
+                  <div>
+                    <h1 className="text-lg font-black tracking-tighter uppercase text-black leading-none">Organizational Structure</h1>
+                    <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider mt-1">Smile Club Mahajanga • Medical Outreach Organization</p>
+                  </div>
                 </div>
                 <div className="text-right">
                   <div className="text-3xl font-black text-black leading-none">{new Date().getFullYear()}</div>

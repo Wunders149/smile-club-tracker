@@ -296,8 +296,9 @@ export default function Attendance() {
             `}</style>
 
             {/* Header */}
-            <div className="flex justify-between items-start mb-6 border-b-2 border-black pb-4">
-              <div className="flex items-start gap-3">
+            <div className="flex justify-between items-end mb-6 border-b-2 border-black pb-4">
+              <div className="flex items-end gap-4">
+                <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="w-16 h-16 object-contain flex-shrink-0" />
                 <div>
                   <h1 className="text-xl font-black uppercase tracking-tight text-black leading-none">Attendance Roster</h1>
                   <p className="text-xs text-gray-600 font-semibold uppercase tracking-wider mt-1">Smile Club Mahajanga</p>
