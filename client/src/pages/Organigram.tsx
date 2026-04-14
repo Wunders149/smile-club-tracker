@@ -82,32 +82,16 @@ export default function Organigram() {
         </div>
 
         <Card className="p-6 sm:p-8 bg-card border-border/50 shadow-xl rounded-3xl no-print">
-          {/* Mobile layout */}
-          <div className="block sm:hidden">
-            <OrgChartMobile
-              volunteers={volunteers}
-              president={president}
-              vicePresident={vicePresident}
-              pastPresident={pastPresident}
-              advisor={advisor}
-              executiveHeads={executiveHeads}
-              getCommitteeMembers={getCommitteeMembers}
-              onCommitteeClick={(dept: string) => setSelectedDept(dept)}
-            />
-          </div>
-          {/* Desktop layout */}
-          <div className="hidden sm:block">
-            <OrgChart
-              volunteers={volunteers}
-              president={president}
-              vicePresident={vicePresident}
-              pastPresident={pastPresident}
-              advisor={advisor}
-              executiveHeads={executiveHeads}
-              getCommitteeMembers={getCommitteeMembers}
-              onCommitteeClick={(dept: string) => setSelectedDept(dept)}
-            />
-          </div>
+          <OrgChart
+            volunteers={volunteers}
+            president={president}
+            vicePresident={vicePresident}
+            pastPresident={pastPresident}
+            advisor={advisor}
+            executiveHeads={executiveHeads}
+            getCommitteeMembers={getCommitteeMembers}
+            onCommitteeClick={(dept: string) => setSelectedDept(dept)}
+          />
         </Card>
 
         {/* Committee Management Dialog */}
@@ -498,139 +482,6 @@ function OrgNode({
         )}>
           {person ? person.fullName : "VACANT"}
         </div>
-      </div>
-    </div>
-  );
-}
-
-/**
- * Mobile-optimized vertical org chart with stacked cards
- */
-function OrgChartMobile({
-  volunteers,
-  president,
-  vicePresident,
-  pastPresident,
-  advisor,
-  executiveHeads,
-  getCommitteeMembers,
-  onCommitteeClick,
-}: any) {
-  return (
-    <div className="flex flex-col items-center gap-5 w-full">
-      {/* ── Leadership Cards ── */}
-      <div className="w-full space-y-3">
-        {/* President & Vice President */}
-        <div className="flex gap-3">
-          <MobileOrgNode person={president} title="President" />
-          <MobileOrgNode person={vicePresident} title="Vice President" />
-        </div>
-        {/* Past President & Advisor */}
-        <div className="flex gap-3">
-          <MobileOrgNode person={pastPresident} title="Past President" dashed />
-          <MobileOrgNode person={advisor} title="Advisor" dashed />
-        </div>
-      </div>
-
-      {/* ── Department Officers (2-col grid) ── */}
-      <div className="grid grid-cols-2 gap-3 w-full">
-        {executiveHeads.map((head: any, idx: number) => {
-          const officer = volunteers?.find((v: any) => v.position === head.pos);
-          const committee = getCommitteeMembers(head.dept);
-
-          return (
-            <div key={idx} className="flex flex-col items-center gap-2 org-node">
-              {/* Officer Card */}
-              <div className="p-2.5 rounded-xl border-2 border-primary/20 bg-card text-center shadow-sm w-full">
-                <div className="text-[7px] font-bold uppercase tracking-widest text-primary mb-0.5">
-                  {head.title}
-                </div>
-                <div className="text-xs font-bold truncate">
-                  {officer?.fullName || <span className="text-gray-400 font-normal italic text-[10px]">Vacant</span>}
-                </div>
-              </div>
-
-              {/* Committee Box */}
-              <div
-                onClick={() => onCommitteeClick?.(head.dept)}
-                className="bg-muted/30 rounded-lg p-2 border border-border/50 cursor-pointer hover:bg-primary/[0.03] hover:border-primary/30 w-full transition-all"
-              >
-                <div className="flex items-center justify-between text-[6px] font-black uppercase tracking-tighter text-muted-foreground/60 mb-1 border-b border-border/50 pb-0.5">
-                  <span>Committee</span>
-                  {committee.length > 0 && (
-                    <span className="text-[6px] px-1 rounded bg-primary/10 text-primary">
-                      {committee.length}
-                    </span>
-                  )}
-                </div>
-
-                <div className="space-y-0.5">
-                  {committee.length > 0 ? committee.map((m: any) => {
-                    const isAbm = m.position === "Assisting Board Member";
-                    return (
-                      <div
-                        key={m.id}
-                        className={cn(
-                          "text-[8px] leading-tight flex items-start gap-1",
-                          isAbm
-                            ? "font-bold text-primary"
-                            : "font-medium text-foreground/80"
-                        )}
-                      >
-                        <span className={cn(
-                          "inline-block flex-shrink-0 mt-0.5 w-1 h-1 rounded-full",
-                          isAbm ? "bg-primary" : "bg-primary/40"
-                        )} />
-                        <span className="line-clamp-2">
-                          {m.fullName}
-                          {isAbm && (
-                            <span className="text-[6px] uppercase tracking-tighter opacity-60 ml-0.5">
-                              (ABM)
-                            </span>
-                          )}
-                        </span>
-                      </div>
-                    );
-                  }) : (
-                    <div className="text-[7px] text-muted-foreground/40 italic">No members</div>
-                  )}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function MobileOrgNode({
-  person,
-  title,
-  dashed = false
-}: {
-  person?: Volunteer;
-  title: string;
-  dashed?: boolean;
-}) {
-  return (
-    <div className={cn(
-      "flex-1 p-2.5 rounded-xl text-center shadow-sm transition-all",
-      dashed
-        ? "border-2 border-dashed border-muted-foreground/20 bg-muted/20"
-        : "border-2 border-primary bg-gradient-to-br from-primary to-primary/80 text-white shadow-primary/20"
-    )}>
-      <div className={cn(
-        "text-[7px] font-black uppercase tracking-widest leading-tight mb-0.5",
-        dashed ? "text-muted-foreground" : "text-white/80"
-      )}>
-        {title}
-      </div>
-      <div className={cn(
-        "text-xs font-bold truncate",
-        dashed ? "" : "text-white"
-      )}>
-        {person ? person.fullName : "—"}
       </div>
     </div>
   );
