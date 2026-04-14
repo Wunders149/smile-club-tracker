@@ -190,20 +190,20 @@ export default function Rankings() {
               let subtextStyle = "text-muted-foreground";
               
               if (isFirst) {
-                cardStyle = "bg-[#FFD700] text-amber-950 border-amber-400/50 sm:scale-[1.02] shadow-xl shadow-amber-200/50 z-10 relative";
-                badgeStyle = "bg-amber-100 text-amber-600 border-amber-200";
-                textStyle = "text-amber-950";
-                subtextStyle = "text-amber-800/70";
+                cardStyle = "bg-slate-950 text-white border-yellow-500/50 sm:scale-[1.02] shadow-xl shadow-yellow-500/20 z-10 relative";
+                badgeStyle = "bg-yellow-500 text-white border-yellow-400";
+                textStyle = "text-white";
+                subtextStyle = "text-slate-300";
               } else if (isSecond) {
-                cardStyle = "bg-[#C0C0C0] text-slate-900 border-slate-300/50 shadow-lg shadow-slate-200/50";
-                badgeStyle = "bg-slate-100 text-slate-500 border-slate-200";
-                textStyle = "text-slate-900";
-                subtextStyle = "text-slate-700/70";
+                cardStyle = "bg-slate-900 text-white border-slate-400/50";
+                badgeStyle = "bg-slate-400 text-white border-slate-300";
+                textStyle = "text-white";
+                subtextStyle = "text-slate-300";
               } else if (isThird) {
-                cardStyle = "bg-[#CD7F32] text-orange-950 border-orange-400/50 shadow-md shadow-orange-100/50";
+                cardStyle = "bg-slate-800 text-white border-orange-500/50";
                 badgeStyle = "bg-orange-500 text-white border-orange-400";
-                textStyle = "text-orange-950";
-                subtextStyle = "text-orange-900/70";
+                textStyle = "text-white";
+                subtextStyle = "text-slate-300";
               }
 
               return (
