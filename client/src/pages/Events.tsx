@@ -558,7 +558,7 @@ export default function Events() {
         <div className="print-only hidden">
           <div
             ref={printRef}
-            className="p-6 sm:p-10 bg-white text-black w-full font-sans"
+            className="p-6 sm:p-10 bg-white text-black w-full font-sans min-h-[100vh] flex flex-col"
             style={{ printColorAdjust: 'exact', WebkitPrintColorAdjust: 'exact' }}
           >
             <style>{`
@@ -627,6 +627,8 @@ export default function Events() {
               }
             `}</style>
 
+            {/* ── Content (flex-1 pushes footer down) ── */}
+            <div className="flex-1">
             {/* ── Header ── */}
             <div className="flex justify-between items-end mb-4 border-b-2 border-black pb-4">
               <div>
@@ -727,8 +729,8 @@ export default function Events() {
               })}
             </div>
 
-            {/* ── Footer ── */}
-            <div className="mt-6 pt-3 border-t border-gray-300 flex justify-between items-end text-[7px] text-gray-500">
+            {/* ── Footer (mt-auto pins to bottom via flexbox) ── */}
+            <div className="mt-auto pt-3 border-t border-gray-300 flex justify-between items-end text-[7px] text-gray-500">
               <div>
                 <p>Generated {format(new Date(), 'MMMM d, yyyy HH:mm')}</p>
                 <p className="text-gray-400">Smile Club Mahajanga Tracker System</p>
@@ -737,6 +739,7 @@ export default function Events() {
                 <p className="text-[9px] font-black">"For The Patients!"</p>
                 <p className="text-gray-500">Medical Outreach Organization</p>
               </div>
+            </div>
             </div>
           </div>
         </div>
