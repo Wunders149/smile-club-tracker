@@ -68,11 +68,17 @@ export default function Events() {
   const [view, setView] = useState<"grid" | "calendar">("grid");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [speakerSearchOpen, setSpeakerSearchOpen] = useState(false);
-  
+
+  // ── PTA year range (needed before useReactToPrint for documentTitle) ──
+  const _now = new Date();
+  const _currentMonth = _now.getMonth();
+  const ptaStartYear = _currentMonth >= 6 ? _now.getFullYear() : _now.getFullYear() - 1;
+  const ptaEndYear = ptaStartYear + 1;
+
   const printRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     contentRef: printRef,
-    documentTitle: `Annual_Events_${new Date().getFullYear()}`,
+    documentTitle: `PTA_Smile_Club_Mahajanga_${ptaStartYear}-${ptaEndYear}`,
     bodyClass: "is-printing",
     onBeforePrint: async () => {
       document.body.classList.add('is-printing');
@@ -131,24 +137,30 @@ export default function Events() {
 
   const eventDays = events?.map(ev => new Date(ev.date)) || [];
 
-  const eventsByMonth = events ? [...events].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).reduce((acc, ev) => {
-    const month = format(new Date(ev.date), 'MMMM');
-    if (!acc[month]) acc[month] = [];
-    acc[month].push(ev);
-    return acc;
-  }, {} as Record<string, Event[]>) : {};
-
   // ── PTA (Plan de Travail Annuel): July → June ──
   const months = [
     "July", "August", "September", "October", "November", "December",
     "January", "February", "March", "April", "May", "June"
   ];
 
-  // Determine current PTA year range
-  const now = new Date();
-  const currentMonth = now.getMonth(); // 0-indexed (0=Jan, 6=Jul)
-  const ptaStartYear = currentMonth >= 6 ? now.getFullYear() : now.getFullYear() - 1;
-  const ptaEndYear = ptaStartYear + 1;
+  // ── Filter events to current PTA year (July ptaStartYear → June ptaEndYear) ──
+  const ptaEvents = events?.filter(ev => {
+    const d = new Date(ev.date);
+    const m = d.getMonth(); // 0-indexed
+    const y = d.getFullYear();
+    // July(6)–Dec(11): must be ptaStartYear; Jan(0)–Jun(5): must be ptaEndYear
+    if (m >= 6) return y === ptaStartYear;
+    return y === ptaEndYear;
+  }) || [];
+
+  // ── Group PTA events by "Year-Month" key so multi-year months don't collide ──
+  const eventsByMonth = ptaEvents.reduce((acc, ev) => {
+    const d = new Date(ev.date);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; // e.g. "2025-07"
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(ev);
+    return acc;
+  }, {} as Record<string, Event[]>);
 
   return (
     <Layout>
@@ -651,7 +663,7 @@ export default function Events() {
             {/* ── Summary + Legend Bar ── */}
             <div className="flex items-center justify-between mb-4 px-1">
               <div className="flex items-center gap-4 text-[9px] font-semibold text-gray-700">
-                <span>Total Events: <strong className="text-black">{events?.length || 0}</strong></span>
+                <span>Total Events: <strong className="text-black">{ptaEvents.length}</strong></span>
                 <span>Active Months: <strong className="text-black">{Object.keys(eventsByMonth).length}</strong></span>
               </div>
 
@@ -669,15 +681,22 @@ export default function Events() {
             {/* ── 4-Column Monthly Grid ── */}
             <div className="planning-grid">
               {months.map((month) => {
-                const monthEvents = (eventsByMonth[month] || []).sort(
+                // Build the "YYYY-MM" key for this PTA month
+                const monthIdx = new Date(`${month} 1, 2000`).getMonth(); // 0-indexed
+                const year = monthIdx >= 6 ? ptaStartYear : ptaEndYear;
+                const key = `${year}-${String(monthIdx + 1).padStart(2, '0')}`;
+
+                const monthEvents = (eventsByMonth[key] || []).sort(
                   (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
                 );
 
                 return (
-                  <div key={month} className="month-block">
+                  <div key={key} className="month-block">
                     {/* Month Header */}
                     <div className="flex items-center justify-between mb-1 pb-1 border-b border-gray-300">
-                      <h3 className="text-[10px] font-black uppercase tracking-tight text-black">{month.slice(0, 3)}</h3>
+                      <h3 className="text-[10px] font-black uppercase tracking-tight text-black">
+                        {month.slice(0, 3)} <span className="text-gray-400 font-bold">{String(year).slice(2)}</span>
+                      </h3>
                       <span className="text-[7px] font-bold text-gray-500">{monthEvents.length}</span>
                     </div>
 
