@@ -577,7 +577,7 @@ export default function Events() {
         <div className="print-only hidden">
           <div
             ref={printRef}
-            className="p-6 sm:p-10 bg-white text-black w-full font-sans min-h-[100vh] flex flex-col"
+            className="p-6 sm:p-10 bg-white text-black w-full font-sans print-container"
             style={{ printColorAdjust: 'exact', WebkitPrintColorAdjust: 'exact' }}
           >
             <style>{`
@@ -591,6 +591,16 @@ export default function Events() {
                   -webkit-print-color-adjust: exact !important;
                 }
                 body { background: white !important; margin: 0; padding: 0; }
+                .print-container { position: relative; }
+                .print-content { padding-bottom: 40px; }
+                .print-footer {
+                  position: fixed;
+                  bottom: 0;
+                  left: 12mm;
+                  right: 12mm;
+                  padding-top: 10px;
+                  border-top: 1px solid #d1d5db;
+                }
               }
               .planning-grid {
                 display: grid;
@@ -646,8 +656,8 @@ export default function Events() {
               }
             `}</style>
 
-            {/* ── Content (flex-1 pushes footer down) ── */}
-            <div className="flex-1">
+            {/* ── Content ── */}
+            <div className="print-content">
             {/* ── Header ── */}
             <div className="flex justify-between items-end mb-4 border-b-2 border-black pb-4">
               <div>
@@ -755,8 +765,8 @@ export default function Events() {
               })}
             </div>
 
-            {/* ── Footer (mt-auto pins to bottom via flexbox) ── */}
-            <div className="mt-auto pt-3 border-t border-gray-300 flex justify-between items-end text-[7px] text-gray-500">
+            {/* ── Footer (fixed at bottom of each page in print) ── */}
+            <div className="print-footer flex justify-between items-end text-[7px] text-gray-500">
               <div>
                 <p>Generated {format(new Date(), 'MMMM d, yyyy HH:mm')}</p>
                 <p className="text-gray-400">Smile Club Mahajanga Tracker System</p>
