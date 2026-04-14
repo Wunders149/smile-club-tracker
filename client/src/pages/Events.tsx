@@ -660,9 +660,12 @@ export default function Events() {
             <div className="print-content">
             {/* ── Header ── */}
             <div className="flex justify-between items-end mb-4 border-b-2 border-black pb-4">
-              <div>
-                <h1 className="text-2xl font-black tracking-tight uppercase text-black leading-none">Plan de Travail Annuel</h1>
-                <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider mt-1">Smile Club Mahajanga • Medical Outreach Organization</p>
+              <div className="flex items-end gap-4">
+                <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="w-16 h-16 object-contain flex-shrink-0" />
+                <div>
+                  <h1 className="text-2xl font-black tracking-tight uppercase text-black leading-none">Plan de Travail Annuel</h1>
+                  <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider mt-1">Smile Club Mahajanga • Medical Outreach Organization</p>
+                </div>
               </div>
               <div className="text-right">
                 <div className="text-4xl font-black text-black leading-none">{ptaStartYear} – {ptaEndYear}</div>

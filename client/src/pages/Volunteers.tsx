@@ -734,10 +734,13 @@ export default function Volunteers() {
 
             {/* Print Header */}
             <div className="flex justify-between items-end mb-5 border-b-2 border-black pb-4">
-              <div>
-                <h1 className="text-xl font-black tracking-tight uppercase text-black leading-none">Volunteer Roster</h1>
-                <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider mt-1">Smile Club Mahajanga</p>
-                <p className="text-[8px] text-gray-500 mt-1">{getFilterDescription()}</p>
+              <div className="flex items-end gap-4">
+                <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="w-16 h-16 object-contain flex-shrink-0" />
+                <div>
+                  <h1 className="text-xl font-black tracking-tight uppercase text-black leading-none">Volunteer Roster</h1>
+                  <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider mt-1">Smile Club Mahajanga</p>
+                  <p className="text-[8px] text-gray-500 mt-1">{getFilterDescription()}</p>
+                </div>
               </div>
               <div className="text-right">
                 <div className="text-3xl font-black text-black leading-none">{filteredVolunteers.length}</div>
