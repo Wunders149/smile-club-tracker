@@ -709,10 +709,19 @@ export default function Volunteers() {
                   -webkit-print-color-adjust: exact !important;
                 }
                 body { background: white !important; margin: 0; padding: 0; }
+                .vol-print-header {
+                  position: fixed;
+                  top: 0;
+                  left: 15mm;
+                  right: 15mm;
+                  background: white;
+                  z-index: 999;
+                }
                 .vol-print-table {
                   width: 100%;
                   border-collapse: collapse;
                   font-size: 8px;
+                  margin-top: 100px;
                 }
                 .vol-print-table th {
                   background: #111827;
@@ -742,8 +751,8 @@ export default function Volunteers() {
               }
             `}</style>
 
-            {/* Print Header */}
-            <div className="flex justify-between items-end mb-5 border-b-2 border-black pb-4">
+            {/* Print Header (fixed, repeats on every printed page) */}
+            <div className="vol-print-header flex justify-between items-end mb-5 border-b-2 border-black pb-4">
               <div className="flex items-end gap-4">
                 <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="w-16 h-16 object-contain flex-shrink-0" />
                 <div>

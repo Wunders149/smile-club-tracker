@@ -167,15 +167,22 @@ export default function Organigram() {
                   -webkit-print-color-adjust: exact !important;
                 }
                 body { background: white !important; margin: 0; padding: 0; }
-                .print-organigram-container { break-inside: avoid; page-break-inside: avoid; width: 100%; }
-                .print-header { break-after: avoid; page-break-after: avoid; }
+                .org-print-header {
+                  position: fixed;
+                  top: 0;
+                  left: 15mm;
+                  right: 15mm;
+                  background: white;
+                  z-index: 999;
+                }
+                .print-organigram-container { padding-top: 90px; }
                 .org-node { break-inside: avoid; page-break-inside: avoid; }
                 .committee-box { break-inside: avoid; page-break-inside: avoid; }
               }
             `}</style>
 
             <div className="print-organigram-container px-6 py-4">
-              <div className="print-header flex justify-between items-end mb-6 border-b-2 border-black pb-4">
+              <div className="org-print-header flex justify-between items-end mb-6 border-b-2 border-black pb-4">
                 <div className="flex items-end gap-4">
                   <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="w-16 h-16 object-contain flex-shrink-0" />
                   <div>

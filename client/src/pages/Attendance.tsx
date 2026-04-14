@@ -261,6 +261,17 @@ export default function Attendance() {
                   margin: 0;
                   padding: 0;
                 }
+                .attendance-print-header {
+                  position: fixed;
+                  top: 0;
+                  left: 20mm;
+                  right: 20mm;
+                  background: white;
+                  z-index: 999;
+                }
+                .attendance-print-content {
+                  padding-top: 130px;
+                }
                 .roster-page {
                   page-break-after: always;
                   break-after: page;
@@ -295,8 +306,9 @@ export default function Attendance() {
               }
             `}</style>
 
-            {/* Header */}
-            <div className="flex justify-between items-end mb-6 border-b-2 border-black pb-4">
+            <div className="attendance-print-content">
+            {/* Header (fixed, repeats on every printed page) */}
+            <div className="attendance-print-header flex justify-between items-end mb-4 border-b-2 border-black pb-3">
               <div className="flex items-end gap-4">
                 <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="w-16 h-16 object-contain flex-shrink-0" />
                 <div>
@@ -397,6 +409,7 @@ export default function Attendance() {
                 })}
               </>
             )}
+            </div>
           </div>
         </div>
       </div>

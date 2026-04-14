@@ -591,8 +591,15 @@ export default function Events() {
                   -webkit-print-color-adjust: exact !important;
                 }
                 body { background: white !important; margin: 0; padding: 0; }
-                .print-container { position: relative; }
-                .print-content { padding-bottom: 40px; }
+                .pta-print-header {
+                  position: fixed;
+                  top: 0;
+                  left: 12mm;
+                  right: 12mm;
+                  background: white;
+                  z-index: 999;
+                }
+                .print-content { padding-top: 100px; }
                 .print-footer {
                   position: fixed;
                   bottom: 0;
@@ -658,8 +665,8 @@ export default function Events() {
 
             {/* ── Content ── */}
             <div className="print-content">
-            {/* ── Header ── */}
-            <div className="flex justify-between items-end mb-4 border-b-2 border-black pb-4">
+            {/* ── Header (fixed, repeats on every printed page) ── */}
+            <div className="pta-print-header flex justify-between items-end mb-4 border-b-2 border-black pb-4">
               <div className="flex items-end gap-4">
                 <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="w-16 h-16 object-contain flex-shrink-0" />
                 <div>
