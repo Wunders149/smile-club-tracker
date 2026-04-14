@@ -138,10 +138,17 @@ export default function Events() {
     return acc;
   }, {} as Record<string, Event[]>) : {};
 
+  // ── PTA (Plan de Travail Annuel): July → June ──
   const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "July", "August", "September", "October", "November", "December",
+    "January", "February", "March", "April", "May", "June"
   ];
+
+  // Determine current PTA year range
+  const now = new Date();
+  const currentMonth = now.getMonth(); // 0-indexed (0=Jan, 6=Jul)
+  const ptaStartYear = currentMonth >= 6 ? now.getFullYear() : now.getFullYear() - 1;
+  const ptaEndYear = ptaStartYear + 1;
 
   return (
     <Layout>
@@ -632,12 +639,12 @@ export default function Events() {
             {/* ── Header ── */}
             <div className="flex justify-between items-end mb-4 border-b-2 border-black pb-4">
               <div>
-                <h1 className="text-2xl font-black tracking-tight uppercase text-black leading-none">Annual Activity Planner</h1>
+                <h1 className="text-2xl font-black tracking-tight uppercase text-black leading-none">Plan de Travail Annuel</h1>
                 <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider mt-1">Smile Club Mahajanga • Medical Outreach Organization</p>
               </div>
               <div className="text-right">
-                <div className="text-5xl font-black text-black leading-none">{new Date().getFullYear()}</div>
-                <div className="text-[7px] font-bold uppercase tracking-widest text-gray-500 mt-1">Official Document</div>
+                <div className="text-4xl font-black text-black leading-none">{ptaStartYear} – {ptaEndYear}</div>
+                <div className="text-[7px] font-bold uppercase tracking-widest text-gray-500 mt-1">July → June • Official Document</div>
               </div>
             </div>
 
