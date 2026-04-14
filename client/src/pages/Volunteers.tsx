@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Plus, MoreVertical, Edit2, Trash2, Mail, Phone, GraduationCap, Users, Upload, Loader2, Search, MapPin } from "lucide-react";
+import { Plus, MoreVertical, Edit2, Trash2, Mail, Phone, GraduationCap, Users, Upload, Loader2, Search, MapPin, Filter, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,6 +34,51 @@ export default function Volunteers() {
   const [isUploading, setIsUploading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // ── Filter states ──
+  const [positionFilter, setPositionFilter] = useState<string>("all");
+  const [genderFilter, setGenderFilter] = useState<string>("all");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all"); // medical | non-medical | student | abm
+
+  const medicalKeywords = [
+    'medec', 'medic', 'chir', 'dent', 'pharma', 'infir', 'sage-f',
+    'health', 'santé', 'sante', 'soins', 'kiné', 'kine', 'obstet',
+    'biomed', 'paramed'
+  ];
+
+  const isMedicalVolunteer = (vol: Volunteer) => {
+    if (vol.position === 'Medical Volunteer') return true;
+    const field = (vol.studyField || '').toLowerCase();
+    return medicalKeywords.some(k => field.includes(k));
+  };
+
+  const filteredVolunteers = volunteers?.filter(vol => {
+    // Text search
+    const matchesSearch = searchQuery === "" ||
+      vol.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      vol.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      vol.position.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (vol.department && vol.department.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    if (!matchesSearch) return false;
+
+    // Position filter
+    if (positionFilter !== "all" && vol.position !== positionFilter) return false;
+
+    // Gender filter
+    if (genderFilter !== "all" && vol.gender !== genderFilter) return false;
+
+    // Category filter
+    if (categoryFilter === "medical" && !isMedicalVolunteer(vol)) return false;
+    if (categoryFilter === "non-medical" && isMedicalVolunteer(vol)) return false;
+    if (categoryFilter === "student" && vol.position !== "Student Volunteer") return false;
+    if (categoryFilter === "abm" && vol.position !== "Assisting Board Member") return false;
+
+    return true;
+  }) || [];
+
+  // Count active filters
+  const activeFilterCount = [positionFilter, genderFilter, categoryFilter].filter(f => f !== "all").length;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(insertVolunteerSchema),
@@ -103,13 +148,6 @@ export default function Volunteers() {
     }
   };
 
-  const filteredVolunteers = volunteers?.filter(vol => 
-    vol.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    vol.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    vol.position.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (vol.department && vol.department.toLowerCase().includes(searchQuery.toLowerCase()))
-  ) || [];
-
   return (
     <Layout>
       <div className="space-y-6">
@@ -118,16 +156,71 @@ export default function Volunteers() {
             <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground">Volunteers</h1>
             <p className="text-muted-foreground mt-1 text-sm">Manage the amazing team behind Smile Club.</p>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row items-center gap-3">
             <div className="relative w-full sm:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input 
-                placeholder="Search volunteers..." 
+              <Input
+                placeholder="Search volunteers..."
                 className="pl-9 rounded-xl border-border/50 bg-card focus:ring-primary/20 w-full"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
+            </div>
+
+            {/* ── Filter Dropdowns ── */}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-1 text-muted-foreground">
+                <Filter className="w-3.5 h-3.5" />
+              </div>
+
+              {/* Category Filter */}
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger className="h-9 w-auto min-w-[140px] rounded-lg text-xs border-border/50">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  <SelectItem value="medical">🏥 Medical Fields</SelectItem>
+                  <SelectItem value="non-medical">💼 Non-Medical Fields</SelectItem>
+                  <SelectItem value="student">🎓 Student Volunteers</SelectItem>
+                  <SelectItem value="abm">⭐ Assisting Board Members</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Position Filter */}
+              <Select value={positionFilter} onValueChange={setPositionFilter}>
+                <SelectTrigger className="h-9 w-auto min-w-[140px] rounded-lg text-xs border-border/50">
+                  <SelectValue placeholder="Position" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[300px]">
+                  <SelectItem value="all">All Positions</SelectItem>
+                  {POSITIONS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                </SelectContent>
+              </Select>
+
+              {/* Gender Filter */}
+              <Select value={genderFilter} onValueChange={setGenderFilter}>
+                <SelectTrigger className="h-9 w-auto min-w-[110px] rounded-lg text-xs border-border/50">
+                  <SelectValue placeholder="Gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Genders</SelectItem>
+                  {GENDERS.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+                </SelectContent>
+              </Select>
+
+              {/* Clear All */}
+              {activeFilterCount > 0 && (
+                <button
+                  onClick={() => { setPositionFilter("all"); setGenderFilter("all"); setCategoryFilter("all"); }}
+                  className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-medium text-destructive bg-destructive/10 hover:bg-destructive/20 transition-colors"
+                >
+                  <X className="w-3 h-3" />
+                  <span className="hidden sm:inline">Clear ({activeFilterCount})</span>
+                  <span className="sm:hidden">{activeFilterCount}</span>
+                </button>
+              )}
             </div>
 
             <Dialog open={isAddOpen} onOpenChange={(open) => {
