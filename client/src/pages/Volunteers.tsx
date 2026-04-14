@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Plus, MoreVertical, Edit2, Trash2, Mail, Phone, GraduationCap, Users, Upload, Loader2, Search, MapPin, Filter, X } from "lucide-react";
+import { Plus, MoreVertical, Edit2, Trash2, Mail, Phone, GraduationCap, Users, Upload, Loader2, Search, MapPin, Filter, X, Printer } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,8 +16,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import imageCompression from 'browser-image-compression';
+import { format } from "date-fns";
 import { uploadVolunteerPhoto, deleteVolunteerPhoto } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
+import { useReactToPrint } from "react-to-print";
 
 type FormValues = z.infer<typeof insertVolunteerSchema>;
 
@@ -79,6 +81,26 @@ export default function Volunteers() {
 
   // Count active filters
   const activeFilterCount = [positionFilter, genderFilter, categoryFilter].filter(f => f !== "all").length;
+
+  // ── Print setup ──
+  const printRef = useRef<HTMLDivElement>(null);
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: `Volunteers_List_${new Date().toISOString().slice(0, 10)}`,
+  });
+
+  // Build filter description for print header
+  const getFilterDescription = () => {
+    const parts: string[] = [];
+    if (categoryFilter !== "all") {
+      const labels: Record<string, string> = { medical: "Medical Fields", "non-medical": "Non-Medical Fields", student: "Student Volunteers", abm: "Assisting Board Members" };
+      parts.push(labels[categoryFilter] || categoryFilter);
+    }
+    if (positionFilter !== "all") parts.push(positionFilter);
+    if (genderFilter !== "all") parts.push(`${genderFilter} only`);
+    if (searchQuery) parts.push(`Search: "${searchQuery}"`);
+    return parts.length > 0 ? parts.join(" • ") : "All Volunteers";
+  };
 
   const form = useForm<FormValues>({
     resolver: zodResolver(insertVolunteerSchema),
@@ -221,6 +243,17 @@ export default function Volunteers() {
                   <span className="sm:hidden">{activeFilterCount}</span>
                 </button>
               )}
+
+              {/* Print Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePrint()}
+                disabled={!filteredVolunteers.length}
+                className="h-9 rounded-lg text-xs border-primary/20 text-primary hover:bg-primary/5"
+              >
+                <Printer className="w-3.5 h-3.5 mr-1.5" /> Print ({filteredVolunteers.length})
+              </Button>
             </div>
 
             <Dialog open={isAddOpen} onOpenChange={(open) => {
@@ -647,6 +680,116 @@ export default function Volunteers() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* ── Printable Volunteer List ── */}
+        <div className="print-only hidden">
+          <div
+            ref={printRef}
+            className="p-6 sm:p-10 bg-white text-black w-full font-sans"
+            style={{ printColorAdjust: 'exact', WebkitPrintColorAdjust: 'exact' }}
+          >
+            <style>{`
+              @page {
+                size: landscape A4;
+                margin: 15mm;
+              }
+              @media print {
+                * {
+                  print-color-adjust: exact !important;
+                  -webkit-print-color-adjust: exact !important;
+                }
+                body { background: white !important; margin: 0; padding: 0; }
+                .vol-print-table {
+                  width: 100%;
+                  border-collapse: collapse;
+                  font-size: 8px;
+                }
+                .vol-print-table th {
+                  background: #111827;
+                  color: white;
+                  font-weight: 800;
+                  text-transform: uppercase;
+                  letter-spacing: 0.05em;
+                  padding: 5px 6px;
+                  text-align: left;
+                  font-size: 7.5px;
+                }
+                .vol-print-table td {
+                  padding: 4px 6px;
+                  border-bottom: 1px solid #e5e7eb;
+                  vertical-align: top;
+                }
+                .vol-print-table tbody tr:nth-child(odd) {
+                  background: #f9fafb;
+                }
+                .vol-print-table tr {
+                  page-break-inside: avoid;
+                  break-inside: avoid;
+                }
+                thead {
+                  display: table-header-group;
+                }
+              }
+            `}</style>
+
+            {/* Print Header */}
+            <div className="flex justify-between items-end mb-5 border-b-2 border-black pb-4">
+              <div>
+                <h1 className="text-xl font-black tracking-tight uppercase text-black leading-none">Volunteer Roster</h1>
+                <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider mt-1">Smile Club Mahajanga</p>
+                <p className="text-[8px] text-gray-500 mt-1">{getFilterDescription()}</p>
+              </div>
+              <div className="text-right">
+                <div className="text-3xl font-black text-black leading-none">{filteredVolunteers.length}</div>
+                <div className="text-[7px] font-bold uppercase tracking-widest text-gray-500 mt-0.5">Volunteers Listed</div>
+              </div>
+            </div>
+
+            {/* Print Table */}
+            <table className="vol-print-table">
+              <thead>
+                <tr>
+                  <th style={{ width: '30px' }}>#</th>
+                  <th style={{ width: '150px' }}>Full Name</th>
+                  <th style={{ width: '80px' }}>Position</th>
+                  <th style={{ width: '80px' }}>Department</th>
+                  <th style={{ width: '100px' }}>Gender</th>
+                  <th style={{ width: '110px' }}>Study Field</th>
+                  <th style={{ width: '110px' }}>Contact</th>
+                  <th style={{ width: '130px' }}>Email</th>
+                  <th style={{ width: '100px' }}>Address</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredVolunteers.map((vol, idx) => (
+                  <tr key={vol.id}>
+                    <td className="font-bold text-gray-500 tabular-nums">{idx + 1}</td>
+                    <td className="font-bold text-black">{vol.fullName}</td>
+                    <td>{vol.position}</td>
+                    <td>{vol.department || "—"}</td>
+                    <td>{vol.gender || "—"}</td>
+                    <td>{vol.studyField || "—"} {vol.major && `(${vol.major})`}</td>
+                    <td>{vol.contact}</td>
+                    <td className="truncate">{vol.email}</td>
+                    <td>{vol.address}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* Print Footer */}
+            <div className="mt-6 pt-3 border-t border-gray-300 flex justify-between items-end text-[7px] text-gray-500">
+              <div>
+                <p>Generated {format(new Date(), 'MMMM d, yyyy HH:mm')}</p>
+                <p className="text-gray-400">Smile Club Mahajanga Tracker System</p>
+              </div>
+              <div className="text-right font-bold text-black">
+                <p className="text-[9px] font-black">"For The Patients!"</p>
+                <p className="text-gray-500">Medical Outreach Organization</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </Layout>
   );
