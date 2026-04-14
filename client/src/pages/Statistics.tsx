@@ -125,14 +125,9 @@ export default function Statistics() {
         {/* Commitment Trend */}
         <Card className="rounded-2xl border-border/50 shadow-lg overflow-hidden">
           <CardHeader className="bg-muted/30 px-4 md:px-6">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-base md:text-xl">
-                <TrendingUp className="w-5 h-5 text-primary" /> Club Commitment
-              </CardTitle>
-              <span className="text-xs text-muted-foreground font-medium">
-                {format(new Date(new Date().getFullYear(), 0, 1), 'MMM yyyy')} – {format(new Date(new Date().getFullYear() + 1, 0, 1), 'MMM yyyy')}
-              </span>
-            </div>
+            <CardTitle className="flex items-center gap-2 text-base md:text-xl">
+              <TrendingUp className="w-5 h-5 text-primary" /> Club Commitment
+            </CardTitle>
           </CardHeader>
           <CardContent className="pt-6 px-2 sm:px-6">
             <div className="h-[250px] sm:h-[300px] w-full">

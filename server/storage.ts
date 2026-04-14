@@ -277,13 +277,7 @@ export class DatabaseStorage implements IStorage {
       commitmentMap.set(dateStr, (commitmentMap.get(dateStr) || 0) + points);
     }
 
-    // ── Filter commitment trend: Jan(current year) → Jan(next year) ──
-    const currentYear = new Date().getFullYear();
-    const trendStart = `${currentYear}-01-01`;
-    const trendEnd = `${currentYear + 1}-01-31`;
-
     const commitmentTrend = Array.from(commitmentMap.entries())
-      .filter(([date]) => date >= trendStart && date <= trendEnd)
       .map(([date, points]) => ({ date, points }))
       .sort((a, b) => a.date.localeCompare(b.date));
 
