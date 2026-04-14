@@ -45,7 +45,7 @@ export default function Volunteers() {
   const medicalKeywords = [
     'medec', 'medic', 'chir', 'dent', 'pharma', 'infir', 'sage-f',
     'health', 'santé', 'sante', 'soins', 'kiné', 'kine', 'obstet',
-    'biomed', 'paramed'
+    'biomed', 'paramed', 'nurs'
   ];
 
   const isMedicalVolunteer = (vol: Volunteer) => {
