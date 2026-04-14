@@ -3,7 +3,7 @@ import { Layout } from "@/components/Layout";
 import { useVolunteers, useUpdateVolunteer } from "@/hooks/use-volunteers";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Printer, User, Network, Check, Search, Download } from "lucide-react";
+import { Printer, User, Network, Check, Search } from "lucide-react";
 import { useReactToPrint } from "react-to-print";
 import { type Volunteer, DEPARTMENTS } from "@shared/schema";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -12,16 +12,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
-/**
- * Organizational Chart (Organigram) Page
- * 
- * Features:
- * - Interactive organizational structure visualization
- * - Department-based committee management
- * - Print-optimized landscape layout
- * - Real-time hierarchy updates
- * - Professional print formatting
- */
 export default function Organigram() {
   const { data: volunteers, isLoading } = useVolunteers();
   const updateMut = useUpdateVolunteer();
@@ -31,30 +21,10 @@ export default function Organigram() {
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
-    documentTitle: `Smile_Club_Organigram_${new Date().toISOString().split('T')[0]}`,
-    pageStyle: `
-      @page {
-        size: landscape;
-        margin: 15mm;
-      }
-    `,
-    onBeforePrint: () => {
-      document.body.classList.add('is-printing');
-    },
-    onAfterPrint: () => {
-      document.body.classList.remove('is-printing');
-    }
+    documentTitle: "Smile_Club_Mahajanga_Organigram",
   });
 
-  if (isLoading) {
-    return (
-      <Layout>
-        <div className="text-center py-12 text-muted-foreground">
-          <div className="animate-pulse">Loading organizational data...</div>
-        </div>
-      </Layout>
-    );
-  }
+  if (isLoading) return <Layout><div className="text-center py-12 text-muted-foreground">Loading organizational data...</div></Layout>;
 
   // Organizational structure logic
   const president = volunteers?.find(v => v.position === "President");
@@ -98,27 +68,22 @@ export default function Organigram() {
   return (
     <Layout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between no-print">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print">
           <div>
             <h1 className="text-3xl font-display font-bold text-foreground">Organizational Chart</h1>
             <p className="text-muted-foreground mt-1">Structure and leadership of Smile Club Mahajanga.</p>
           </div>
-          <Button 
-            onClick={() => handlePrint()} 
-            className="rounded-xl shadow-lg shadow-primary/20 w-full sm:w-auto"
-          >
+          <Button onClick={() => handlePrint()} className="rounded-xl shadow-lg shadow-primary/20">
             <Printer className="w-4 h-4 mr-2" /> Print Organigram
           </Button>
         </div>
 
-        {/* Interactive Display */}
-        <Card className="p-6 sm:p-12 overflow-x-auto bg-card border-border/50 shadow-xl rounded-3xl min-w-full no-print">
+        <Card className="p-12 overflow-x-auto bg-card border-border/50 shadow-xl rounded-3xl min-w-[1000px] no-print">
           <OrgChart 
             volunteers={volunteers}
             president={president} 
             vicePresident={vicePresident} 
-                pastPresident={pastPresident}
+            pastPresident={pastPresident}
             advisor={advisor}
             executiveHeads={executiveHeads}
             getCommitteeMembers={getCommitteeMembers}
