@@ -3,7 +3,7 @@ import { Layout } from "@/components/Layout";
 import { useVolunteers, useUpdateVolunteer } from "@/hooks/use-volunteers";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Printer, User, Network, Check, Search } from "lucide-react";
+import { Printer, User, Network, Check, Search, Download } from "lucide-react";
 import { useReactToPrint } from "react-to-print";
 import { type Volunteer, DEPARTMENTS } from "@shared/schema";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -12,6 +12,16 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
+/**
+ * Organizational Chart (Organigram) Page
+ * 
+ * Features:
+ * - Interactive organizational structure visualization
+ * - Department-based committee management
+ * - Print-optimized landscape layout
+ * - Real-time hierarchy updates
+ * - Professional print formatting
+ */
 export default function Organigram() {
   const { data: volunteers, isLoading } = useVolunteers();
   const updateMut = useUpdateVolunteer();
@@ -21,10 +31,30 @@ export default function Organigram() {
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
-    documentTitle: "Smile_Club_Mahajanga_Organigram",
+    documentTitle: `Smile_Club_Organigram_${new Date().toISOString().split('T')[0]}`,
+    pageStyle: `
+      @page {
+        size: landscape;
+        margin: 15mm;
+      }
+    `,
+    onBeforePrint: () => {
+      document.body.classList.add('is-printing');
+    },
+    onAfterPrint: () => {
+      document.body.classList.remove('is-printing');
+    }
   });
 
-  if (isLoading) return <Layout><div className="text-center py-12 text-muted-foreground">Loading organizational data...</div></Layout>;
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="text-center py-12 text-muted-foreground">
+          <div className="animate-pulse">Loading organizational data...</div>
+        </div>
+      </Layout>
+    );
+  }
 
   // Organizational structure logic
   const president = volunteers?.find(v => v.position === "President");
@@ -68,22 +98,27 @@ export default function Organigram() {
   return (
     <Layout>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print">
+        {/* Header */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between no-print">
           <div>
             <h1 className="text-3xl font-display font-bold text-foreground">Organizational Chart</h1>
             <p className="text-muted-foreground mt-1">Structure and leadership of Smile Club Mahajanga.</p>
           </div>
-          <Button onClick={() => handlePrint()} className="rounded-xl shadow-lg shadow-primary/20">
+          <Button 
+            onClick={() => handlePrint()} 
+            className="rounded-xl shadow-lg shadow-primary/20 w-full sm:w-auto"
+          >
             <Printer className="w-4 h-4 mr-2" /> Print Organigram
           </Button>
         </div>
 
-        <Card className="p-12 overflow-x-auto bg-card border-border/50 shadow-xl rounded-3xl min-w-[1000px] no-print">
+        {/* Interactive Display */}
+        <Card className="p-6 sm:p-12 overflow-x-auto bg-card border-border/50 shadow-xl rounded-3xl min-w-full no-print">
           <OrgChart 
             volunteers={volunteers}
             president={president} 
             vicePresident={vicePresident} 
-            pastPresident={pastPresident}
+                pastPresident={pastPresident}
             advisor={advisor}
             executiveHeads={executiveHeads}
             getCommitteeMembers={getCommitteeMembers}
@@ -91,7 +126,7 @@ export default function Organigram() {
           />
         </Card>
 
-        {/* Selection Dialog */}
+        {/* Committee Management Dialog */}
         <Dialog open={!!selectedDept} onOpenChange={(open) => !open && setSelectedDept(null)}>
           <DialogContent className="sm:max-w-[500px] rounded-3xl">
             <DialogHeader>
@@ -123,15 +158,19 @@ export default function Organigram() {
                     )}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center overflow-hidden">
-                        {vol.photo ? <img src={vol.photo} className="w-full h-full object-cover" /> : <User className="w-4 h-4" />}
+                      <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center overflow-hidden flex-shrink-0">
+                        {vol.photo ? (
+                          <img src={vol.photo} alt={vol.fullName} className="w-full h-full object-cover" />
+                        ) : (
+                          <User className="w-4 h-4 text-muted-foreground" />
+                        )}
                       </div>
-                      <div className="text-left">
-                        <p className="text-sm font-bold">{vol.fullName}</p>
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{vol.position}</p>
+                      <div className="text-left min-w-0">
+                        <p className="text-sm font-bold truncate">{vol.fullName}</p>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider truncate">{vol.position}</p>
                       </div>
                     </div>
-                    {vol.department === selectedDept && <Check className="w-4 h-4 text-primary" />}
+                    {vol.department === selectedDept && <Check className="w-5 h-5 text-primary flex-shrink-0" />}
                   </button>
                 ))}
               </div>
@@ -139,19 +178,35 @@ export default function Organigram() {
           </DialogContent>
         </Dialog>
 
-        {/* Printable version */}
-        <div className="print-only">
-          <div ref={printRef} className="p-0 bg-white text-black w-full font-sans">
+        {/* Printable Version - Landscape A4 */}
+        <div className="print-only hidden">
+          <div 
+            ref={printRef} 
+            className="p-0 bg-white text-black w-full font-sans"
+            style={{
+              printColorAdjust: 'exact',
+              WebkitPrintColorAdjust: 'exact'
+            }}
+          >
             <style>{`
               @page {
-                size: landscape;
+                size: landscape A4;
                 margin: 15mm;
               }
               @media print {
+                * {
+                  print-color-adjust: exact !important;
+                  -webkit-print-color-adjust: exact !important;
+                }
                 body {
-                  print-color-adjust: exact;
-                  -webkit-print-color-adjust: exact;
                   background: white !important;
+                  margin: 0;
+                  padding: 0;
+                }
+                .print-organigram-container {
+                  break-inside: avoid;
+                  page-break-inside: avoid;
+                  width: 100%;
                 }
                 .print-header {
                   break-after: avoid;
@@ -159,45 +214,55 @@ export default function Organigram() {
                 }
                 .org-node {
                   break-inside: avoid;
+                  page-break-inside: avoid;
+                }
+                .committee-box {
+                  break-inside: avoid;
+                  page-break-inside: avoid;
                 }
               }
             `}</style>
             
-            <div className="print-header flex justify-between items-center mb-8 border-b-2 border-gray-900 pb-6">
-              <div className="flex items-center gap-4">
-                <img src="/smile-club-logo.png" alt="Logo" className="h-12 object-contain" />
-                <div>
-                  <h1 className="text-xl font-bold tracking-tighter uppercase text-gray-900">Organizational Structure</h1>
-                  <p className="text-[10px] text-gray-500 font-medium uppercase tracking-widest">Smile Club Mahajanga</p>
+            <div className="print-organigram-container px-6 py-4">
+              {/* Print Header */}
+              <div className="print-header flex justify-between items-start mb-6 border-b-2 border-black pb-4">
+                <div className="flex items-start gap-3">
+                  <div>
+                    <h1 className="text-lg font-black tracking-tighter uppercase text-black leading-none">Organizational Structure</h1>
+                    <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider mt-1">Smile Club Mahajanga • Medical Outreach Organization</p>
+                  </div>
+                </div>
+                
+                <div className="text-right">
+                  <div className="text-3xl font-black text-black leading-none">{new Date().getFullYear()}</div>
+                  <div className="text-[7px] font-bold uppercase tracking-widest text-gray-600 mt-0.5">Official</div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-4xl font-black text-gray-900 leading-none">{new Date().getFullYear()}</div>
-                <div className="text-[7px] font-bold uppercase tracking-[0.2em] text-primary mt-1">Official Club Document</div>
-              </div>
-            </div>
 
-            <div className="py-4">
-              <OrgChart 
-                volunteers={volunteers}
-                president={president} 
-                vicePresident={vicePresident} 
-                pastPresident={pastPresident}
-                advisor={advisor}
-                executiveHeads={executiveHeads}
-                getCommitteeMembers={getCommitteeMembers}
-                isPrint
-              />
-            </div>
-
-            <div className="mt-8 pt-6 border-t border-gray-100 flex justify-between items-end text-[7px] font-bold uppercase tracking-[0.1em] text-gray-400">
-              <div>
-                <p>Generated {format(new Date(), 'yyyy.MM.dd HH:mm')}</p>
-                <p className="mt-0.5 text-gray-300">Smile Club Tracker Internal System</p>
+              {/* Main Org Chart */}
+              <div className="print-org-content">
+                <OrgChart 
+                  volunteers={volunteers}
+                  president={president} 
+                  vicePresident={vicePresident} 
+                  pastPresident={pastPresident}
+                  advisor={advisor}
+                  executiveHeads={executiveHeads}
+                  getCommitteeMembers={getCommitteeMembers}
+                  isPrint={true}
+                />
               </div>
-              <div className="text-right">
-                <p className="text-gray-900">For The Patients!</p>
-                <p className="text-[5px] text-gray-300 tracking-[0.2em]">Confidential activity log</p>
+
+              {/* Print Footer */}
+              <div className="mt-6 pt-4 border-t border-gray-200 flex justify-between items-end text-[7px] font-semibold uppercase tracking-wider text-gray-500">
+                <div>
+                  <p>Generated {format(new Date(), 'MMMM d, yyyy')}</p>
+                  <p className="text-[6px] text-gray-400">Internal Management System</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-black">For The Patients!</p>
+                  <p className="text-[6px] text-gray-400">Smile Club Mahajanga</p>
+                </div>
               </div>
             </div>
           </div>
@@ -207,85 +272,182 @@ export default function Organigram() {
   );
 }
 
-function OrgChart({ volunteers, president, vicePresident, pastPresident, advisor, executiveHeads, getCommitteeMembers, onCommitteeClick, isPrint }: any) {
+/**
+ * Core Organizational Chart Component
+ * Renders hierarchy from President down through departments and committees
+ */
+function OrgChart({ 
+  volunteers, 
+  president, 
+  vicePresident, 
+  pastPresident, 
+  advisor, 
+  executiveHeads, 
+  getCommitteeMembers, 
+  onCommitteeClick, 
+  isPrint = false 
+}: any) {
   return (
-    <div className="flex flex-col items-center gap-12 w-full">
-      {/* Top Level: President & Vice President */}
-      <div className="relative flex items-start gap-32">
-        {/* Sides */}
-        <div className="absolute -left-48 top-4 flex flex-col gap-4">
-          <div className="p-3 rounded-xl border-2 border-dashed border-muted-foreground/20 text-center w-40 bg-muted/5">
-            <div className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Past President</div>
-            <div className="text-xs font-bold">{pastPresident?.fullName || "N/A"}</div>
+    <div className={cn(
+      "flex flex-col items-center gap-8 sm:gap-12 w-full",
+      isPrint && "gap-6 py-2"
+    )}>
+      {/* Top Level: President & Vice President with Advisors */}
+      <div className={cn(
+        "relative flex items-start gap-16 sm:gap-32 w-full justify-center",
+        isPrint && "gap-12"
+      )}>
+        {/* Past President - Left Side */}
+        <div className={cn(
+          "absolute -left-32 sm:-left-48 top-4 flex flex-col gap-4",
+          isPrint && "absolute -left-40 top-2"
+        )}>
+          <div className="p-2 sm:p-3 rounded-lg border-2 border-dashed border-gray-300 text-center w-32 sm:w-40 bg-gray-50">
+            <div className="text-[7px] sm:text-[8px] font-bold uppercase tracking-widest text-gray-600 mb-0.5">Past President</div>
+            <div className="text-xs sm:text-sm font-bold text-gray-900">{pastPresident?.fullName || "—"}</div>
           </div>
-          <div className="absolute left-40 top-1/2 w-8 h-[1.5px] bg-muted-foreground/20 border-t border-dashed" />
         </div>
 
-        <div className="absolute -right-48 top-4 flex flex-col gap-4">
-          <div className="p-3 rounded-xl border-2 border-dashed border-muted-foreground/20 text-center w-40 bg-muted/5">
-            <div className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Advisor</div>
-            <div className="text-xs font-bold">{advisor?.fullName || "N/A"}</div>
+        {/* Advisor - Right Side */}
+        <div className={cn(
+          "absolute -right-32 sm:-right-48 top-4 flex flex-col gap-4",
+          isPrint && "absolute -right-40 top-2"
+        )}>
+          <div className="p-2 sm:p-3 rounded-lg border-2 border-dashed border-gray-300 text-center w-32 sm:w-40 bg-gray-50">
+            <div className="text-[7px] sm:text-[8px] font-bold uppercase tracking-widest text-gray-600 mb-0.5">Advisor</div>
+            <div className="text-xs sm:text-sm font-bold text-gray-900">{advisor?.fullName || "—"}</div>
           </div>
-          <div className="absolute right-40 top-1/2 w-8 h-[1.5px] bg-muted-foreground/20 border-t border-dashed" />
         </div>
 
-        {/* Main Top */}
-        <div className="flex gap-8">
+        {/* Main Top Tier */}
+        <div className={cn(
+          "flex gap-6 sm:gap-8",
+          isPrint && "gap-8"
+        )}>
           <OrgNode person={president} title="President" primary />
           <OrgNode person={vicePresident} title="Vice President" primary />
         </div>
       </div>
 
-      {/* Connecting Vertical Line from Top */}
-      <div className="w-0.5 h-12 bg-primary/20 -mt-12" />
+      {/* Connecting Vertical Line */}
+      <div className={cn(
+        "w-0.5 h-12 bg-primary/30 -mt-12",
+        isPrint && "h-8 w-1 bg-gray-400 -mt-8"
+      )} />
 
-      {/* Executive Level */}
+      {/* Executive Level - Department Heads & Committees */}
       <div className="w-full relative">
-        <div className="absolute top-0 left-[10%] right-[10%] h-0.5 bg-primary/20" />
-        <div className="flex justify-between w-full px-[5%]">
+        {/* Top horizontal line connecting all departments */}
+        <div className={cn(
+          "absolute top-0 left-[5%] right-[5%] h-0.5 bg-primary/20",
+          isPrint && "bg-gray-400 left-[3%] right-[3%]"
+        )} />
+        
+        <div className="flex justify-between w-full px-[5%] gap-2 sm:gap-3">
           {executiveHeads.map((head: any, idx: number) => {
             const officer = volunteers?.find((v: any) => v.position === head.pos);
             const committee = getCommitteeMembers(head.dept);
             
             return (
-              <div key={idx} className="flex flex-col items-center gap-6 flex-1">
-                <div className="w-0.5 h-8 bg-primary/20" />
-                <div className="p-4 rounded-2xl border-2 border-primary/20 bg-card text-center shadow-md w-[180px] hover:scale-105 transition-transform duration-300">
-                  <div className="text-[9px] font-bold uppercase tracking-widest text-primary mb-1">{head.title}</div>
-                  <div className="text-sm font-bold truncate">
-                    {officer?.fullName || <span className="text-muted-foreground/30 font-normal italic">Vacant</span>}
+              <div 
+                key={idx} 
+                className={cn(
+                  "flex flex-col items-center gap-4 sm:gap-6 flex-1 org-node",
+                  isPrint && "gap-3"
+                )}
+              >
+                {/* Vertical line from top */}
+                <div className={cn(
+                  "w-0.5 h-8 bg-primary/20",
+                  isPrint && "h-6 w-1 bg-gray-400"
+                )} />
+                
+                {/* Department Head Box */}
+                <div className={cn(
+                  "p-3 sm:p-4 rounded-xl sm:rounded-2xl border-2 border-primary/20 bg-card text-center shadow-md w-32 sm:w-40 lg:w-48 hover:scale-105 transition-transform duration-300",
+                  isPrint && "p-2 rounded-lg border border-black bg-white w-44 shadow-none hover:scale-100"
+                )}>
+                  <div className={cn(
+                    "text-[8px] sm:text-[9px] font-bold uppercase tracking-widest text-primary mb-0.5 sm:mb-1",
+                    isPrint && "text-[7px] text-black font-black tracking-wider"
+                  )}>
+                    {head.title}
+                  </div>
+                  <div className={cn(
+                    "text-xs sm:text-sm font-bold truncate",
+                    isPrint && "text-sm font-bold"
+                  )}>
+                    {officer?.fullName || <span className="text-gray-400 font-normal italic text-[11px]">Vacant</span>}
                   </div>
                 </div>
 
-                {/* Committee members */}
-                <div className="w-0.5 h-6 bg-border/50" />
-                <div className="w-full px-2">
+                {/* Vertical line to committee */}
+                <div className={cn(
+                  "w-0.5 h-4 sm:h-6 bg-border/50",
+                  isPrint && "h-4 w-1 bg-gray-400"
+                )} />
+                
+                {/* Committee Box */}
+                <div className={cn(
+                  "w-full px-1 sm:px-2 committee-box",
+                  isPrint && "px-1"
+                )}>
                   <div 
-                    onClick={() => !isPrint && onCommitteeClick(head.dept)}
+                    onClick={() => !isPrint && onCommitteeClick?.(head.dept)}
                     className={cn(
-                      "bg-muted/30 rounded-xl p-3 border border-border/50 transition-all group/box",
-                      !isPrint && "cursor-pointer hover:bg-primary/[0.03] hover:border-primary/30"
+                      "bg-muted/30 rounded-lg sm:rounded-xl p-2 sm:p-3 border border-border/50 transition-all group/box text-[10px]",
+                      !isPrint && "cursor-pointer hover:bg-primary/[0.03] hover:border-primary/30",
+                      isPrint && "bg-white border border-black p-2 rounded text-[9px]"
                     )}
                   >
-                    <div className="text-[8px] font-black uppercase tracking-tighter text-muted-foreground/60 mb-2 border-b border-border/50 pb-1 flex justify-between items-center">
-                      <span>Committee</span>
-                      {!isPrint && <div className="text-[7px] bg-primary/10 text-primary px-1 rounded opacity-0 group-hover/box:opacity-100 transition-opacity">Click to Manage</div>}
+                    <div className={cn(
+                      "text-[7px] font-black uppercase tracking-tighter text-muted-foreground/60 mb-1 border-b border-border/50 pb-0.5",
+                      isPrint && "text-[8px] text-black font-bold border-b border-black mb-1 pb-1"
+                    )}>
+                      Committee
                     </div>
-                    <div className="space-y-1.5">
-                      {committee.length > 0 ? committee.map((m: any) => (
-                        <div key={m.id} className={cn(
-                          "text-[10px] leading-tight flex items-center gap-1.5",
-                          m.position === "Assisting Board Member" ? "font-bold text-primary" : "font-medium text-foreground/80"
+                    
+                    <div className="space-y-1">
+                      {committee.length > 0 ? (
+                        committee.map((m: any) => (
+                          <div 
+                            key={m.id} 
+                            className={cn(
+                              "text-[9px] sm:text-[10px] leading-tight flex items-start gap-1",
+                              m.position === "Assisting Board Member" 
+                                ? "font-bold text-primary" 
+                                : "font-medium text-foreground/80",
+                              isPrint && m.position === "Assisting Board Member" 
+                                ? "font-bold text-black"
+                                : "font-normal text-black"
+                            )}
+                          >
+                            <span className={cn(
+                              "inline-block flex-shrink-0 mt-1 w-1 h-1 rounded-full",
+                              m.position === "Assisting Board Member" 
+                                ? "bg-primary" 
+                                : "bg-primary/40"
+                            )} />
+                            <span className="line-clamp-2">
+                              {m.fullName}
+                              {m.position === "Assisting Board Member" && (
+                                <span className={cn(
+                                  "text-[7px] uppercase tracking-tighter opacity-60 ml-1",
+                                  isPrint && "opacity-100"
+                                )}>
+                                  (ABM)
+                                </span>
+                              )}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className={cn(
+                          "text-[8px] text-muted-foreground/40 italic",
+                          isPrint && "text-[8px] text-gray-500"
                         )}>
-                          <div className={cn(
-                            "w-1 h-1 rounded-full",
-                            m.position === "Assisting Board Member" ? "bg-primary" : "bg-primary/40"
-                          )} />
-                          {m.fullName}
-                          {m.position === "Assisting Board Member" && <span className="text-[7px] uppercase tracking-tighter opacity-60"> (ABM)</span>}
+                          No members
                         </div>
-                      )) : (
-                        <div className="text-[9px] text-muted-foreground/40 italic">No members</div>
                       )}
                     </div>
                   </div>
@@ -299,15 +461,37 @@ function OrgChart({ volunteers, president, vicePresident, pastPresident, advisor
   );
 }
 
-function OrgNode({ person, title, primary }: { person?: Volunteer, title: string, primary?: boolean }) {
+/**
+ * Individual Organizational Node
+ * Renders a single person's position card
+ */
+function OrgNode({ 
+  person, 
+  title, 
+  primary = false 
+}: { 
+  person?: Volunteer
+  title: string
+  primary?: boolean 
+}) {
   return (
     <div className="org-node flex flex-col items-center">
-      <div className={`
-        min-w-[200px] p-5 rounded-2xl border-2 text-center shadow-lg relative
-        ${primary ? 'border-primary bg-primary text-white shadow-primary/20' : 'border-primary/20 bg-card text-foreground'}
-      `}>
-        <div className={`text-[10px] font-black uppercase tracking-[0.2em] mb-1 ${primary ? 'text-white/70' : 'text-muted-foreground'}`}>{title}</div>
-        <div className="text-lg font-black tracking-tight leading-none uppercase">
+      <div className={cn(
+        "min-w-[160px] sm:min-w-[200px] p-3 sm:p-5 rounded-xl sm:rounded-2xl border-2 text-center shadow-lg relative transition-all hover:shadow-xl",
+        primary 
+          ? "border-primary bg-gradient-to-br from-primary to-primary/80 text-white shadow-primary/30" 
+          : "border-primary/20 bg-card text-foreground hover:border-primary/30"
+      )}>
+        <div className={cn(
+          "text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] mb-1 sm:mb-1.5 leading-tight",
+          primary ? "text-white/80" : "text-muted-foreground"
+        )}>
+          {title}
+        </div>
+        <div className={cn(
+          "text-base sm:text-lg font-black tracking-tight leading-none uppercase",
+          primary ? "text-white" : "text-foreground"
+        )}>
           {person ? person.fullName : "VACANT"}
         </div>
       </div>

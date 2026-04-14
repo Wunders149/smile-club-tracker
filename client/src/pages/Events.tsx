@@ -532,110 +532,168 @@ export default function Events() {
           </div>
         )}
 
-        {/* Printable Annual Calendar */}
-        <div className="print-only">
-          <div ref={printRef} className="p-0 bg-white text-black w-full font-sans">
+        {/* Printable Annual Calendar - Landscape A4 */}
+        <div className="print-only hidden">
+          <div 
+            ref={printRef} 
+            className="p-6 sm:p-8 bg-white text-black w-full font-sans"
+            style={{
+              printColorAdjust: 'exact',
+              WebkitPrintColorAdjust: 'exact'
+            }}
+          >
             <style>{`
               @page {
-                size: landscape;
+                size: landscape A4;
                 margin: 20mm;
               }
               @media print {
+                * {
+                  print-color-adjust: exact !important;
+                  -webkit-print-color-adjust: exact !important;
+                }
                 body {
-                  print-color-adjust: exact;
-                  -webkit-print-color-adjust: exact;
                   background: white !important;
+                  margin: 0;
+                  padding: 0;
                 }
                 .annual-grid {
-                  display: block;
-                  column-count: 2;
-                  column-gap: 60px;
-                  column-fill: auto;
+                  display: grid;
+                  grid-template-columns: repeat(2, 1fr);
+                  gap: 40px;
                   width: 100%;
-                  margin-top: 40px;
+                  margin-top: 30px;
                 }
                 .month-section {
-                  display: block;
-                  width: 100%;
                   break-inside: avoid-column;
                   page-break-inside: avoid;
-                  margin-bottom: 40px;
+                  margin-bottom: 10px;
                 }
                 .month-table {
                   width: 100%;
                   border-collapse: collapse;
                 }
                 .event-row {
-                  border-bottom: 0.5px solid #f0f0f0;
-                }
-                .event-row:last-child {
-                  border-bottom: none;
+                  page-break-inside: avoid;
+                  break-inside: avoid;
                 }
                 .print-header {
                   margin-bottom: 20px;
-                  padding-bottom: 30px;
-                  border-bottom: 2px solid #000;
+                  padding-bottom: 25px;
+                  border-bottom: 3px solid black;
                 }
               }
             `}</style>
             
+            {/* Header Section */}
             <div className="print-header flex justify-between items-end">
-              <div className="flex items-center gap-6">
-                <img src="/smile-club-logo.png" alt="Logo" className="h-16 object-contain" />
+              <div className="flex items-end gap-4 flex-1">
                 <div>
-                  <h1 className="text-2xl font-black tracking-tighter uppercase text-gray-900 leading-none mb-1">Activity Calendar</h1>
-                  <p className="text-[11px] text-gray-500 font-bold uppercase tracking-[0.2em]">Smile Club Mahajanga</p>
+                  <h1 className="text-2xl font-black tracking-tighter uppercase text-black leading-none mb-0.5">Annual Activity Calendar</h1>
+                  <p className="text-xs text-gray-700 font-bold uppercase tracking-wider">Smile Club Mahajanga</p>
                 </div>
               </div>
+              
               <div className="text-right">
-                <div className="text-5xl font-black text-gray-900 leading-none">{new Date().getFullYear()}</div>
-                <div className="text-[8px] font-bold uppercase tracking-[0.3em] text-primary mt-2">Official Club Document</div>
+                <div className="text-5xl font-black text-black leading-none">{new Date().getFullYear()}</div>
+                <div className="text-[7px] font-bold uppercase tracking-widest text-gray-600 mt-2">Official Document • Medical NGO</div>
               </div>
             </div>
 
-            <div className="annual-grid">
-              {months.map(month => {
-                const monthEvents = eventsByMonth[month] || [];
-                if (monthEvents.length === 0) return null;
+            {/* Event Summary */}
+            <div className="mb-4 px-3 py-2 bg-gray-50 border border-gray-300 text-xs">
+              <span className="font-bold">Total Events:</span> {events?.length || 0} •
+              <span className="font-bold ml-2">Total Months:</span> {Object.keys(eventsByMonth).length}
+            </div>
 
+            {/* Two-Column Layout for Months */}
+            <div className="annual-grid">
+              {months.map((month, monthIdx) => {
+                const monthEvents = eventsByMonth[month] || [];
+                
                 return (
                   <div key={month} className="month-section">
-                    <div className="flex items-baseline justify-between border-b-2 border-gray-900/10 mb-3 pb-1">
-                      <h3 className="text-xl font-black uppercase italic tracking-tighter text-gray-900">{month}</h3>
-                      <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">{monthEvents.length} activities</span>
+                    {/* Month Header */}
+                    <div className="flex items-center justify-between border-b-2 border-black mb-2 pb-1">
+                      <h3 className="text-lg font-black uppercase tracking-tight text-black">{month}</h3>
+                      <span className="text-[8px] font-bold uppercase tracking-widest text-gray-500">
+                        {monthEvents.length} {monthEvents.length === 1 ? 'event' : 'events'}
+                      </span>
                     </div>
-                    <table className="month-table">
-                      <tbody>
-                        {monthEvents.map(ev => (
-                          <tr key={ev.id} className="event-row">
-                            <td className="py-2.5 px-1">
-                              <div className="flex items-start gap-4">
-                                <div className="text-base font-bold text-primary tabular-nums min-w-[22px]">
-                                  {format(new Date(ev.date), 'dd')}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="font-bold text-gray-900 leading-tight mb-1 uppercase text-[11px] truncate">{ev.name}</div>
-                                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[9px] font-semibold text-gray-500 uppercase tracking-tight">
-                                    <span className="text-primary/80 font-bold">{ev.type}</span>
-                                    {ev.venue && (
-                                      <>
-                                        <span className="text-gray-300">•</span>
-                                        <span className="truncate max-w-[180px]">{ev.venue}</span>
-                                      </>
-                                    )}
-                                    <span className="text-gray-300">•</span>
-                                    <span>{format(new Date(ev.date), 'h:mm a')}</span>
+
+                    {/* Events List */}
+                    {monthEvents.length > 0 ? (
+                      <table className="month-table">
+                        <tbody>
+                          {monthEvents.map((ev, idx) => (
+                            <tr key={ev.id} className={`event-row ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                              <td className="py-1.5 px-2 border border-gray-200">
+                                <div className="flex items-start gap-2.5">
+                                  {/* Date */}
+                                  <div className="font-black text-xs text-black tabular-nums min-w-[20px] pt-0.5">
+                                    {format(new Date(ev.date), 'dd')}
+                                  </div>
+
+                                  {/* Content */}
+                                  <div className="flex-1 min-w-0">
+                                    {/* Event Name */}
+                                    <div className="font-bold text-black text-xs leading-tight mb-0.5 truncate">
+                                      {ev.name}
+                                    </div>
+
+                                    {/* Event Details */}
+                                    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[7.5px] font-semibold text-gray-600 uppercase tracking-tight">
+                                      {/* Type */}
+                                      <span className="bg-black/10 text-black font-bold px-1 py-0.5 rounded-sm">
+                                        {ev.type}
+                                      </span>
+
+                                      {/* Time */}
+                                      <span>{format(new Date(ev.date), 'h:mm a')}</span>
+
+                                      {/* Venue */}
+                                      {ev.venue && (
+                                        <>
+                                          <span className="text-gray-400">•</span>
+                                          <span className="truncate max-w-[120px]">{ev.venue}</span>
+                                        </>
+                                      )}
+
+                                      {/* Speaker */}
+                                      {ev.speaker && (
+                                        <>
+                                          <span className="text-gray-400">•</span>
+                                          <span className="italic truncate max-w-[120px]">{ev.speaker}</span>
+                                        </>
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    ) : (
+                      <div className="py-3 px-2 text-xs text-gray-400 italic text-center border border-gray-200">
+                        No events scheduled
+                      </div>
+                    )}
                   </div>
                 );
               })}
+            </div>
+
+            {/* Footer */}
+            <div className="mt-8 pt-4 border-t-2 border-gray-300 flex justify-between items-end text-[7px] leading-none">
+              <div className="text-gray-600 space-y-1">
+                <p>Generated: {format(new Date(), 'MMMM d, yyyy HH:mm')}</p>
+                <p className="text-gray-500">Smile Club Mahajanga Tracker System</p>
+              </div>
+              <div className="text-right font-bold text-black space-y-1">
+                <p className="text-xs font-black">"For The Patients!"</p>
+                <p className="text-gray-600">Medical Outreach Organization</p>
+              </div>
             </div>
           </div>
         </div>

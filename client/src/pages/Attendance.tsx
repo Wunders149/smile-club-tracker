@@ -223,71 +223,166 @@ export default function Attendance() {
           </Card>
         </div>
 
-        {/* Printable Roster */}
-        <div className="print-only">
-          <div ref={printRef} className="p-10 bg-white text-black font-sans w-full">
+        {/* Printable Roster - Professional Attendance Sheet */}
+        <div className="print-only hidden">
+          <div 
+            ref={printRef} 
+            className="p-6 sm:p-10 bg-white text-black font-sans w-full"
+            style={{
+              printColorAdjust: 'exact',
+              WebkitPrintColorAdjust: 'exact'
+            }}
+          >
             <style>{`
               @page {
-                size: auto;
+                size: A4;
                 margin: 20mm;
               }
               @media print {
-                tr {
-                  page-break-inside: avoid;
+                * {
+                  print-color-adjust: exact !important;
+                  -webkit-print-color-adjust: exact !important;
                 }
-                thead {
-                  display: table-header-group;
+                body {
+                  background: white !important;
+                  margin: 0;
+                  padding: 0;
                 }
-                tfoot {
-                  display: table-footer-group;
+                .roster-page {
+                  page-break-after: always;
+                  break-after: page;
+                }
+                .roster-page:last-child {
+                  page-break-after: avoid;
+                  break-after: avoid;
                 }
                 table {
                   width: 100%;
                   border-collapse: collapse;
                   margin-top: 10px;
+                  page-break-inside: auto;
+                }
+                tr {
+                  page-break-inside: avoid;
+                  break-inside: avoid;
+                }
+                thead {
+                  display: table-header-group;
+                  border-bottom: 2px solid black;
+                }
+                tbody tr:nth-child(odd) {
+                  background-color: #f9f9f9;
+                }
+                .signature-line {
+                  min-height: 35px;
+                  border-bottom: 1px solid #333;
+                  margin: 0;
+                  padding: 0;
                 }
               }
             `}</style>
-            <div className="flex justify-between items-start mb-8 border-b-2 border-primary pb-6">
-              <div>
-                <img src="/smile-club-logo.png" alt="Logo" className="h-16 mb-2" />
-                <h1 className="text-2xl font-bold uppercase tracking-tight">Attendance Roster</h1>
+
+            {/* Header */}
+            <div className="flex justify-between items-start mb-6 border-b-2 border-black pb-4">
+              <div className="flex items-start gap-3">
+                <div>
+                  <h1 className="text-xl font-black uppercase tracking-tight text-black leading-none">Attendance Roster</h1>
+                  <p className="text-xs text-gray-600 font-semibold uppercase tracking-wider mt-1">Smile Club Mahajanga</p>
+                </div>
               </div>
               <div className="text-right">
-                <p className="font-bold text-lg">{selectedEvent?.name || "Event Roster"}</p>
-                <p className="text-gray-600">{selectedEvent?.date ? format(new Date(selectedEvent.date), 'MMMM d, yyyy') : format(new Date(), 'MMMM d, yyyy')}</p>
-                <p className="text-gray-500 text-sm mt-1">{selectedEvent?.type || "General"}</p>
+                <p className="font-bold text-sm">{selectedEvent?.name || "Event Roster"}</p>
+                <p className="text-xs text-gray-700 font-semibold">
+                  {selectedEvent?.date ? format(new Date(selectedEvent.date), 'MMMM d, yyyy • h:mm a') : format(new Date(), 'MMMM d, yyyy')}
+                </p>
+                <p className="text-xs text-gray-600 mt-0.5">{selectedEvent?.type || "General"}</p>
+                <p className="text-[10px] text-gray-500 mt-2">
+                  Total Volunteers: <span className="font-bold">{volunteers?.length || 0}</span>
+                </p>
               </div>
             </div>
 
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="border border-gray-200 p-3 text-left font-bold uppercase text-xs tracking-wider">Volunteer Name</th>
-                  <th className="border border-gray-200 p-3 text-left font-bold uppercase text-xs tracking-wider">Position</th>
-                  <th className="border border-gray-200 p-3 text-center font-bold uppercase text-xs tracking-wider w-32">Status</th>
-                  <th className="border border-gray-200 p-3 text-left font-bold uppercase text-xs tracking-wider w-40">Signature</th>
-                </tr>
-              </thead>
-              <tbody>
-                {/* Note: In printable version we always show ALL volunteers, not filtered ones */}
-                {volunteers?.sort((a, b) => a.fullName.localeCompare(b.fullName)).map((vol) => (
-                  <tr key={vol.id}>
-                    <td className="border border-gray-200 p-3 font-medium">{vol.fullName}</td>
-                    <td className="border border-gray-200 p-3 text-gray-600 text-sm">{vol.position}</td>
-                    <td className="border border-gray-200 p-3 text-center font-bold text-xs uppercase italic">
-                      {attendanceState[vol.id] !== 'absent' ? (attendanceState[vol.id]?.replace('_', ' ')) : ''}
-                    </td>
-                    <td className="border border-gray-200 p-3"></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            <div className="mt-12 pt-8 border-t border-gray-100 flex justify-between items-end text-xs text-gray-400">
-              <p>Generated by Smile Club Mahajanga Tracker</p>
-              <p className="italic">"For The Patients!"</p>
+            {/* Instructions/Legend */}
+            <div className="mb-4 text-xs border border-gray-300 p-2 bg-gray-50">
+              <p className="font-bold mb-1">Attendance Status Legend:</p>
+              <p>✓ = On Time (5 pts) | ⏱ = Late (3 pts) | ℹ = Excused (1 pt) | ✗ = Absent (0 pts)</p>
             </div>
+
+            {/* Multi-page Roster Table */}
+            {volunteers && (
+              <>
+                {Array.from({ length: Math.ceil(volunteers.length / 25) }).map((_, pageIdx) => {
+                  const pageVolunteers = volunteers
+                    .sort((a, b) => a.fullName.localeCompare(b.fullName))
+                    .slice(pageIdx * 25, (pageIdx + 1) * 25);
+                  
+                  return (
+                    <div key={pageIdx} className="roster-page">
+                      <table>
+                        {pageIdx === 0 && (
+                          <thead>
+                            <tr className="bg-gray-200 border-b-2 border-black">
+                              <th className="border border-gray-400 p-2 text-left font-bold uppercase text-xs tracking-wider w-40">Name</th>
+                              <th className="border border-gray-400 p-2 text-left font-bold uppercase text-xs tracking-wider">Position</th>
+                              <th className="border border-gray-400 p-2 text-center font-bold uppercase text-xs tracking-wider w-16">Status</th>
+                              <th className="border border-gray-400 p-2 text-center font-bold uppercase text-xs tracking-wider flex-1">Signature</th>
+                            </tr>
+                          </thead>
+                        )}
+                        {pageIdx > 0 && (
+                          <thead>
+                            <tr className="bg-gray-200 border-b-2 border-black">
+                              <th className="border border-gray-400 p-2 text-left font-bold uppercase text-xs tracking-wider w-40">Name</th>
+                              <th className="border border-gray-400 p-2 text-left font-bold uppercase text-xs tracking-wider">Position</th>
+                              <th className="border border-gray-400 p-2 text-center font-bold uppercase text-xs tracking-wider w-16">Status</th>
+                              <th className="border border-gray-400 p-2 text-center font-bold uppercase text-xs tracking-wider flex-1">Signature</th>
+                            </tr>
+                          </thead>
+                        )}
+                        <tbody>
+                          {pageVolunteers.map((vol, idx) => {
+                            const status = attendanceState[vol.id] || 'absent';
+                            const statusDisplay = {
+                              'on_time': '✓',
+                              'late': '⏱',
+                              'excused': 'ℹ',
+                              'absent': '✗'
+                            }[status] || '';
+
+                            return (
+                              <tr key={vol.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                <td className="border border-gray-400 p-2 font-semibold text-sm">{vol.fullName}</td>
+                                <td className="border border-gray-400 p-2 text-xs text-gray-700">{vol.position}</td>
+                                <td className="border border-gray-400 p-2 text-center font-bold text-base">
+                                  {statusDisplay}
+                                </td>
+                                <td className="border border-gray-400 p-0">
+                                  <div className="signature-line" />
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+
+                      {/* Page footer */}
+                      {pageIdx === Math.ceil(volunteers.length / 25) - 1 && (
+                        <div className="mt-8 pt-4 border-t border-gray-300 text-xs text-gray-600 flex justify-between">
+                          <div>
+                            <p className="font-semibold">Total Pages: {Math.ceil(volunteers.length / 25)}</p>
+                            <p className="text-gray-500 text-[10px] mt-1">Generated {format(new Date(), 'MMMM d, yyyy HH:mm')}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-black">"For The Patients!"</p>
+                            <p className="text-[10px] text-gray-500">Smile Club Mahajanga Tracker</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </>
+            )}
           </div>
         </div>
       </div>
