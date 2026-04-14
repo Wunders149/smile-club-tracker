@@ -3,7 +3,7 @@ import { Layout } from "@/components/Layout";
 import { useVolunteers, useUpdateVolunteer } from "@/hooks/use-volunteers";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Printer, User, Star, Search, Check } from "lucide-react";
+import { Printer, User, Search, Check } from "lucide-react";
 import { useReactToPrint } from "react-to-print";
 import { type Volunteer } from "@shared/schema";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -32,10 +32,6 @@ export default function Organigram() {
   const pastPresident = volunteers?.find(v => v.position === "Past President");
   const advisor = volunteers?.find(v => v.position === "Advisor");
 
-  // ── All ABMs (shown as a dedicated section below officers) ──
-  const abmMembers = volunteers?.filter(v => v.position === "Assisting Board Member")
-    .sort((a, b) => a.fullName.localeCompare(b.fullName)) || [];
-
   // ── Department heads ──
   const executiveHeads = [
     { title: "Head of Administration", pos: "Administration Officer", dept: "Administration" },
@@ -45,7 +41,7 @@ export default function Organigram() {
     { title: "Head of Communications", pos: "Communication Officer", dept: "Communications" },
   ];
 
-  // ── Committee members under each dept (includes ABMs assigned to that dept, sorted to top) ──
+  // ── Committee members under each dept (ABMs highlighted at top) ──
   const getCommitteeMembers = (dept: string) => {
     return (volunteers?.filter(v =>
       v.department === dept &&
@@ -53,7 +49,6 @@ export default function Organigram() {
       v.position !== "President" &&
       v.position !== "Vice President"
     ) || []).sort((a, b) => {
-      // ABMs always at the top
       const aIsAbm = a.position === "Assisting Board Member";
       const bIsAbm = b.position === "Assisting Board Member";
       if (aIsAbm && !bIsAbm) return -1;
@@ -86,14 +81,13 @@ export default function Organigram() {
           </Button>
         </div>
 
-        <Card className="p-8 sm:p-12 overflow-x-auto bg-card border-border/50 shadow-xl rounded-3xl min-w-[1000px] no-print">
+        <Card className="p-6 sm:p-8 bg-card border-border/50 shadow-xl rounded-3xl no-print">
           <OrgChart
             volunteers={volunteers}
             president={president}
             vicePresident={vicePresident}
             pastPresident={pastPresident}
             advisor={advisor}
-            abmMembers={abmMembers}
             executiveHeads={executiveHeads}
             getCommitteeMembers={getCommitteeMembers}
             onCommitteeClick={(dept: string) => setSelectedDept(dept)}
@@ -177,7 +171,6 @@ export default function Organigram() {
                 .print-header { break-after: avoid; page-break-after: avoid; }
                 .org-node { break-inside: avoid; page-break-inside: avoid; }
                 .committee-box { break-inside: avoid; page-break-inside: avoid; }
-                .abm-section-print { break-inside: avoid; page-break-inside: avoid; }
               }
             `}</style>
 
@@ -200,7 +193,6 @@ export default function Organigram() {
                   vicePresident={vicePresident}
                   pastPresident={pastPresident}
                   advisor={advisor}
-                  abmMembers={abmMembers}
                   executiveHeads={executiveHeads}
                   getCommitteeMembers={getCommitteeMembers}
                   isPrint={true}
@@ -234,8 +226,6 @@ export default function Organigram() {
  *   ─────────────────────────────────────────
  *   5 Department Officers (horizontal row)
  *   ─────────────────────────────────────────
- *   Assisting Board Members (dedicated highlighted section)
- *   ─────────────────────────────────────────
  *   Committee members under each officer (with ABMs highlighted at top)
  */
 function OrgChart({
@@ -244,7 +234,6 @@ function OrgChart({
   vicePresident,
   pastPresident,
   advisor,
-  abmMembers,
   executiveHeads,
   getCommitteeMembers,
   onCommitteeClick,
@@ -260,35 +249,46 @@ function OrgChart({
           Past President (left)  |  Advisor (right)
          ───────────────────────────────────────────────────── */}
       <div className={cn(
-        "relative flex items-start gap-16 sm:gap-32 w-full justify-center",
-        isPrint && "gap-12"
+        "flex flex-col items-center gap-4 w-full",
+        isPrint && "gap-3"
       )}>
-        {/* Past President — Left */}
-        <div className={cn(
-          "absolute -left-32 sm:-left-48 top-4",
-          isPrint && "absolute -left-40 top-2"
-        )}>
-          <div className="p-2 sm:p-3 rounded-lg border-2 border-dashed border-gray-300 text-center w-32 sm:w-40 bg-gray-50">
-            <div className="text-[7px] sm:text-[8px] font-bold uppercase tracking-widest text-gray-600 mb-0.5">Past President</div>
-            <div className="text-xs sm:text-sm font-bold text-gray-900">{pastPresident?.fullName || "—"}</div>
-          </div>
-        </div>
-
-        {/* Advisor — Right */}
-        <div className={cn(
-          "absolute -right-32 sm:-right-48 top-4",
-          isPrint && "absolute -right-40 top-2"
-        )}>
-          <div className="p-2 sm:p-3 rounded-lg border-2 border-dashed border-gray-300 text-center w-32 sm:w-40 bg-gray-50">
-            <div className="text-[7px] sm:text-[8px] font-bold uppercase tracking-widest text-gray-600 mb-0.5">Advisor</div>
-            <div className="text-xs sm:text-sm font-bold text-gray-900">{advisor?.fullName || "—"}</div>
-          </div>
-        </div>
-
         {/* Main Top Tier */}
-        <div className={cn("flex gap-6 sm:gap-8", isPrint && "gap-8")}>
-          <OrgNode person={president} title="President" primary />
-          <OrgNode person={vicePresident} title="Vice President" primary />
+        <div className={cn("flex items-center gap-6 sm:gap-12", isPrint && "gap-8")}>
+          {/* Past President */}
+          <div className={cn(
+            "p-2 sm:p-3 rounded-xl border-2 border-dashed border-muted-foreground/20 text-center w-36 sm:w-44 bg-muted/20",
+            isPrint && "border-gray-300 bg-gray-50"
+          )}>
+            <div className={cn(
+              "text-[7px] sm:text-[8px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5",
+              isPrint && "text-gray-600"
+            )}>Past President</div>
+            <div className={cn(
+              "text-xs sm:text-sm font-bold",
+              isPrint && "text-sm font-bold text-black"
+            )}>{pastPresident?.fullName || "—"}</div>
+          </div>
+
+          {/* President & Vice President */}
+          <div className="flex items-center gap-4 sm:gap-8">
+            <OrgNode person={president} title="President" primary />
+            <OrgNode person={vicePresident} title="Vice President" primary />
+          </div>
+
+          {/* Advisor */}
+          <div className={cn(
+            "p-2 sm:p-3 rounded-xl border-2 border-dashed border-muted-foreground/20 text-center w-36 sm:w-44 bg-muted/20",
+            isPrint && "border-gray-300 bg-gray-50"
+          )}>
+            <div className={cn(
+              "text-[7px] sm:text-[8px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5",
+              isPrint && "text-gray-600"
+            )}>Advisor</div>
+            <div className={cn(
+              "text-xs sm:text-sm font-bold",
+              isPrint && "text-sm font-bold text-black"
+            )}>{advisor?.fullName || "—"}</div>
+          </div>
         </div>
       </div>
 
@@ -424,91 +424,6 @@ function OrgChart({
               </div>
             );
           })}
-        </div>
-      </div>
-
-      {/* ─────────────────────────────────────────────────────
-          LEVEL 3 — Assisting Board Members (highlighted)
-         ───────────────────────────────────────────────────── */}
-      <div className={cn(
-        "w-0.5 h-6 sm:h-8 bg-primary/30",
-        isPrint && "h-5 w-1 bg-gray-400"
-      )} />
-
-      <div className="w-full flex justify-center">
-        <div className={cn(
-          "abm-section flex flex-col items-center gap-3",
-          isPrint && "gap-2 abm-section-print"
-        )}>
-          {/* ABM Section Label */}
-          <div className={cn(
-            "flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 shadow-sm",
-            isPrint && "bg-white border border-gray-300 shadow-none"
-          )}>
-            <Star className={cn(
-              "w-3.5 h-3.5 text-amber-500 fill-amber-500",
-              isPrint && "text-gray-600 fill-gray-600"
-            )} />
-            <span className={cn(
-              "text-[10px] sm:text-xs font-black uppercase tracking-widest text-amber-700",
-              isPrint && "text-black"
-            )}>
-              Assisting Board Members
-            </span>
-            <span className={cn(
-              "text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-700 min-w-[20px] text-center",
-              isPrint && "bg-gray-200 text-gray-700"
-            )}>
-              {abmMembers?.length || 0}
-            </span>
-          </div>
-
-          {/* ABM Member Cards */}
-          {abmMembers && abmMembers.length > 0 && (
-            <div className={cn(
-              "flex flex-wrap justify-center gap-2 sm:gap-3 max-w-4xl",
-              isPrint && "gap-2 max-w-none"
-            )}>
-              {abmMembers.map((m: any) => (
-                <div
-                  key={m.id}
-                  className={cn(
-                    "abm-card flex items-center gap-2 px-3 py-2 rounded-xl border-2 bg-gradient-to-br from-amber-50 to-yellow-50/50 border-amber-300 shadow-md transition-all duration-200",
-                    !isPrint && "hover:shadow-lg hover:scale-105",
-                    isPrint && "bg-white border border-gray-400 shadow-sm hover:scale-100"
-                  )}
-                >
-                  <div className={cn(
-                    "w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0",
-                    isPrint
-                      ? "bg-gray-100"
-                      : "bg-gradient-to-br from-amber-400 to-yellow-500"
-                  )}>
-                    <Star className={cn(
-                      "w-3.5 h-3.5",
-                      isPrint ? "text-gray-600" : "text-white fill-white"
-                    )} />
-                  </div>
-                  <div className="min-w-0">
-                    <div className={cn(
-                      "text-xs sm:text-sm font-bold truncate",
-                      isPrint && "text-sm font-bold"
-                    )}>
-                      {m.fullName}
-                    </div>
-                    {m.displayName && (
-                      <div className={cn(
-                        "text-[8px] sm:text-[9px] text-amber-600/70 truncate",
-                        isPrint && "text-gray-500 text-[8px]"
-                      )}>
-                        {m.displayName}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       </div>
     </div>
