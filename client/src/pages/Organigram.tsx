@@ -159,33 +159,51 @@ export default function Organigram() {
             <style>{`
               @page {
                 size: landscape A4;
-                margin: 15mm;
-                margin-top: 40mm;
-                margin-bottom: 25mm;
+                margin: 8mm;
               }
               @media print {
                 * {
                   print-color-adjust: exact !important;
                   -webkit-print-color-adjust: exact !important;
                 }
-                body { background: white !important; margin: 0; padding: 0; }
+                html, body { background: white !important; margin: 0; padding: 0; width: 100%; height: 100%; }
                 .org-print-header {
                   position: fixed;
                   top: 0;
-                  left: 15mm;
-                  right: 15mm;
-                  height: 25mm;
+                  left: 8mm;
+                  right: 8mm;
+                  height: 18mm;
                   background: white;
                   z-index: 10;
                 }
                 .org-print-footer {
                   position: fixed;
-                  bottom: 0;
-                  left: 15mm;
-                  right: 15mm;
-                  height: 12mm;
+                  bottom: 3mm;
+                  left: 8mm;
+                  right: 8mm;
+                  height: 8mm;
                 }
-                .print-organigram-container { width: 100%; }
+                .print-organigram-container {
+                  box-sizing: border-box;
+                  width: 100%;
+                  height: 194mm;
+                  padding: 21mm 8mm 10mm !important;
+                  overflow: hidden;
+                  page-break-after: avoid;
+                  break-after: avoid;
+                }
+                .print-org-content {
+                  display: flex;
+                  justify-content: center;
+                  width: 100%;
+                  height: 157mm;
+                  overflow: hidden;
+                }
+                .print-org-content > div {
+                  flex: 0 0 122%;
+                  transform: scale(.82);
+                  transform-origin: top center;
+                }
                 .org-node { break-inside: avoid; page-break-inside: avoid; }
                 .committee-box { break-inside: avoid; page-break-inside: avoid; }
               }
