@@ -206,7 +206,7 @@ const BadgeID = React.forwardRef<HTMLDivElement, { volunteer: any }>(({ voluntee
 
       {/* Logo */}
       <div className="z-10 mt-1 mb-4">
-        <img src="/smile-club-logo.png?v=20260802" alt="Logo" className="h-12 object-contain" />
+        <img src="/smile-club-logo.png?v=20260802" alt="Logo" className="h-[67px] max-w-full object-contain" />
       </div>
 
       {/* Photo */}
