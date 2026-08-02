@@ -118,7 +118,7 @@
 }
 
 /* Global Print Styles */
-@media print, .is-printing {
+@media print {
   /* Basic resets for the document */
   html, body, .is-printing {
     background: white !important;

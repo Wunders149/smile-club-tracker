@@ -125,7 +125,7 @@ export class DatabaseStorage implements IStorage {
     const event = await this.getEvent(eventId);
     if (!event) throw new Error("Event not found");
 
-    const volunteerIds = [...new Set(records.map(record => record.volunteerId))];
+    const volunteerIds = Array.from(new Set(records.map(record => record.volunteerId)));
     if (volunteerIds.length > 0) {
       const existingVolunteers = await db.select({ id: volunteers.id })
         .from(volunteers)
