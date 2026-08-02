@@ -30,60 +30,46 @@ export default function Rankings() {
     });
 
     try {
-      // Temporarily show the watermark for PDF generation
-      const watermark = rankingRef.current.querySelector('.show-on-export') as HTMLElement;
-      if (watermark) {
-        watermark.style.display = 'flex';
-      }
+      const watermark = rankingRef.current.querySelector('.ranking-export-header') as HTMLElement;
+      const rows = Array.from(rankingRef.current.querySelectorAll<HTMLElement>('.ranking-export-row'));
+      if (watermark) watermark.style.setProperty('display', 'flex', 'important');
 
-      // Capture at a fixed width to ensure horizontal fit regardless of screen size
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const margin = 12;
+      const usableWidth = pdfWidth - (margin * 2);
       const captureWidth = 1000;
-      const canvas = await toCanvas(rankingRef.current, {
+      let cursorY = margin;
+
+      const captureElement = async (element: HTMLElement) => toCanvas(element, {
         pixelRatio: 2,
         backgroundColor: "#fcfaf8",
         width: captureWidth,
-        style: {
-          width: `${captureWidth}px`,
-          margin: '0',
-          padding: '20px', // Extra internal padding for the snapshot
-          transform: 'none',
-        }
+        style: { width: `${captureWidth}px`, margin: '0', transform: 'none' },
       });
 
-      // Re-hide the watermark
       if (watermark) {
-        watermark.style.display = 'none';
+        const headerCanvas = await captureElement(watermark);
+        const headerHeight = (headerCanvas.height * usableWidth) / headerCanvas.width;
+        pdf.addImage(headerCanvas.toDataURL('image/png'), 'PNG', margin, cursorY, usableWidth, headerHeight, undefined, 'FAST');
+        cursorY += headerHeight + 6;
       }
 
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      
-      const margin = 10; // 10mm margin
-      const usableWidth = pdfWidth - (margin * 2);
-      const usableHeight = pdfHeight - (margin * 2);
-      
-      const imgWidth = usableWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      let heightLeft = imgHeight;
-      let page = 0;
+      for (const row of rows) {
+        const rowCanvas = await captureElement(row);
+        const rowHeight = (rowCanvas.height * usableWidth) / rowCanvas.width;
 
-      // Vertical pagination logic
-      while (heightLeft > 0) {
-        if (page > 0) pdf.addPage();
-        
-        // Calculate Y position to "scroll" the image across pages
-        // We start at 'margin' and offset by the height already covered
-        const yPos = margin - (page * usableHeight);
-        
-        pdf.addImage(imgData, 'PNG', margin, yPos, imgWidth, imgHeight, undefined, 'FAST');
-        
-        heightLeft -= usableHeight;
-        page++;
+        if (cursorY + rowHeight > pdfHeight - margin) {
+          pdf.addPage();
+          cursorY = margin;
+        }
+
+        pdf.addImage(rowCanvas.toDataURL('image/png'), 'PNG', margin, cursorY, usableWidth, rowHeight, undefined, 'FAST');
+        cursorY += rowHeight + 4;
       }
+
+      if (watermark) watermark.style.removeProperty('display');
 
       pdf.save(`Smile-Club-Rankings-${selectedYear}.pdf`);
       
@@ -99,6 +85,9 @@ export default function Rankings() {
         variant: "destructive",
       });
     } finally {
+      if (rankingRef.current) {
+        rankingRef.current.querySelector('.ranking-export-header')?.removeAttribute('style');
+      }
       setIsDownloading(false);
     }
   };
@@ -164,7 +153,7 @@ export default function Rankings() {
         ) : (
           <div ref={rankingRef} className="space-y-3 md:space-y-4 px-2 md:px-0 pb-12">
             {/* Watermark for Exported PDF */}
-            <div className="hidden show-on-export flex items-center justify-between mb-8 pb-4 border-b border-border/50">
+            <div className="hidden show-on-export ranking-export-header items-center justify-between mb-8 pb-4 border-b border-border/50">
               <div className="flex items-center gap-4">
                 <img src="/smile-club-logo.png?v=20260802" alt="Logo" className="h-10 object-contain" />
                 <div>
@@ -208,6 +197,7 @@ export default function Rankings() {
 
               return (
                 <motion.div 
+                  className="ranking-export-row"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
