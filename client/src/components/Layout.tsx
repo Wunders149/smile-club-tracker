@@ -126,8 +126,8 @@ export function Layout({ children }: { children: ReactNode }) {
               <Menu className="w-6 h-6" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-72 bg-card">
-            <div className="mb-8 pt-4">
+          <SheetContent side="left" className="w-72 max-h-screen overflow-y-auto bg-card pb-8">
+            <div className="mb-8 pt-4 pr-8">
               <img src="/smile-club-logo.png?v=20260802" alt="Smile Club Mahajanga" className="h-[64px] w-auto object-contain" />
             </div>
             <NavLinks onNavigate={() => setMobileMenuOpen(false)} />
