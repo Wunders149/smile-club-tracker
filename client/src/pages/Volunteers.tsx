@@ -763,7 +763,7 @@ export default function Volunteers() {
             {/* Print Header (repeats on every printed page) */}
             <div className="vol-print-header flex justify-between items-end border-b border-gray-200 pb-2">
               <div className="flex items-end gap-4">
-                <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="w-16 h-16 object-contain flex-shrink-0" />
+                <img src="/smile-club-logo.png?v=20260802" alt="Smile Club Mahajanga" className="w-16 h-16 object-contain flex-shrink-0" />
                 <div>
                   <h1 className="text-xl font-black tracking-tight uppercase text-black leading-none">Volunteer Roster</h1>
                   <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider mt-1">Smile Club Mahajanga</p>

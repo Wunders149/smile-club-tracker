@@ -317,7 +317,7 @@ export default function Attendance() {
             {/* Header (repeats on every printed page) */}
             <div className="attendance-print-header flex justify-between items-end border-b border-gray-200 pb-2">
               <div className="flex items-end gap-4">
-                <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="w-16 h-16 object-contain flex-shrink-0" />
+                <img src="/smile-club-logo.png?v=20260802" alt="Smile Club Mahajanga" className="w-16 h-16 object-contain flex-shrink-0" />
                 <div>
                   <h1 className="text-xl font-black uppercase tracking-tight text-black leading-none">Attendance Roster</h1>
                   <p className="text-xs text-gray-600 font-semibold uppercase tracking-wider mt-1">Smile Club Mahajanga</p>

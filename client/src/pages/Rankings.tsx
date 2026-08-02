@@ -166,7 +166,7 @@ export default function Rankings() {
             {/* Watermark for Exported PDF */}
             <div className="hidden show-on-export flex items-center justify-between mb-8 pb-4 border-b border-border/50">
               <div className="flex items-center gap-4">
-                <img src="/smile-club-logo.png" alt="Logo" className="h-10 object-contain" />
+                <img src="/smile-club-logo.png?v=20260802" alt="Logo" className="h-10 object-contain" />
                 <div>
                   <h2 className="text-lg font-display font-bold text-foreground leading-none">Smile Club Mahajanga</h2>
                   <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1">Volunteer Leaderboard {selectedYear}</p>

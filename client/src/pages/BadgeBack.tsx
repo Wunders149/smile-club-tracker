@@ -114,7 +114,7 @@ function BadgeBackID() {
       
       {/* Watermark Logo */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none grayscale">
-        <img src="/smile-club-logo.png" alt="" className="w-48 object-contain" />
+        <img src="/smile-club-logo.png?v=20260802" alt="" className="w-48 object-contain" />
       </div>
 
       <div className="z-10 flex flex-col items-center gap-8 w-full">

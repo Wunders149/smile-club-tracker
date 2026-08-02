@@ -194,7 +194,7 @@ export default function Organigram() {
             <div className="print-organigram-container px-6 py-4">
               <div className="org-print-header flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
                 <div className="flex items-end gap-4">
-                  <img src="/smile-club-logo.png" alt="Smile Club Mahajanga" className="w-16 h-16 object-contain flex-shrink-0" />
+                  <img src="/smile-club-logo.png?v=20260802" alt="Smile Club Mahajanga" className="w-16 h-16 object-contain flex-shrink-0" />
                   <div>
                     <h1 className="text-lg font-black tracking-tighter uppercase text-black leading-none">Organizational Structure</h1>
                     <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider mt-1">Smile Club Mahajanga • Medical Outreach Organization</p>
