@@ -103,7 +103,7 @@ export function Layout({ children }: { children: ReactNode }) {
           <img src="/smile-club-logo.png?v=20260802" alt="Smile Club Mahajanga" className="h-[85px] w-auto object-contain" />
         </div>
         
-        <nav className="flex-1">
+        <nav className="flex-1 min-h-0 overflow-y-auto pr-1">
           <NavLinks />
           <SyncButton />
         </nav>
