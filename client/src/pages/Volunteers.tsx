@@ -415,7 +415,8 @@ export default function Volunteers() {
               </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  {Array.from({ length: 5 }).map((_, index) => (
+                  <>
+                    {Array.from({ length: 5 }).map((_, index) => (
                       <TableRow key={index}>
                         <TableCell><div className="flex items-center gap-4"><Skeleton className="w-12 h-12 rounded-2xl" /><Skeleton className="h-4 w-40" /></div></TableCell>
                         <TableCell><Skeleton className="h-4 w-52" /></TableCell>
@@ -423,6 +424,7 @@ export default function Volunteers() {
                         <TableCell><Skeleton className="h-9 w-9 rounded-xl" /></TableCell>
                       </TableRow>
                     ))}
+                  </>
                 ) : filteredVolunteers.length === 0 ? (
                   <TableRow><TableCell colSpan={4} className="text-center py-16 text-muted-foreground italic">
                     <div className="flex flex-col items-center gap-2">
