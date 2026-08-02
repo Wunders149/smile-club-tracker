@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Plus, MoreVertical, Edit2, Trash2, Mail, Phone, GraduationCap, Users, Upload, Loader2, Search, MapPin, Filter, X, Printer } from "lucide-react";
+import { Plus, MoreVertical, Edit2, Trash2, Mail, Phone, GraduationCap, Users, Upload, Loader2, Search, MapPin, Filter, X, Printer, SlidersHorizontal } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,6 +20,7 @@ import { format } from "date-fns";
 import { uploadVolunteerPhoto, deleteVolunteerPhoto } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { useReactToPrint } from "react-to-print";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type FormValues = z.infer<typeof insertVolunteerSchema>;
 
@@ -41,6 +42,7 @@ export default function Volunteers() {
   const [positionFilter, setPositionFilter] = useState<string>("all");
   const [genderFilter, setGenderFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all"); // medical | non-medical | student | abm
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
   const medicalKeywords = [
     'medec', 'medic', 'chir', 'dent', 'pharma', 'infir', 'sage-f',
@@ -201,7 +203,12 @@ export default function Volunteers() {
             </div>
 
             {/* ── Filter Dropdowns ── */}
-            <div className="flex flex-wrap items-center gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={() => setIsMobileFiltersOpen(open => !open)} className="sm:hidden h-9 rounded-lg w-full justify-center">
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+            </Button>
+
+            <div className={`${isMobileFiltersOpen ? 'flex' : 'hidden'} sm:flex flex-wrap items-center gap-2 w-full sm:w-auto`}>
               <div className="flex items-center gap-1 text-muted-foreground">
                 <Filter className="w-3.5 h-3.5" />
               </div>
@@ -408,7 +415,14 @@ export default function Volunteers() {
               </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  <TableRow><TableCell colSpan={4} className="text-center py-12 text-muted-foreground italic">Loading volunteers...</TableCell></TableRow>
+                  {Array.from({ length: 5 }).map((_, index) => (
+                      <TableRow key={index}>
+                        <TableCell><div className="flex items-center gap-4"><Skeleton className="w-12 h-12 rounded-2xl" /><Skeleton className="h-4 w-40" /></div></TableCell>
+                        <TableCell><Skeleton className="h-4 w-52" /></TableCell>
+                        <TableCell><Skeleton className="h-6 w-32 rounded-full" /></TableCell>
+                        <TableCell><Skeleton className="h-9 w-9 rounded-xl" /></TableCell>
+                      </TableRow>
+                    ))}
                 ) : filteredVolunteers.length === 0 ? (
                   <TableRow><TableCell colSpan={4} className="text-center py-16 text-muted-foreground italic">
                     <div className="flex flex-col items-center gap-2">
@@ -471,7 +485,7 @@ export default function Volunteers() {
         {/* Mobile/Tablet Card View */}
         <div className="lg:hidden space-y-4">
           {isLoading ? (
-            <div className="text-center py-12 text-muted-foreground italic">Loading volunteers...</div>
+            <div className="space-y-4">{Array.from({ length: 4 }).map((_, index) => <Card key={index} className="rounded-2xl p-4"><div className="flex items-center gap-3"><Skeleton className="w-14 h-14 rounded-2xl" /><div className="space-y-2"><Skeleton className="h-5 w-36" /><Skeleton className="h-4 w-24" /></div></div><div className="mt-4 space-y-2"><Skeleton className="h-9 w-full" /><Skeleton className="h-9 w-full" /></div></Card>)}</div>
           ) : filteredVolunteers.length === 0 ? (
             <div className="text-center py-16 bg-card rounded-3xl border border-border/50 italic">
               <div className="flex flex-col items-center gap-2">

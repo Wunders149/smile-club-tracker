@@ -2,7 +2,9 @@ import { Layout } from "@/components/Layout";
 import { useVolunteers, useVolunteerRankings } from "@/hooks/use-volunteers";
 import { useEvents } from "@/hooks/use-events";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Calendar as CalendarIcon, Award, ArrowRight, Trophy } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Users, Calendar as CalendarIcon, Award, ArrowRight, Trophy, Plus, ClipboardCheck } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { format, isAfter } from "date-fns";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
@@ -25,7 +27,9 @@ export default function Dashboard() {
       icon: Users,
       color: "from-blue-500 to-indigo-500",
       bg: "bg-blue-500/10",
-      text: "text-blue-600"
+      text: "text-blue-600",
+      href: "/volunteers",
+      isLoading: loadingVols,
     },
     {
       title: "Total Events",
@@ -33,7 +37,9 @@ export default function Dashboard() {
       icon: CalendarIcon,
       color: "from-primary to-orange-400",
       bg: "bg-primary/10",
-      text: "text-primary"
+      text: "text-primary",
+      href: "/events",
+      isLoading: loadingEvents,
     },
     {
       title: "Top Performer",
@@ -41,16 +47,24 @@ export default function Dashboard() {
       icon: Award,
       color: "from-accent to-yellow-400",
       bg: "bg-accent/10",
-      text: "text-accent-foreground"
+      text: "text-accent-foreground",
+      href: "/rankings",
+      isLoading: loadingRankings,
     }
   ];
 
   return (
     <Layout>
       <div className="space-y-6 md:space-y-8 pb-8">
-        <div className="text-center sm:text-left">
-          <h1 className="text-2xl md:text-4xl font-display font-bold text-foreground leading-tight">Welcome back!</h1>
-          <p className="text-muted-foreground mt-2 text-base md:text-lg">Here's what's happening at Smile Club Mahajanga.</p>
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
+          <div className="text-center sm:text-left">
+            <h1 className="text-2xl md:text-4xl font-display font-bold text-foreground leading-tight">Welcome back!</h1>
+            <p className="text-muted-foreground mt-2 text-base md:text-lg">Here's what's happening at Smile Club Mahajanga.</p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button asChild size="sm" className="rounded-lg"><Link href="/volunteers"><Plus /> Add volunteer</Link></Button>
+            <Button asChild size="sm" variant="outline" className="rounded-lg"><Link href="/attendance"><ClipboardCheck /> Record attendance</Link></Button>
+          </div>
         </div>
 
         {/* Stats Grid */}
@@ -65,13 +79,14 @@ export default function Dashboard() {
                 key={stat.title}
                 className={i === 2 ? "sm:col-span-2 lg:col-span-1" : ""}
               >
+                <Link href={stat.href} className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 <Card className="border-border/50 shadow-lg shadow-black/5 hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden relative group h-full">
                   <div className={`absolute top-0 left-0 w-1 h-full bg-gradient-to-b ${stat.color}`} />
                   <CardContent className="p-5 md:p-6">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-xs md:text-sm font-bold text-muted-foreground mb-1 uppercase tracking-wider">{stat.title}</p>
-                        <h3 className="text-2xl md:text-3xl font-display font-bold text-foreground">{loadingVols ? "-" : stat.value}</h3>
+                        {stat.isLoading ? <Skeleton className="h-9 w-24" /> : <h3 className="text-2xl md:text-3xl font-display font-bold text-foreground">{stat.value}</h3>}
                       </div>
                       <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center ${stat.bg} ${stat.text} group-hover:scale-110 transition-transform duration-300 shrink-0`}>
                         <Icon className="w-5 h-5 md:w-6 md:h-6" />
@@ -79,6 +94,7 @@ export default function Dashboard() {
                     </div>
                   </CardContent>
                 </Card>
+                </Link>
               </motion.div>
             );
           })}
@@ -100,7 +116,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent className="p-0 flex-1">
               {loadingEvents ? (
-                <div className="p-12 text-center text-muted-foreground italic">Loading...</div>
+                <div className="p-5 space-y-4"><Skeleton className="h-14 w-full" /><Skeleton className="h-14 w-full" /><Skeleton className="h-14 w-full" /></div>
               ) : upComingEvents.length === 0 ? (
                 <div className="p-12 text-center flex flex-col items-center justify-center h-full">
                   <CalendarIcon className="w-12 h-12 text-muted mb-3 opacity-20" />
@@ -143,7 +159,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent className="p-0 flex-1">
               {loadingRankings ? (
-                <div className="p-12 text-center text-muted-foreground italic">Loading...</div>
+                <div className="p-5 space-y-4"><Skeleton className="h-14 w-full" /><Skeleton className="h-14 w-full" /><Skeleton className="h-14 w-full" /></div>
               ) : topVolunteers.length === 0 ? (
                 <div className="p-12 text-center flex flex-col items-center justify-center h-full">
                   <Award className="w-12 h-12 text-muted mb-3 opacity-20" />

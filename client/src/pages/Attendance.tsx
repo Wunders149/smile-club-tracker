@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { CheckSquare, Save, Users, AlertCircle, Printer, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { useReactToPrint } from "react-to-print";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Attendance() {
   const { data: events, isLoading: loadingEvents } = useEvents();
@@ -89,6 +90,12 @@ export default function Attendance() {
     excused: 'bg-yellow-100 text-yellow-800 border-yellow-200',
     absent: 'bg-red-100 text-red-800 border-red-200'
   };
+  const statusOptions = [
+    { value: 'on_time', label: 'On time' },
+    { value: 'late', label: 'Late' },
+    { value: 'excused', label: 'Excused' },
+    { value: 'absent', label: 'Absent' },
+  ];
 
   return (
     <Layout>
@@ -135,7 +142,7 @@ export default function Attendance() {
                   <p>Select an event above to load the volunteer list.</p>
                 </div>
               ) : loadingVols || loadingAttendances ? (
-                <div className="py-12 text-center text-muted-foreground">Loading roster...</div>
+                <div className="p-4 sm:p-6 space-y-4">{Array.from({ length: 6 }).map((_, index) => <div key={index} className="flex items-center justify-between gap-4"><div className="flex items-center gap-4"><Skeleton className="h-10 w-10 rounded-full" /><div className="space-y-2"><Skeleton className="h-4 w-32" /><Skeleton className="h-3 w-24" /></div></div><div className="flex gap-1"><Skeleton className="h-8 w-16" /><Skeleton className="h-8 w-16" /><Skeleton className="h-8 w-16" /><Skeleton className="h-8 w-16" /></div></div>)}</div>
               ) : !volunteers?.length ? (
                 <div className="py-12 text-center text-muted-foreground">No volunteers found.</div>
               ) : (
@@ -179,10 +186,11 @@ export default function Attendance() {
 
                     <div className="flex items-center gap-2 flex-wrap pt-2">
                       <span className="text-xs font-bold text-muted-foreground mr-2 uppercase tracking-tight">Bulk Actions:</span>
-                      <Button variant="outline" size="sm" onClick={() => updateAll('on_time')} className="rounded-lg h-8 text-[10px] uppercase font-bold tracking-wider">✓ On Time</Button>
-                      <Button variant="outline" size="sm" onClick={() => updateAll('late')} className="rounded-lg h-8 text-[10px] uppercase font-bold tracking-wider">⏱ Late</Button>
-                      <Button variant="outline" size="sm" onClick={() => updateAll('excused')} className="rounded-lg h-8 text-[10px] uppercase font-bold tracking-wider">ℹ Excused</Button>
-                      <Button variant="outline" size="sm" onClick={() => updateAll('absent')} className="rounded-lg h-8 text-[10px] uppercase font-bold tracking-wider">✗ Absent</Button>
+                      {statusOptions.map(option => (
+                        <Button key={option.value} variant="outline" size="sm" onClick={() => updateAll(option.value)} className="rounded-lg h-8 text-[10px] uppercase font-bold tracking-wider">
+                          {option.label}
+                        </Button>
+                      ))}
                     </div>
                   </div>
 
@@ -204,9 +212,9 @@ export default function Attendance() {
                               </div>
                             </div>
                             <div className="flex gap-1">
-                              {['on_time', 'late', 'excused', 'absent'].map(s => (
-                                <button key={s} onClick={() => updateStatus(vol.id, s)} className={`px-2 py-1 rounded text-xs font-semibold transition-all ${status === s ? statusColors[s] : 'bg-muted text-muted-foreground'}`}>
-                                  {s === 'on_time' ? '✓' : s === 'late' ? '⏱' : s === 'excused' ? 'ℹ' : '✗'}
+                              {statusOptions.map(option => (
+                                <button key={option.value} type="button" aria-label={`${option.label} for ${vol.fullName}`} aria-pressed={status === option.value} onClick={() => updateStatus(vol.id, option.value)} className={`px-2.5 py-1.5 rounded text-xs font-semibold transition-all ${status === option.value ? statusColors[option.value] : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}>
+                                  {option.label}
                                 </button>
                               ))}
                             </div>
@@ -338,7 +346,7 @@ export default function Attendance() {
             {/* Instructions/Legend */}
             <div className="mb-4 text-xs border border-gray-300 p-2 bg-gray-50">
               <p className="font-bold mb-1">Attendance Status Legend:</p>
-              <p>✓ = On Time (5 pts) | ⏱ = Late (3 pts) | ℹ = Excused (1 pt) | ✗ = Absent (0 pts)</p>
+              <p>On time = 5 pts | Late = 3 pts | Excused = 1 pt | Absent = 0 pts</p>
             </div>
 
             {/* Multi-page Roster Table */}

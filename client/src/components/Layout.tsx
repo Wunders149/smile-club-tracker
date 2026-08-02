@@ -32,6 +32,7 @@ const NAV_ITEMS = [
 
 export function Layout({ children }: { children: ReactNode }) {
   const [location] = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -70,14 +71,14 @@ export function Layout({ children }: { children: ReactNode }) {
     </Button>
   );
 
-  const NavLinks = () => (
+  const NavLinks = ({ onNavigate }: { onNavigate?: () => void } = {}) => (
     <div className="space-y-2 py-4">
       {NAV_ITEMS.map((item) => {
         const isActive = location === item.href || (item.href !== "/" && location.startsWith(item.href));
         const Icon = item.icon;
         
         return (
-          <Link key={item.href} href={item.href} 
+          <Link key={item.href} href={item.href} onClick={onNavigate}
             className={`
               flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
               ${isActive 
@@ -119,9 +120,9 @@ export function Layout({ children }: { children: ReactNode }) {
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-card/80 backdrop-blur-md border-b border-border/50 z-50 flex items-center justify-between px-4">
         <img src="/smile-club-logo.png?v=20260802" alt="Smile Club Mahajanga" className="h-[53px] w-auto object-contain" />
         
-        <Sheet>
+        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" aria-label="Open navigation menu">
               <Menu className="w-6 h-6" />
             </Button>
           </SheetTrigger>
@@ -129,7 +130,7 @@ export function Layout({ children }: { children: ReactNode }) {
             <div className="mb-8 pt-4">
               <img src="/smile-club-logo.png?v=20260802" alt="Smile Club Mahajanga" className="h-[64px] w-auto object-contain" />
             </div>
-            <NavLinks />
+            <NavLinks onNavigate={() => setMobileMenuOpen(false)} />
             <SyncButton />
           </SheetContent>
         </Sheet>
