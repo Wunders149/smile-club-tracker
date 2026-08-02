@@ -6,7 +6,7 @@ import {
   type InsertAttendance, type Attendance, type RankingRecord, type StatisticsData,
   getAttendancePoints
 } from "@shared/schema";
-import { eq, sql, desc } from "drizzle-orm";
+import { asc, and, eq, inArray, sql } from "drizzle-orm";
 import { sendAttendanceEmail } from "./email";
 
 export interface IStorage {
@@ -38,7 +38,7 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   // --- Volunteers ---
   async getVolunteers(): Promise<Volunteer[]> {
-    return await db.select().from(volunteers);
+    return await db.select().from(volunteers).orderBy(asc(volunteers.fullName));
   }
 
   async getVolunteer(id: number): Promise<Volunteer | undefined> {
@@ -86,7 +86,7 @@ export class DatabaseStorage implements IStorage {
 
   // --- Events ---
   async getEvents(): Promise<Event[]> {
-    return await db.select().from(events);
+    return await db.select().from(events).orderBy(asc(events.date));
   }
 
   async getEvent(id: number): Promise<Event | undefined> {
@@ -108,31 +108,51 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteEvent(id: number): Promise<void> {
-    await db.delete(events).where(eq(events.id, id));
+    await db.transaction(async (tx) => {
+      await tx.delete(attendances).where(eq(attendances.eventId, id));
+      await tx.delete(events).where(eq(events.id, id));
+    });
   }
 
   // --- Attendances ---
   async getAttendancesByEvent(eventId: number): Promise<Attendance[]> {
-    return await db.select().from(attendances).where(eq(attendances.eventId, eventId));
+    return await db.select().from(attendances)
+      .where(eq(attendances.eventId, eventId))
+      .orderBy(asc(attendances.volunteerId));
   }
 
   async recordAttendances(eventId: number, records: { volunteerId: number; status: string }[]): Promise<boolean> {
-    // Delete existing records for this event
-    await db.delete(attendances).where(eq(attendances.eventId, eventId));
-    
-    // Insert new records
-    if (records.length > 0) {
-      const inserts = records.map(r => ({
-        eventId,
-        volunteerId: r.volunteerId,
-        status: r.status
-      }));
-      await db.insert(attendances).values(inserts);
+    const event = await this.getEvent(eventId);
+    if (!event) throw new Error("Event not found");
+
+    const volunteerIds = [...new Set(records.map(record => record.volunteerId))];
+    if (volunteerIds.length > 0) {
+      const existingVolunteers = await db.select({ id: volunteers.id })
+        .from(volunteers)
+        .where(inArray(volunteers.id, volunteerIds));
+      if (existingVolunteers.length !== volunteerIds.length) {
+        throw new Error("One or more volunteers were not found");
+      }
     }
+
+    const validStatuses = new Set(["on_time", "late", "excused", "absent"]);
+    if (records.some(record => !validStatuses.has(record.status))) {
+      throw new Error("Invalid attendance status");
+    }
+
+    await db.transaction(async (tx) => {
+      await tx.delete(attendances).where(eq(attendances.eventId, eventId));
+      if (records.length > 0) {
+        await tx.insert(attendances).values(records.map(record => ({
+          eventId,
+          volunteerId: record.volunteerId,
+          status: record.status,
+        })));
+      }
+    });
     
     // Send email to those who attended (not absent)
-    const event = await this.getEvent(eventId);
-    if (event) {
+    {
       const year = new Date(event.date).getFullYear();
       const rankings = await this.getVolunteerRankings(year);
       
@@ -153,32 +173,28 @@ export class DatabaseStorage implements IStorage {
 
   // --- Rankings ---
   async getVolunteerRankings(year?: number): Promise<RankingRecord[]> {
-    const allVolunteers = await db.select().from(volunteers);
     const targetYear = year || new Date().getFullYear();
-    
-    // Get all events for the target year
-    const yearEvents = await db.select().from(events);
-    const yearEventIds = yearEvents
-      .filter(e => new Date(e.date).getFullYear() === targetYear)
-      .map(e => e.id);
+    const points = sql<number>`coalesce(sum(case
+      when ${events.id} is not null and ${attendances.status} = 'on_time' then 5
+      when ${events.id} is not null and ${attendances.status} = 'late' then 3
+      when ${events.id} is not null and ${attendances.status} = 'excused' then 1
+      else 0
+    end), 0)::int`;
 
-    const rankings: RankingRecord[] = [];
-    for (const vol of allVolunteers) {
-      const volAttendances = await db.select().from(attendances).where(eq(attendances.volunteerId, vol.id));
-      
-      // Only count attendances for events that happened in the target year
-      const filteredAttendances = volAttendances.filter(a => yearEventIds.includes(a.eventId));
-      
-      const totalPoints = filteredAttendances.reduce((sum, att) => sum + getAttendancePoints(att.status as any), 0);
-      
-      // Only include volunteers who have at least one attendance record in that year, 
-      // or if it's the current year include everyone
-      if (totalPoints > 0 || targetYear === new Date().getFullYear()) {
-        rankings.push({ volunteer: vol, totalPoints });
-      }
-    }
-    
-    return rankings.sort((a, b) => b.totalPoints - a.totalPoints);
+    const rows = await db.select({ volunteer: volunteers, totalPoints: points })
+      .from(volunteers)
+      .leftJoin(attendances, eq(attendances.volunteerId, volunteers.id))
+      .leftJoin(events, and(
+        eq(events.id, attendances.eventId),
+        sql`extract(year from ${events.date}) = ${targetYear}`,
+      ))
+      .groupBy(volunteers.id)
+      .orderBy(sql`${points} desc`, asc(volunteers.fullName));
+
+    const currentYear = new Date().getFullYear();
+    return rows
+      .filter(row => targetYear === currentYear || row.totalPoints > 0)
+      .map(row => ({ volunteer: row.volunteer, totalPoints: Number(row.totalPoints) }));
   }
 
   // --- Statistics ---

@@ -67,6 +67,7 @@ export async function registerRoutes(
     try {
       const input = api.volunteers.update.input.parse(req.body);
       const item = await storage.updateVolunteer(Number(req.params.id), input);
+      if (!item) return res.status(404).json({ message: 'Volunteer not found' });
       createBackup().catch(err => console.error("Auto-backup failed:", err));
       res.json(item);
     } catch (err) {
@@ -81,6 +82,8 @@ export async function registerRoutes(
   });
 
   app.delete(api.volunteers.delete.path, async (req, res) => {
+    const existing = await storage.getVolunteer(Number(req.params.id));
+    if (!existing) return res.status(404).json({ message: 'Volunteer not found' });
     await storage.deleteVolunteer(Number(req.params.id));
     createBackup().catch(err => console.error("Auto-backup failed:", err));
     res.status(204).send();
@@ -131,6 +134,7 @@ export async function registerRoutes(
       });
       const input = bodySchema.parse(req.body);
       const item = await storage.updateEvent(Number(req.params.id), input);
+      if (!item) return res.status(404).json({ message: 'Event not found' });
       createBackup().catch(err => console.error("Auto-backup failed:", err));
       res.json(item);
     } catch (err) {
@@ -145,6 +149,8 @@ export async function registerRoutes(
   });
 
   app.delete(api.events.delete.path, async (req, res) => {
+    const existing = await storage.getEvent(Number(req.params.id));
+    if (!existing) return res.status(404).json({ message: 'Event not found' });
     await storage.deleteEvent(Number(req.params.id));
     createBackup().catch(err => console.error("Auto-backup failed:", err));
     res.status(204).send();
@@ -169,6 +175,9 @@ export async function registerRoutes(
           message: err.errors[0].message,
           field: err.errors[0].path.join('.'),
         });
+      }
+      if (err instanceof Error && ["Event not found", "One or more volunteers were not found", "Invalid attendance status"].includes(err.message)) {
+        return res.status(400).json({ message: err.message });
       }
       throw err;
     }

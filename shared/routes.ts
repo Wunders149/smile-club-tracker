@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { insertVolunteerSchema, insertEventSchema, volunteers, events, attendances } from './schema';
+import { ATTENDANCE_STATUS, insertVolunteerSchema, insertEventSchema, volunteers, events, attendances } from './schema';
 
 export const errorSchemas = {
   validation: z.object({
@@ -128,7 +128,7 @@ export const api = {
         eventId: z.number(),
         records: z.array(z.object({
           volunteerId: z.number(),
-          status: z.string(),
+          status: z.enum(ATTENDANCE_STATUS),
         })),
       }),
       responses: {

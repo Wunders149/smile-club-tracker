@@ -1,4 +1,4 @@
-import { pgTable, text, serial, timestamp, integer, boolean } from "drizzle-orm/pg-core";
+import { index, pgTable, text, serial, timestamp, integer } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -68,7 +68,9 @@ export const events = pgTable("events", {
   speaker: text("speaker"),
   endTime: timestamp("end_time"),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (table) => ({
+  dateIdx: index("events_date_idx").on(table.date),
+}));
 
 export const attendances = pgTable("attendances", {
   id: serial("id").primaryKey(),
@@ -76,7 +78,10 @@ export const attendances = pgTable("attendances", {
   eventId: integer("event_id").notNull(),
   status: text("status").default("absent"), // on_time, late, excused, absent
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (table) => ({
+  eventIdx: index("attendances_event_id_idx").on(table.eventId),
+  volunteerIdx: index("attendances_volunteer_id_idx").on(table.volunteerId),
+}));
 
 export const volunteersRelations = relations(volunteers, ({ many }) => ({
   attendances: many(attendances),
